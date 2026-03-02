@@ -1,4 +1,4 @@
-# 🚀 Ingeniería de Software I - Periodo 2026-10
+# 🚀 Ingeniería de Software I - Periodo 2026-1
 
 > *"Si un enfoque no produce mejor software más rápido, no es ingeniería."*
 
@@ -24,7 +24,8 @@ Ingeniero y Arquitecto de Software con más de 25 años de experiencia conectand
 - 📧 **Contacto:** [a.barrera@javeriana.edu.co](mailto:a.barrera@javeriana.edu.co)
 - 📱 **WhatsApp:** [301 755 9026](https://wa.me/573017559026) (7:00 am – 9:00 pm)
 - 🏢 **Atención:** L–V, 4:00 pm – 5:00 pm (Previa cita)
-- 📄 **Perfil Detallado:** [abarrera.md](./abarrera.md)
+- 📄 **Perfil Detallado:** [abarrera.md](./integrantes/abarrera.md)
+- 🐙 **GitHub:** (<https://github.com/andres-barrera1980>
 
 ---
 
@@ -67,6 +68,7 @@ Trabajaremos en equipos de **3 estudiantes** para desarrollar un software funcio
 - [Syllabus en Brightspace](#) (Link a la plataforma)
 - [Guía del Reto Inicial: Fibonacci](./README.md#9-reto-inicial-serie-fibonacci)
 - [Estructura del Proyecto](./README.md#11-proyecto-del-curso)
+- [Integrantes](./integrantes/integrantes.md)
 
 ---
 *Usa este repositorio para seguir el progreso de tus laboratorios y entregas oficiales.*

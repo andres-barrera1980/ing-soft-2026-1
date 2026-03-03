@@ -1,6 +1,6 @@
 package co.edu.javeriana.ingsoft.katas.easy.calc.operaciones.base;
 
-public class DivisionSegura {
+public abstract class DivisionSegura extends OperacionBinaria {
 
     public double dividir(double numerador, double divisor) {
 

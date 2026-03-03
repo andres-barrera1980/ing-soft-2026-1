@@ -29,4 +29,4 @@ Requieren un único valor de entrada:
 
 Este proyecto está desarrollado en **Java 21**, aplicando principios fundamentales de **Programación Orientada a Objetos (OOP)**. La lógica de negocio se encuentra desacoplada de la interfaz de consola, utilizando polimorfismo para gestionar las distintas operaciones matemáticas de manera extensible y mantenible.
 
-La calculadora solicita al usuario el tipo de operación deseada, pide los operandos necesarios y muestra el resultado final en la terminal, manejando errores comunes como la división por cero o raíces de números negativos,.
+La calculadora solicita al usuario el tipo de operación deseada, pide los operandos necesarios y muestra el resultado final en la terminal, manejando errores comunes como la división por cero o raíces de números negativos,. 

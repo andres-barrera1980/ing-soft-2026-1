@@ -1,8 +1,8 @@
 package co.edu.javeriana.ingsoft.katas.easy.calc.operaciones.base;
 
-public class Logaritmo {
+public class Logaritmo extends OperacionUnaria{
 
-    public Double realizarOperacion(Double numero) {
+    public Integer realizarOperacion(Integer numero) {
 
         if (numero == null) {
             throw new IllegalArgumentException("El número no puede ser nulo");
@@ -12,6 +12,6 @@ public class Logaritmo {
             throw new ArithmeticException("El logaritmo solo está definido para números positivos");
         }
 
-        return Math.log10(numero);
+        return (int) Math.log10(numero);
     }
 }

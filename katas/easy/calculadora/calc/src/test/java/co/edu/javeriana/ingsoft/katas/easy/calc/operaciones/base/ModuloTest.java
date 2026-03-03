@@ -9,8 +9,8 @@ class ModuloTest {
     private final Modulo modulo = new Modulo();
 
     @Test
-    void realizarOperacionSumaExitosa() {
-        assertEquals(5, modulo.realizarOperacion(2, 3));
+    void realizarOperacionModuloExitosa() {
+        assertEquals(2, modulo.realizarOperacion(2, 3));
     }
 
     @Test
@@ -25,11 +25,11 @@ class ModuloTest {
 
     @Test
     void realizarOperacionOverflowMaximo() {
-        assertThrows(ArithmeticException.class, () -> modulo.realizarOperacion(Integer.MAX_VALUE, 1));
+        assertEquals(0, modulo.realizarOperacion(Integer.MAX_VALUE, 1));
     }
 
     @Test
     void realizarOperacionOverflowMinimo() {
-        assertThrows(ArithmeticException.class, () -> modulo.realizarOperacion(Integer.MIN_VALUE, -1));
+        assertEquals(0, modulo.realizarOperacion(Integer.MIN_VALUE, -1));
     }
 }

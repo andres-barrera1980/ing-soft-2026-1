@@ -10,6 +10,7 @@ class SumaTest {
 
     @Test
     void realizarOperacionSumaExitosa() {
+
         assertEquals(5, suma.realizarOperacion(2, 3));
     }
 

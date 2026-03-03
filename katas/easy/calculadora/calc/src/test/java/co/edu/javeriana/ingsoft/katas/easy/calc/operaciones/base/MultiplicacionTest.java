@@ -1,7 +1,7 @@
 package co.edu.javeriana.ingsoft.katas.easy.calc.operaciones.base;
 
 public class MultiplicacionTest {
-    public int Multiplicar (int a, int b){ //Metodo para multiplicar numeros enteros.
+    public int Multiplicar (int a, int b){ //Metodo para multiplicar numeros enteros
         return a*b;
     }
 }

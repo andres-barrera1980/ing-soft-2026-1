@@ -10,17 +10,24 @@ import java.util.Scanner;
  */
 public class App 
 {
-    public static void main( String[] args )
-    {
+    public static void main(String[] args) {
+
         Scanner sc = new Scanner(System.in);
-        System.out.print("Base: ");     long base = sc.nextLong();
-        System.out.print("Exponente: "); int exp = sc.nextInt();
+        System.out.print("Base: ");
+        int base = sc.nextInt();
+
+        System.out.print("Exponente: ");
+        int exp = sc.nextInt();
 
         try {
-            System.out.println("Resultado: " + Potenciacion.potencia(base, exp));
-        } catch (ArithmeticException e) {
+            Potenciacion p = new Potenciacion();
+            Integer resultado = p.realizarOperacion(base, exp);
+            System.out.println("Resultado: " + resultado);
+        } catch (ArithmeticException | IllegalArgumentException e) {
             System.out.println("Error: " + e.getMessage());
         }
+
+        sc.close();
     }
 
 

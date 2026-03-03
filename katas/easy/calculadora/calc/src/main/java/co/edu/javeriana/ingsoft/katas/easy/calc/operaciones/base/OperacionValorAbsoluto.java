@@ -1,5 +1,5 @@
 package co.edu.javeriana.ingsoft.katas.easy.calc.operaciones.base;
-
+// Samuel Iregui Juan Pablo Suarez
 public class OperacionValorAbsoluto  {
     public Integer realizarOperacion(Integer num) {
         if (num == null) {

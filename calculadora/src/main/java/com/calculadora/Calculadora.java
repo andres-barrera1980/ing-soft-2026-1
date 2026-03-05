@@ -1,3 +1,5 @@
+package com.calculadora;
+
 public class Calculadora {
 
     public static double log10(double x) {

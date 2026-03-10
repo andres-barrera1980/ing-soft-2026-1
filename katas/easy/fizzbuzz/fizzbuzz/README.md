@@ -44,20 +44,23 @@ Implementar la función `calculate(int number)` que devuelve:
 
 La clase principal contiene:
 
-- **Constantes** ([`FizzBuzz.java:6-10`](src/main/java/co/edu/javeriana/ingsoft/kata/fizzbuzz/FizzBuzz.java)):
+- **Constantes** ([`FizzBuzz.java:8-13`](src/main/java/co/edu/javeriana/ingsoft/kata/fizzbuzz/FizzBuzz.java)):
   - `MIN_VALUE = 1`: Valor mínimo permitido
   - `MAX_VALUE = 100`: Valor máximo permitido
   - `FIZZ_NUMBER = 3`: Divisor para "Fizz"
   - `BUZZ_NUMBER = 5`: Divisor para "Buzz"
   - `FIZZ = "Fizz"`: Literal para Fizz
+  - `BUZZ = "Buzz"`: Literal para Buzz (extraído como constante)
 
-- **Método `calculate(int number)`** ([`FizzBuzz.java:12-29`](src/main/java/co/edu/javeriana/ingsoft/kata/fizzbuzz/FizzBuzz.java)):
+- **Método `calculate(int number)`** ([`FizzBuzz.java:15-31`](src/main/java/co/edu/javeriana/ingsoft/kata/fizzbuzz/FizzBuzz.java)):
   - Valida que el número esté dentro del rango `[MIN_VALUE, MAX_VALUE]`
   - Retorna el número como string si no es divisible por 3 ni 5
   - Concatena "Fizz" si es divisible por 3
   - Concatena "Buzz" si es divisible por 5
 
-- **Método `print()`** ([`FizzBuzz.java:31-35`](src/main/java/co/edu/javeriana/ingsoft/kata/fizzbuzz/FizzBuzz.java)):
+- **Métodos `print()`** ([`FizzBuzz.java:33-41`](src/main/java/co/edu/javeriana/ingsoft/kata/fizzbuzz/FizzBuzz.java)):
+  - `print()`: Imprime en `System.out` (sin parámetros)
+  - `print(PrintStream output)`: Acepta un `PrintStream` inyectado para testabilidad
   - Itera e imprime el resultado de `calculate()` para todos los números en el rango
 
 ### Tests: `FizzBuzzTest.java`
@@ -66,12 +69,20 @@ Los tests cubren los siguientes casos (ver [`FizzBuzzTest.java`](src/test/java/c
 
 | Test | Línea | Propósito |
 |------|-------|-----------|
-| `testMinDomainRange()` | [12-18](src/test/java/co/edu/javeriana/ingsoft/kata/fizzbuzz/FizzBuzzTest.java) | Verifica excepción para número < 1 |
-| `testMaxDomainRange()` | [21-28](src/test/java/co/edu/javeriana/ingsoft/kata/fizzbuzz/FizzBuzzTest.java) | Verifica excepción para número > 100 |
-| `testFizz()` | [30-40](src/test/java/co/edu/javeriana/ingsoft/kata/fizzbuzz/FizzBuzzTest.java) | Valida "Fizz" para múltiplos de 3 |
-| `testBuzz()` | [42-52](src/test/java/co/edu/javeriana/ingsoft/kata/fizzbuzz/FizzBuzzTest.java) | Valida "Buzz" para múltiplos de 5 |
-| `testFizzBuzz()` | [54-64](src/test/java/co/edu/javeriana/ingsoft/kata/fizzbuzz/FizzBuzzTest.java) | Valida "FizzBuzz" para múltiplos de 15 |
-| `testNoFizzBuzz()` | [66-76](src/test/java/co/edu/javeriana/ingsoft/kata/fizzbuzz/FizzBuzzTest.java) | Valida número como string |
+| `testMinDomainRange()` | [20-25](src/test/java/co/edu/javeriana/ingsoft/kata/fizzbuzz/FizzBuzzTest.java) | Verifica excepción para número < 1 |
+| `testMaxDomainRange()` | [27-33](src/test/java/co/edu/javeriana/ingsoft/kata/fizzbuzz/FizzBuzzTest.java) | Verifica excepción para número > 100 |
+| `testOne()` | [79-88](src/test/java/co/edu/javeriana/ingsoft/kata/fizzbuzz/FizzBuzzTest.java) | Valida "1" para entrada 1 |
+| `testTwo()` | [90-99](src/test/java/co/edu/javeriana/ingsoft/kata/fizzbuzz/FizzBuzzTest.java) | Valida "2" para entrada 2 |
+| `testThree()` | [101-110](src/test/java/co/edu/javeriana/ingsoft/kata/fizzbuzz/FizzBuzzTest.java) | Valida "Fizz" para entrada 3 |
+| `testFizz()` | [35-44](src/test/java/co/edu/javeriana/ingsoft/kata/fizzbuzz/FizzBuzzTest.java) | Valida "Fizz" para múltiplos de 3 (27) |
+| `testFive()` | [112-121](src/test/java/co/edu/javeriana/ingsoft/kata/fizzbuzz/FizzBuzzTest.java) | Valida "Buzz" para entrada 5 |
+| `testSix()` | [123-132](src/test/java/co/edu/javeriana/ingsoft/kata/fizzbuzz/FizzBuzzTest.java) | Valida "Fizz" para entrada 6 |
+| `testBuzz()` | [46-55](src/test/java/co/edu/javeriana/ingsoft/kata/fizzbuzz/FizzBuzzTest.java) | Valida "Buzz" para múltiplos de 5 (10) |
+| `testNine()` | [134-143](src/test/java/co/edu/javeriana/ingsoft/kata/fizzbuzz/FizzBuzzTest.java) | Valida "Fizz" para entrada 9 |
+| `testTen()` | [145-154](src/test/java/co/edu/javeriana/ingsoft/kata/fizzbuzz/FizzBuzzTest.java) | Valida "Buzz" para entrada 10 |
+| `testFizzBuzz()` | [57-66](src/test/java/co/edu/javeriana/ingsoft/kata/fizzbuzz/FizzBuzzTest.java) | Valida "FizzBuzz" para múltiplos de 15 (15) |
+| `testThirty()` | [156-165](src/test/java/co/edu/javeriana/ingsoft/kata/fizzbuzz/FizzBuzzTest.java) | Valida "FizzBuzz" para entrada 30 |
+| `testNoFizzBuzz()` | [68-77](src/test/java/co/edu/javeriana/ingsoft/kata/fizzbuzz/FizzBuzzTest.java) | Valida número como string (4)
 
 ## Ejecución de tests
 
@@ -90,14 +101,31 @@ mvn exec:java -Dexec.mainClass="co.edu.javeriana.ingsoft.kata.App"
 - Mantén las pruebas pequeñas y enfocadas.
 - Evita implementar todos los casos antes de tener tests.
 - Refactoriza solo cuando los tests estén verdes.
-- La lógica usa constantes declaradas en la clase para mejorar mantenibilidad (ver [`FizzBuzz.java:6-10`](src/main/java/co/edu/javeriana/ingsoft/kata/fizzbuzz/FizzBuzz.java)).
+- La lógica usa constantes declaradas en la clase para mejorar mantenibilidad (ver [`FizzBuzz.java:8-13`](src/main/java/co/edu/javeriana/ingsoft/kata/fizzbuzz/FizzBuzz.java)).
 - El patrón de concatenación en `calculate()` permite agregar fácilmente más divisores en el futuro.
+- El método `print(PrintStream)` permite inyectar salida para testing sin depender de `System.out`.
 
-## Commits sugeridos
+## Historial de mejoras (Refactoring)
 
-1. Implementación inicial con tests unitarios
-2. Refactor de constantes para mejor legibilidad
-3. Extensión con nuevos casos de prueba si es necesario
+Se aplicaron mejoras progresivas en dos tiers:
+
+### TIER 1 - Mejoras críticas de calidad
+1. **Refactorizar tests con `@BeforeEach`** - Elimina 6 instanciaciones repetidas de FizzBuzz
+2. **Cambiar `Integer` a `int`** en constantes - Mejor eficiencia y sigue best practices
+3. **Corregir mensaje de error** - Ahora usa constantes `MIN_VALUE` y `MAX_VALUE` en lugar de valores hardcodeados
+
+### TIER 2 - Mejoras de mantenibilidad y testabilidad
+1. **Extraer constante `BUZZ`** - Por consistencia con `FIZZ`
+2. **Hacer `print()` testeable** - Crear sobrecarga `print(PrintStream)` para inyectar salida
+3. **Ampliar cobertura de tests** - Agregar test cases para casos base: 1, 2, 3, 5, 6, 9, 10, 30
+
+## Commits sugeridos / Realizados
+
+**Commits de mejoras aplicadas:**
+
+1. `08fb908` - Refactor: eliminar instanciación repetida con @BeforeEach
+2. `969e19f` - Refactor: cambiar Integer→int, corregir mensaje error, eliminar comentarios
+3. `2003640` - Refactor: extraer constante BUZZ y hacer print() testeable con 8 tests adicionales
 
 ## Dependencias
 

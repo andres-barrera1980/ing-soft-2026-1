@@ -2,35 +2,39 @@ package co.edu.javeriana.ingsoft.kata.fizzbuzz;
 
 
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class FizzBuzzTest {
 
+    private FizzBuzz fizzBuzz;
+
+    @BeforeEach
+    void setUp() {
+        fizzBuzz = new FizzBuzz();
+    }
+
     @Test
     void testMinDomainRange(){
         //Arrange
-        FizzBuzz fizzBuzz = new FizzBuzz();
         int minValue = -1;
-        //Act &&
+        //Act && Assert
         assertThrows(IllegalArgumentException.class, ()-> fizzBuzz.calculate(minValue));
-
     }
 
     @Test
     void testMaxDomainRange(){
         //Arrange
-        FizzBuzz fizzBuzz = new FizzBuzz();
         int minValue = 101;
-        //Act &&
+        //Act && Assert
         assertThrows(IllegalArgumentException.class, ()-> fizzBuzz.calculate(minValue));
     }
 
     @Test
     void testFizz(){
         //Arrange
-        FizzBuzz fizzBuzz = new FizzBuzz();
         int value = 27;
         String expected = "Fizz";
         //Act
@@ -42,7 +46,6 @@ class FizzBuzzTest {
     @Test
     void testBuzz(){
         //Arrange
-        FizzBuzz fizzBuzz = new FizzBuzz();
         int value = 10;
         String expected = "Buzz";
         //Act
@@ -54,7 +57,6 @@ class FizzBuzzTest {
     @Test
     void testFizzBuzz(){
         //Arrange
-        FizzBuzz fizzBuzz = new FizzBuzz();
         int value = 15;
         String expected = "FizzBuzz";
         //Act
@@ -66,7 +68,6 @@ class FizzBuzzTest {
     @Test
     void testNoFizzBuzz(){
         //Arrange
-        FizzBuzz fizzBuzz = new FizzBuzz();
         int value = 4;
         String expected = "4";
         //Act
@@ -74,7 +75,5 @@ class FizzBuzzTest {
         //Assert
         assertEquals(expected, result);
     }
-
-
 
 }

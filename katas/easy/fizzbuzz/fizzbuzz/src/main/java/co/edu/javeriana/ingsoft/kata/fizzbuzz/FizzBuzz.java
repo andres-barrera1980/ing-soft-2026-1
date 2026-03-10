@@ -1,5 +1,7 @@
 package co.edu.javeriana.ingsoft.kata.fizzbuzz;
 
+import java.io.PrintStream;
+
 
 public class FizzBuzz {
 
@@ -8,6 +10,7 @@ public class FizzBuzz {
     public static final int FIZZ_NUMBER = 3;
     public static final int BUZZ_NUMBER = 5;
     public static final String FIZZ = "Fizz";
+    public static final String BUZZ = "Buzz";
 
     public String calculate(int number) {
         if(number < MIN_VALUE || number > MAX_VALUE){
@@ -21,15 +24,19 @@ public class FizzBuzz {
             result = FIZZ;
 
         if(number % BUZZ_NUMBER == 0)
-            result = result.concat("Buzz");
+            result = result.concat(BUZZ);
 
         return result;
 
     }
 
     public void print() {
+        print(System.out);
+    }
+
+    public void print(PrintStream output) {
         for(int i = MIN_VALUE; i <= MAX_VALUE; i++) {
-            System.out.println(calculate(i));
+            output.println(calculate(i));
         }
     }
 }

@@ -76,4 +76,92 @@ class FizzBuzzTest {
         assertEquals(expected, result);
     }
 
+    @Test
+    void testOne(){
+        //Arrange
+        int value = 1;
+        String expected = "1";
+        //Act
+        String result = fizzBuzz.calculate(value);
+        //Assert
+        assertEquals(expected, result);
+    }
+
+    @Test
+    void testTwo(){
+        //Arrange
+        int value = 2;
+        String expected = "2";
+        //Act
+        String result = fizzBuzz.calculate(value);
+        //Assert
+        assertEquals(expected, result);
+    }
+
+    @Test
+    void testThree(){
+        //Arrange
+        int value = 3;
+        String expected = "Fizz";
+        //Act
+        String result = fizzBuzz.calculate(value);
+        //Assert
+        assertEquals(expected, result);
+    }
+
+    @Test
+    void testFive(){
+        //Arrange
+        int value = 5;
+        String expected = "Buzz";
+        //Act
+        String result = fizzBuzz.calculate(value);
+        //Assert
+        assertEquals(expected, result);
+    }
+
+    @Test
+    void testSix(){
+        //Arrange
+        int value = 6;
+        String expected = "Fizz";
+        //Act
+        String result = fizzBuzz.calculate(value);
+        //Assert
+        assertEquals(expected, result);
+    }
+
+    @Test
+    void testNine(){
+        //Arrange
+        int value = 9;
+        String expected = "Fizz";
+        //Act
+        String result = fizzBuzz.calculate(value);
+        //Assert
+        assertEquals(expected, result);
+    }
+
+    @Test
+    void testTen(){
+        //Arrange
+        int value = 10;
+        String expected = "Buzz";
+        //Act
+        String result = fizzBuzz.calculate(value);
+        //Assert
+        assertEquals(expected, result);
+    }
+
+    @Test
+    void testThirty(){
+        //Arrange
+        int value = 30;
+        String expected = "FizzBuzz";
+        //Act
+        String result = fizzBuzz.calculate(value);
+        //Assert
+        assertEquals(expected, result);
+    }
+
 }

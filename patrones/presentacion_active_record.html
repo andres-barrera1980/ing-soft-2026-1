@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Active Record: Arquitectura y Diseño</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@300;400;700&family=Space+Mono&family=Special+Elite&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --paper: #f4f1ea;
+            --ink: #2c3e50;
+            --blueprint-blue: rgba(52, 152, 219, 0.15);
+            --amber: #d35400;
+            --amber-light: rgba(211, 84, 0, 0.1);
+            --danger: #c0392b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--paper);
+            color: var(--ink);
+            font-family: 'Roboto Slab', serif;
+            line-height: 1.6;
+            background-image:
+                linear-gradient(var(--blueprint-blue) 1px, transparent 1px),
+                linear-gradient(90deg, var(--blueprint-blue) 1px, transparent 1px);
+            background-size: 40px 40px;
+            scroll-snap-type: y mandatory;
+            overflow-y: scroll;
+        }
+
+        /* Presentation Slides */
+        section {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 4rem;
+            scroll-snap-align: start;
+            position: relative;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        /* Technical Elements */
+        .corner-stamp {
+            position: absolute;
+            top: 40px;
+            right: 40px;
+            border: 3px solid var(--ink);
+            padding: 10px;
+            font-family: 'Special Elite', cursive;
+            transform: rotate(5deg);
+            opacity: 0.6;
+        }
+
+        .page-number {
+            position: absolute;
+            bottom: 40px;
+            right: 40px;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.8rem;
+        }
+
+        /* Typography */
+        h1 {
+            font-size: 4rem;
+            text-transform: uppercase;
+            border-bottom: 12px solid var(--ink);
+            margin-bottom: 1.5rem;
+        }
+
+        h2 {
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+            text-transform: uppercase;
+            color: var(--amber);
+            border-left: 8px solid var(--ink);
+            padding-left: 20px;
+        }
+
+        h3 {
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+            font-family: 'Space Mono', monospace;
+        }
+
+        p,
+        li {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            max-width: 800px;
+        }
+
+        .mono {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.9rem;
+        }
+
+        /* Blueprint Components */
+        .blueprint-card {
+            background: white;
+            border: 2px solid var(--ink);
+            padding: 2.5rem;
+            box-shadow: 15px 15px 0px rgba(0, 0, 0, 0.05);
+            position: relative;
+        }
+
+        .highlight-box {
+            background: var(--amber-light);
+            border: 2px dashed var(--amber);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        ul {
+            list-style: none;
+            padding-left: 1rem;
+        }
+
+        ul li::before {
+            content: ">>";
+            color: var(--amber);
+            margin-right: 1rem;
+            font-family: 'Space Mono', monospace;
+        }
+
+        /* Grid Layouts */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            align-items: center;
+        }
+
+        /* Decision Table */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: 'Space Mono', monospace;
+            background: white;
+        }
+
+        th,
+        td {
+            border: 2px solid var(--ink);
+            padding: 15px;
+            text-align: left;
+        }
+
+        th {
+            background: var(--ink);
+            color: var(--paper);
+        }
+
+        .active-row {
+            background: var(--amber-light);
+            border: 3px solid var(--amber);
+        }
+
+        /* Scroll Hint */
+        .scroll-hint {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-family: 'Space Mono', monospace;
+            font-size: 0.7rem;
+            opacity: 0.5;
+            animation: blink 2s infinite;
+        }
+
+        @keyframes blink {
+
+            0%,
+            100% {
+                opacity: 0.2;
+            }
+
+            50% {
+                opacity: 0.8;
+            }
+        }
+
+        /* Code Block */
+        pre {
+            background: #1e1e1e;
+            border: 2px solid var(--ink);
+            padding: 1.5rem;
+            overflow-x: auto;
+            font-size: 0.85rem;
+            line-height: 1.5;
+        }
+        pre code {
+            font-family: 'Space Mono', monospace;
+            color: #d4d4d4;
+        }
+        .kw { color: #569cd6; }
+        .tp { color: #4ec9b0; }
+        .cm { color: #6a9955; }
+        .str { color: #ce9178; }
+    </style>
+</head>
+
+<body>
+
+    <!-- Slide 1: Portada -->
+    <section id="slide-1">
+        <div class="corner-stamp">ESPECIFICACIÓN<br>TÉCNICA v2.1</div>
+        <div class="container">
+            <p class="mono">PATRONES DE ARQUITECTURA EMPRESARIAL</p>
+            <h1>Active Record</h1>
+            <p style="font-size: 1.8rem;">El puente entre la Lógica de Dominio y la Persistencia de Datos.</p>
+            <div style="margin-top: 3rem; border-top: 1px solid var(--ink); padding-top: 1rem;">
+                <p class="mono">Expositor: Juan David Rodriguez | Fecha: 2026</p>
+            </div>
+        </div>
+        <div class="scroll-hint">DESLIZA PARA CONTINUAR ▼</div>
+        <div class="page-number">01 / 12</div>
+    </section>
+
+    <!-- Slide 2: Origen -->
+    <section id="slide-2">
+        <div class="container">
+            <h2>Origen y Autoría</h2>
+            <div class="grid-2">
+                <div>
+                    <p>Propuesto formalmente por <strong>Martin Fowler</strong> en su libro seminal de 2003:</p>
+                    <h3 style="color: var(--ink);">"Patterns of Enterprise Application Architecture" (PEAA)</h3>
+                    <p>Fowler identificó este patrón al observar cómo los desarrolladores integraban bases de datos SQL
+                        en lenguajes orientados a objetos de forma rápida y efectiva.</p>
+                </div>
+                <div class="blueprint-card">
+                    <p class="mono">CONTEXTO HISTÓRICO:</p>
+                    <p style="font-size: 1rem;">Surgió como una alternativa potente a los complejos EJB (Enterprise
+                        JavaBeans) de la época, priorizando la <strong>simplicidad</strong> y la
+                        <strong>cohesión</strong>.
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="page-number">02 / 12</div>
+    </section>
+
+    <!-- Slide 3: ¿Qué es? -->
+    <section id="slide-3">
+        <div class="container">
+            <h2>¿Qué es exactamente?</h2>
+            <div class="blueprint-card">
+                <p style="font-size: 1.5rem; font-style: italic;">
+                    "Un objeto que envuelve una fila en una tabla o vista de base de datos, encapsula el acceso a la
+                    base de datos y añade lógica de dominio sobre esos datos."
+                </p>
+                <div class="highlight-box">
+                    <h3 class="mono">Diagrama: Isomorfismo Active Record</h3>
+                    <div style="display: flex; gap: 1rem; align-items: stretch; margin-top: 1rem;">
+                        <div style="flex: 1; border: 2px solid var(--ink); padding: 0.8rem; background: white;">
+                            <p class="mono" style="text-align: center; font-weight: bold; font-size: 0.85rem;">TABLA SQL</p>
+                            <hr style="margin: 0.5rem 0;">
+                            <table style="font-size: 0.7rem; width: 100%; margin: 0;">
+                                <tr><th style="width:33%; padding: 4px;">ID</th><th style="width:33%; padding: 4px;">NAME</th><th style="width:34%; padding: 4px;">STATUS</th></tr>
+                                <tr><td style="padding: 4px;">1</td><td style="padding: 4px;">Juan</td><td style="padding: 4px;">active</td></tr>
+                            </table>
+                            <p class="mono" style="text-align: center; margin-top: 0.8rem; font-size: 0.7rem; color: var(--amber);"> ── fila → objeto ──</p>
+                        </div>
+                        <div style="display: flex; align-items: center; font-size: 2rem; color: var(--amber);">→</div>
+                        <div style="flex: 2; border: 2px solid var(--amber); padding: 0.8rem; background: white;">
+                            <p class="mono" style="text-align: center; font-weight: bold; font-size: 0.85rem; color: var(--amber);">ACTIVE RECORD: Customer</p>
+                            <hr style="margin: 0.5rem 0;">
+                            <div style="border: 1px solid var(--ink); padding: 0.4rem; margin-bottom: 0.3rem;">
+                                <p class="mono" style="font-size: 0.7rem;"><strong>DATOS:</strong> id, name, status</p>
+                            </div>
+                            <div style="border: 1px solid var(--ink); padding: 0.4rem; margin-bottom: 0.3rem;">
+                                <p class="mono" style="font-size: 0.7rem;"><strong>PERSISTENCIA:</strong> find(), insert(), update()</p>
+                            </div>
+                            <div style="border: 2px solid var(--amber); padding: 0.4rem; background: var(--amber-light);">
+                                <p class="mono" style="font-size: 0.7rem;"><strong style="color: var(--amber);">LÓGICA:</strong> isPremium(), calcularDescuento()</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <p>En Active Record, <strong>los datos y el comportamiento viven juntos</strong>. No hay una separación
+                    estricta entre "el que guarda" y "lo que se guarda".</p>
+            </div>
+        </div>
+        <div class="page-number">03 / 12</div>
+    </section>
+
+    <!-- Slide 4: Métodos Estándar -->
+    <section id="slide-4">
+        <div class="container">
+            <h2>Los 6 Métodos Estándar</h2>
+            <p>Según el libro PEAA, una clase Active Record típica debe implementar:</p>
+            <div class="grid-2">
+                <div class="blueprint-card">
+                    <ul class="mono">
+                        <li><strong>1. Constructor (de fila SQL):</strong> Crea instancia desde un ResultSet.</li>
+                        <li><strong>2. Constructor (de inserción):</strong> Prepara un objeto nuevo vacío.</li>
+                        <li><strong>3. Finders Estáticos:</strong> Encapsulan SELECTs (ej. findBy(id)).</li>
+                    </ul>
+                </div>
+                <div class="blueprint-card">
+                    <ul class="mono">
+                        <li><strong>4. Persistence Methods:</strong> Métodos de instancia para INSERT/UPDATE.</li>
+                        <li><strong>5. Data Accessors:</strong> Getters y Setters para cada columna.</li>
+                        <li><strong>6. Domain Logic:</strong> La "corteza" del negocio sobre los datos.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="page-number">04 / 12</div>
+    </section>
+
+    <!-- Slide 5: Ejemplo en Java -->
+    <section id="slide-code" style="padding: 2rem 4rem; overflow-y: auto;">
+        <div class="container">
+            <h2 style="margin-bottom: 1rem; font-size: 2rem;">Active Record en Java</h2>
+            <p style="margin-bottom: 0.8rem; font-size: 1rem;">Implementación de los 6 métodos estándar en la clase <span class="mono">Customer</span>:</p>
+            <div class="blueprint-card" style="padding: 0.8rem;">
+                <pre style="padding: 0.8rem; font-size: 0.7rem; line-height: 1.3; margin: 0;"><code><span class="kw">public class</span> <span class="tp">Customer</span> {
+    <span class="kw">private</span> <span class="tp">int</span> id;
+    <span class="kw">private</span> <span class="tp">String</span> name;
+    <span class="kw">private</span> <span class="tp">String</span> status;
+    <span class="cm">// 1. Constructor desde fila SQL</span>
+    <span class="kw">public</span> <span class="fn">Customer</span>(<span class="tp">ResultSet</span> rs) <span class="kw">throws</span> <span class="tp">SQLException</span> {
+        <span class="kw">this</span>.id = rs.getInt(<span class="str">"id"</span>);
+        <span class="kw">this</span>.name = rs.getString(<span class="str">"name"</span>);
+        <span class="kw">this</span>.status = rs.getString(<span class="str">"status"</span>);
+    }
+    <span class="cm">// 2. Constructor para nuevo registro</span>
+    <span class="kw">public</span> <span class="fn">Customer</span>(<span class="tp">String</span> name, <span class="tp">String</span> status) {
+        <span class="kw">this</span>.name = name; <span class="kw">this</span>.status = status;
+    }
+    <span class="cm">// 3. Finder estatico</span>
+    <span class="kw">public static</span> <span class="tp">Customer</span> <span class="fn">find</span>(<span class="tp">int</span> id) {
+        <span class="tp">String</span> sql = <span class="str">"SELECT * FROM customers WHERE id = ?"</span>;
+        <span class="cm">// ... JDBC query ...</span>
+    }
+    <span class="cm">// 4a. INSERT / 4b. UPDATE</span>
+    <span class="kw">public</span> <span class="tp">Long</span> <span class="fn">insert</span>() { <span class="cm">/* ... */</span> }
+    <span class="kw">public void</span> <span class="fn">update</span>() { <span class="cm">/* ... */</span> }
+    <span class="cm">// 5. Data Accessors</span>
+    <span class="kw">public</span> <span class="tp">String</span> <span class="fn">getName</span>() { <span class="kw">return</span> name; }
+    <span class="kw">public void</span> <span class="fn">setName</span>(<span class="tp">String</span> n) { name = n; }
+    <span class="cm">// 6. Domain Logic</span>
+    <span class="kw">public boolean</span> <span class="fn">isPremium</span>() {
+        <span class="kw">return</span> <span class="str">"premium"</span>.equals(status);
+    }
+}</code></pre>
+            </div>
+        </div>
+        <div class="page-number">05 / 12</div>
+    </section>
+
+    <!-- Slide 6: ¿Para qué se usa? -->
+    <section id="slide-5">
+        <div class="container">
+            <h2>¿Para qué se utiliza?</h2>
+            <div class="grid-2">
+                <ul>
+                    <li><strong>Prototipado Rápido:</strong> Cuando el tiempo de mercado es crítico y la lógica no es
+                        excesivamente compleja.</li>
+                    <li><strong>Aplicaciones centradas en Datos:</strong> Sistemas donde la estructura de la aplicación
+                        refleja casi perfectamente la base de datos.</li>
+                    <li><strong>Validaciones de Registro Único:</strong> Operaciones que solo requieren la información
+                        de una fila.</li>
+                    <li><strong>Evolución de Scripts:</strong> Para organizar código que ha crecido demasiado usando el
+                        patrón <em>Transaction Script</em>.</li>
+                </ul>
+                <div class="blueprint-card" style="background: var(--amber-light);">
+                    <h3 class="mono">EL "SWEET SPOT"</h3>
+                    <p style="font-size: 1rem;">Brilla en aplicaciones CRUD donde las tablas son "objetos de primera
+                        clase" y las relaciones no son complejas.</p>
+                </div>
+            </div>
+        </div>
+        <div class="page-number">06 / 12</div>
+    </section>
+
+    <!-- Slide 6: El Isomorfismo -->
+    <section id="slide-6">
+        <div class="container">
+            <h2>Simetría 1:1 (Isomorfismo)</h2>
+            <p>La regla de oro del diseño en Active Record es la correspondencia exacta entre el código y la
+                persistencia.</p>
+            <div class="grid-2">
+                <div class="blueprint-card">
+                    <h4 class="mono">SQL TABLE: CUSTOMER</h4>
+                    <hr style="margin: 10px 0;">
+                    <p class="mono">ID: INTEGER<br>NAME: VARCHAR<br>STATUS: VARCHAR</p>
+                </div>
+                <div style="text-align: center; font-size: 2rem;">↔</div>
+                <div class="blueprint-card" style="border-color: var(--amber);">
+                    <h4 class="mono" style="color: var(--amber);">CLASS: CUSTOMER</h4>
+                    <hr style="margin: 10px 0;">
+                    <p class="mono">this.id<br>this.name<br>this.status</p>
+                </div>
+            </div>
+            <p style="margin-top: 2rem; opacity: 0.7;">No hay capas de traducción complejas. Lo que ves en la DB es lo
+                que tienes en el objeto.</p>
+        </div>
+        <div class="page-number">07 / 12</div>
+    </section>
+
+    <!-- Slide 7: Ventajas -->
+    <section id="slide-7">
+        <div class="container">
+            <h2>Ventajas del Patrón</h2>
+            <div class="grid-2">
+                <div class="blueprint-card">
+                    <h3>Simplicidad</h3>
+                    <p>Es extremadamente intuitivo. Cualquier programador entiende que un usuario tiene un método
+                        <code>user.save()</code>.
+                    </p>
+                </div>
+                <div class="blueprint-card">
+                    <h3>Baja Indirección</h3>
+                    <p>No hay que navegar por 5 capas de código para encontrar dónde se guarda un dato.</p>
+                </div>
+            </div>
+            <div class="blueprint-card" style="margin-top: 2rem;">
+                <h3>Productividad Inmediata</h3>
+                <p>Frameworks como <strong>Ruby on Rails</strong> y <strong>Laravel (Eloquent)</strong> han demostrado
+                    que permite construir aplicaciones en tiempo récord.</p>
+            </div>
+        </div>
+        <div class="page-number">08 / 12</div>
+    </section>
+
+    <!-- Slide 8: Desventajas -->
+    <section id="slide-9">
+        <div class="container">
+            <h2 style="color: var(--danger); border-left-color: var(--danger);">El Punto de Quiebre</h2>
+            <div class="blueprint-card" style="border-style: dashed; border-color: var(--danger);">
+                <p>A medida que la lógica crece, Active Record empieza a mostrar sus debilidades:</p>
+                <ul>
+                    <li><strong>Acoplamiento Fuerte:</strong> El diseño es "esclavo" del esquema de la base de datos.
+                    </li>
+                    <li><strong>Dificultad de Testing:</strong> Difícil probar el negocio sin tocar la base de datos
+                        real.</li>
+                    <li><strong>Violación del SRP:</strong> El objeto tiene dos razones para cambiar (negocio o DB).
+                    </li>
+                    <li><strong>La Pesadilla de la Herencia:</strong> El mapeo 1:1 falla cuando intentas modelar
+                        jerarquías de clases complejas.</li>
+                </ul>
+            </div>
+        </div>
+        <div class="page-number">09 / 12</div>
+    </section>
+
+    <!-- Slide 9: Conclusión -->
+    <section id="slide-10">
+        <div class="container" style="text-align: center;">
+            <h2>La Tríada de la Persistencia</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Patrón</th>
+                        <th>Lógica de Negocio</th>
+                        <th>Acoplado</th>
+                        <th>Uso Ideal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Row Data Gateway</td>
+                        <td>Ninguna</td>
+                        <td>Sí</td>
+                        <td>Acceso simple</td>
+                    </tr>
+                    <tr class="active-row">
+                        <td><strong>Active Record</strong></td>
+                        <td><strong>Incluida (Simple)</strong></td>
+                        <td><strong>Sí</strong></td>
+                        <td><strong>CRUD + Lógica</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Data Mapper</td>
+                        <td>Aislada (Compleja)</td>
+                        <td>No</td>
+                        <td>Sistemas Grandes</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p class="mono" style="margin-top: 2rem;">Comparativa basada en PEAA (Fowler)</p>
+        </div>
+        <div class="page-number">10 / 12</div>
+    </section>
+
+    <!-- Slide 10: Relaciones y Concurrencia -->
+    <section id="slide-11">
+        <div class="container">
+            <h2>Relaciones y Concurrencia</h2>
+            <div class="grid-2">
+                <div class="blueprint-card">
+                    <h3 class="mono">Gestión de Relaciones</h3>
+                    <p>¿Cómo maneja las claves foráneas?</p>
+                    <ul style="font-size: 0.9rem;">
+                        <li><strong>Foreign Key Mapping:</strong> El objeto contiene el ID del padre.</li>
+                        <li><strong>Lazy Load:</strong> Los "hijos" se cargan solo cuando se accede al método, ej:
+                            <code>cliente.getPedidos()</code>.
+                        </li>
+                    </ul>
+                </div>
+                <div class="blueprint-card" style="border-color: var(--amber);">
+                    <h3 class="mono" style="color: var(--amber);">Control de Concurrencia</h3>
+                    <p>Para evitar colisiones de datos:</p>
+                    <ul style="font-size: 0.9rem;">
+                        <li><strong>Optimistic Locking:</strong> Uso de una columna <code>version</code> o
+                            <code>timestamp</code>.
+                        </li>
+                        <li>Si el dato cambió en la DB antes de guardar, el objeto lanza una excepción.</li>
+                    </ul>
+                </div>
+            </div>
+            <div style="margin-top: 3rem; text-align: center;">
+                <h3 style="color: var(--amber);">"La simplicidad no es la ausencia de complejidad, sino la maestría
+                    sobre ella."</h3>
+            </div>
+        </div>
+        <div class="page-number">11 / 12</div>
+    </section>
+
+    <!-- Slide 11: Gracias -->
+    <section id="slide-12">
+        <div class="container"
+            style="text-align: center; display: flex; flex-direction: column; justify-content: center; height: 80vh;">
+            <p class="mono" style="letter-spacing: 5px;">FIN DE LA ESPECIFICACIÓN</p>
+            <h1 style="font-size: 5rem; margin: 2rem 0;">Gracias por su atención</h1>
+            <div style="width: 200px; height: 2px; background: var(--amber); margin: 0 auto;"></div>
+            <p class="mono" style="margin-top: 2rem;">Juan David Rodriguez</p>
+        </div>
+        <div class="page-number">12 / 12</div>
+    </section>
+
+</body>
+
+</html>

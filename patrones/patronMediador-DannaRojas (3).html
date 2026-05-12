@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Patrón Mediator – Design Patterns</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.6.1/reveal.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.6.1/theme/black.min.css">
+<style>
+  :root {
+    --accent: #00e5ff;
+    --accent2: #7c3aed;
+    --bg: #070b14;
+    --surface: #0f1829;
+    --border: rgba(0,229,255,0.18);
+    --text: #e2eaf4;
+    --muted: #8898aa;
+    --code-bg: #0a0f1e;
+  }
+
+  .reveal-viewport { background: var(--bg); }
+  .reveal .slides { font-family: 'Syne', sans-serif; color: var(--text); }
+
+  /* ── GRID NOISE TEXTURE ── */
+  .reveal .slides::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image:
+      linear-gradient(rgba(0,229,255,.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,229,255,.03) 1px, transparent 1px);
+    background-size: 48px 48px;
+    pointer-events: none; z-index: 0;
+  }
+
+  .reveal section { padding: 0 !important; }
+  .slide-inner {
+    position: relative;
+    width: 100%; height: 100%;
+    display: flex; flex-direction: column;
+    justify-content: center; align-items: center;
+    padding: 3.5rem 4.5rem;
+    box-sizing: border-box;
+    overflow: hidden;
+    text-align: center;
+  }
+
+  /* ── ACCENT ORBS ── */
+  .orb {
+    position: absolute; border-radius: 50%;
+    filter: blur(90px); opacity: .25; pointer-events: none;
+  }
+  .orb-tl { width: 400px; height: 400px; background: var(--accent); top: -120px; left: -120px; }
+  .orb-br { width: 350px; height: 350px; background: var(--accent2); bottom: -100px; right: -100px; }
+
+  /* ── SLIDE LABEL ── */
+  .slide-tag {
+    font-size: .7rem; letter-spacing: .18em; text-transform: uppercase;
+    color: var(--accent); font-family: 'JetBrains Mono', monospace;
+    margin-bottom: 1rem; opacity: .85; text-align: center; width: 100%;
+  }
+
+  /* ── COVER SLIDE ── */
+  .cover-title {
+    font-size: 4.2rem; font-weight: 800; line-height: 1.05;
+    background: linear-gradient(120deg, #fff 30%, var(--accent));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    margin: 0 0 .6rem; text-align: center; width: 100%;
+  }
+  .cover-subtitle {
+    font-size: 1.1rem; color: var(--muted); margin: 0 0 2.2rem;
+    font-family: 'JetBrains Mono', monospace; letter-spacing: .05em;
+  }
+  .cover-author {
+    display: inline-flex; align-items: center; gap: .6rem;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 2rem; padding: .5rem 1.2rem;
+    font-size: .9rem; color: var(--accent);
+  }
+  .cover-book {
+    margin-top: 1.4rem;
+    font-size: .75rem; color: var(--muted); font-family: 'JetBrains Mono', monospace;
+  }
+  .cover-corner {
+    display: flex; flex-direction: column; align-items: center; gap: 1.2rem;
+    margin-top: 1.2rem;
+  }
+  .hex-icon {
+    width: 110px; height: 110px;
+    background: linear-gradient(135deg, var(--accent2), var(--accent));
+    clip-path: polygon(50% 0%,95% 25%,95% 75%,50% 100%,5% 75%,5% 25%);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 3rem;
+  }
+
+  /* ── SECTION TITLES ── */
+  h2.section-title {
+    font-size: 2.2rem; font-weight: 800;
+    background: linear-gradient(90deg, #fff 60%, var(--accent));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    margin: 0 0 1.4rem; line-height: 1.1; text-align: center; width: 100%;
+  }
+
+  /* ── CARDS / BOXES ── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px; padding: 1.1rem 1.4rem;
+    margin-bottom: .8rem; width: 100%;
+  }
+  .card-title {
+    font-size: .7rem; letter-spacing: .15em; text-transform: uppercase;
+    color: var(--accent); font-family: 'JetBrains Mono', monospace;
+    margin-bottom: .4rem;
+  }
+  .card p { margin: 0; font-size: .92rem; line-height: 1.55; color: var(--text); text-align: left; }
+
+  /* ── PROBLEM GRID ── */
+  .prob-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: .9rem; width: 100%; margin-top: .5rem;
+  }
+  .prob-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; padding: 1rem 1.1rem;
+  }
+  .prob-icon { font-size: 1.8rem; margin-bottom: .4rem; }
+  .prob-card h4 { margin: 0 0 .3rem; font-size: .88rem; color: var(--accent); }
+  .prob-card p  { margin: 0; font-size: .8rem; color: var(--muted); line-height: 1.45; text-align: left; }
+
+  /* ── INTENT QUOTE ── */
+  .intent-quote {
+    border-left: 3px solid var(--accent);
+    padding: .9rem 1.3rem; margin: 1rem 0 1.2rem;
+    background: rgba(0,229,255,.05); border-radius: 0 8px 8px 0;
+    font-size: 1rem; color: var(--text); font-style: italic; line-height: 1.6;
+    text-align: left;
+  }
+  .intent-quote cite {
+    display: block; margin-top: .5rem;
+    font-size: .7rem; font-style: normal; color: var(--muted);
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* ── DIAGRAM SVG ── */
+  .diagram-wrap { width: 100%; display: flex; justify-content: center; margin-top: .6rem; }
+  .diagram-wrap svg text { font-family: 'JetBrains Mono', monospace; }
+
+  /* ── CODE ── */
+  .code-wrap {
+    background: var(--code-bg); border: 1px solid var(--border);
+    border-radius: 10px; padding: 1.1rem 1.3rem; width: 100%;
+    overflow: auto; max-height: 58vh;
+  }
+  .code-wrap pre {
+    margin: 0; font-family: 'JetBrains Mono', monospace;
+    font-size: .72rem; line-height: 1.6;
+    color: #c8d3e0; text-align: left;
+  }
+  .kw  { color: #7c3aed; }
+  .ty  { color: #00e5ff; }
+  .str { color: #86efac; }
+  .cm  { color: #4a5568; font-style: italic; }
+  .fn  { color: #fbbf24; }
+
+  /* ── PROS/CONS ── */
+  .pros-cons {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 1rem; width: 100%; margin-top: .4rem;
+  }
+  .pros, .cons {
+    background: var(--surface); border-radius: 10px; padding: 1rem 1.2rem;
+  }
+  .pros { border-top: 3px solid #22c55e; }
+  .cons { border-top: 3px solid #ef4444; }
+  .pros h4 { color: #22c55e; margin: 0 0 .7rem; font-size: .85rem; text-transform: uppercase; letter-spacing: .1em; text-align:center; }
+  .cons h4 { color: #ef4444; margin: 0 0 .7rem; font-size: .85rem; text-transform: uppercase; letter-spacing: .1em; text-align:center; }
+  .pros li, .cons li {
+    font-size: .8rem; color: var(--text); margin-bottom: .45rem; line-height: 1.45;
+    list-style: none; padding-left: 1.1rem; position: relative; text-align: left;
+  }
+  .pros li::before { content: '✓'; position: absolute; left: 0; color: #22c55e; }
+  .cons li::before { content: '✗'; position: absolute; left: 0; color: #ef4444; }
+
+  /* ── CONCLUSION ── */
+  .takeaways {
+    display: flex; flex-direction: column; gap: .7rem; width: 100%; margin-top: .8rem;
+  }
+  .takeaway {
+    display: flex; align-items: flex-start; gap: .9rem;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; padding: .8rem 1.1rem;
+  }
+  .takeaway-num {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent2), var(--accent));
+    display: flex; align-items: center; justify-content: center;
+    font-size: .75rem; font-weight: 700; flex-shrink: 0;
+  }
+  .takeaway p { margin: 0; font-size: .84rem; line-height: 1.5; color: var(--text); text-align: left; }
+
+  .questions-box {
+    margin-top: 1.4rem;
+    background: linear-gradient(135deg, rgba(124,58,237,.2), rgba(0,229,255,.1));
+    border: 1px solid var(--border); border-radius: 14px;
+    padding: 1.4rem 2rem; text-align: center; width: 100%;
+  }
+  .questions-box h3 { margin: 0 0 .3rem; font-size: 1.5rem; color: var(--accent); }
+  .questions-box p  { margin: 0; font-size: .85rem; color: var(--muted); }
+
+  /* ── PROGRESS ── */
+  .reveal .progress { background: rgba(0,229,255,.1); }
+  .reveal .progress span { background: var(--accent); }
+
+  /* ── SLIDE NUMBER ── */
+  .slide-num {
+    position: absolute; bottom: 1.4rem; right: 1.8rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .7rem; color: var(--muted); opacity: .6;
+  }
+</style>
+</head>
+<body>
+<div class="reveal">
+<div class="slides">
+
+<!-- ═══════════════════════════════════ SLIDE 1 – PORTADA ═══════════════════════════════════ -->
+<section>
+<div class="slide-inner">
+  <div class="orb orb-tl"></div>
+  <div class="orb orb-br"></div>
+
+  <span class="slide-tag">Design Patterns · GoF · Behavioral</span>
+  <h1 class="cover-title">Patrón<br>Mediator</h1>
+  
+  <div class="cover-author">
+    <span><strong>Danna Gabriela Rojas Bernal</strong></span>
+  </div>
+  
+
+  <div class="cover-corner">
+    <div class="hex-icon">🔗</div>
+    <span style="font-size:.65rem;color:var(--muted);font-family:'JetBrains Mono',monospace;letter-spacing:.08em">BEHAVIORAL<br>PATTERN</span>
+  </div>
+  <div class="slide-num">01 / 07</div>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════ SLIDE 2 – EL PROBLEMA ═══════════════════════════════════ -->
+<section>
+<div class="slide-inner">
+  <div class="orb orb-tl"></div>
+
+  <span class="slide-tag">Motivación</span>
+  <h2 class="section-title">El Problema:<br>Alto Acoplamiento</h2>
+
+  <!-- ── Ejemplo visual GUI ───────────────────────────── -->
+  <div style="display:flex;gap:1.4rem;width:100%;align-items:flex-start;margin-bottom:.8rem;">
+    <div style="flex-shrink:0;background:#fff;border-radius:8px;padding:6px;border:2px solid var(--accent);box-shadow:0 0 18px rgba(0,229,255,.25);">
+      <img src="data:image/png;base64,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" style="display:block;width:160px;border-radius:4px;" alt="Font Chooser Dialog"/>
+      <p style="margin:.4rem 0 0;font-size:.62rem;color:#555;text-align:center;font-family:'JetBrains Mono',monospace;">Font Chooser – GoF pág. 274</p>
+    </div>
+    <div class="prob-grid" style="flex:1;margin:0;">
+      <div class="prob-card">
+        <div class="prob-icon">🕸️</div>
+        <h4>Conexiones N×N</h4>
+        <p>Cuando N objetos se comunican directamente entre sí, se generan hasta N² dependencias. El sistema actúa como un monolito.</p>
+      </div>
+      <div class="prob-card">
+        <div class="prob-icon">🔒</div>
+        <h4>Bajo reúso</h4>
+        <p>Un objeto que conoce muchos otros no puede ser reutilizado sin arrastrar todas sus dependencias.</p>
+      </div>
+      <div class="prob-card">
+        <div class="prob-icon">⚙️</div>
+        <h4>Difícil de cambiar</h4>
+        <p>El comportamiento está repartido entre muchas clases. Cualquier cambio obliga a modificar múltiples subclases.</p>
+      </div>
+      <div class="prob-card">
+        <div class="prob-icon">💡</div>
+        <h4>Ejemplo del libro</h4>
+        <p>Un diálogo GUI: botones, listas y campos de texto se afectan mutuamente. Cada widget conoce a todos los demás.</p>
+      </div>
+    </div>
+  </div>
+  <div class="slide-num">02 / 07</div>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════ SLIDE 3 – INTENCIÓN ═══════════════════════════════════ -->
+<section>
+<div class="slide-inner">
+  <div class="orb orb-tl"></div>
+  <div class="orb orb-br"></div>
+
+  <span class="slide-tag">Intención &amp; Propósito</span>
+  <h2 class="section-title">¿Qué define el patrón<br>Mediator?</h2>
+
+  <blockquote class="intent-quote">
+    "Define an object that encapsulates how a set of objects interact. Mediator promotes loose coupling by keeping objects from referring to each other explicitly, and it lets you vary their interaction independently."
+    <cite>— Gamma et al., Design Patterns, pág. 273</cite>
+  </blockquote>
+
+  <div class="card" style="border-color:rgba(0,229,255,.45);background:rgba(0,229,255,.06);">
+    <div class="card-title">💡 Clave conceptual</div>
+    <p>Los objetos (<em>Colleagues</em>) dejan de conocerse entre sí: <strong>solo conocen al Mediador</strong>. El mediador centraliza y coordina toda la lógica de interacción.</p>
+  </div>
+
+  <div style="display:flex;gap:.8rem;width:100%;margin:.6rem 0;">
+    <div style="flex:1;background:rgba(124,58,237,.12);border:1px solid rgba(124,58,237,.35);border-radius:10px;padding:.8rem 1rem;">
+      <div class="card-title" style="color:#a78bfa;">🚦 Analogía</div>
+      <p style="margin:0;font-size:.82rem;line-height:1.5;color:var(--text);">
+        Piensa en el <strong>control de tráfico aéreo</strong>: los aviones no se hablan entre sí, todos hablan con la <em>torre de control</em>. La torre coordina quién aterriza, quién espera y por dónde. El Mediador es esa torre.
+      </p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Cuándo aplicarlo</div>
+    <p>• Un conjunto de objetos se comunica de forma compleja y difícil de entender.<br>
+       • Reutilizar un objeto es difícil porque referencia a muchos otros.<br>
+       • El comportamiento distribuido debe ser personalizable sin proliferar subclases.</p>
+  </div>
+
+  <div class="slide-num">03 / 07</div>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════ SLIDE 4 – ESTRUCTURA ═══════════════════════════════════ -->
+<section>
+<div class="slide-inner">
+  <div class="orb orb-tl"></div>
+
+  <span class="slide-tag">Estructura del Patrón</span>
+  <h2 class="section-title">Diagrama de Clases</h2>
+
+  <div class="diagram-wrap" style="justify-content:center;width:100%;">
+    <svg viewBox="0 0 820 320" width="820" height="320" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="arr" markerWidth="9" markerHeight="6" refX="9" refY="3" orient="auto">
+          <polygon points="0 0,9 3,0 6" fill="#00e5ff" opacity=".7"/>
+        </marker>
+        <marker id="darr" markerWidth="9" markerHeight="6" refX="9" refY="3" orient="auto">
+          <polygon points="0 0,9 3,0 6" fill="#7c3aed" opacity=".9"/>
+        </marker>
+      </defs>
+
+      <!-- Mediator (abstract) -->
+      <rect x="300" y="20" width="220" height="70" rx="8" fill="#0f1829" stroke="#00e5ff" stroke-width="1.5"/>
+      <text x="410" y="44" text-anchor="middle" fill="#00e5ff" font-size="11" font-style="italic">«interface»</text>
+      <text x="410" y="62" text-anchor="middle" fill="#fff" font-size="13" font-weight="bold">Mediator</text>
+      <text x="410" y="80" text-anchor="middle" fill="#8898aa" font-size="10">+ mediate(event)</text>
+
+      <!-- ConcreteMediator -->
+      <rect x="300" y="155" width="220" height="80" rx="8" fill="#0f1829" stroke="#7c3aed" stroke-width="1.5"/>
+      <text x="410" y="177" text-anchor="middle" fill="#7c3aed" font-size="10">«concrete»</text>
+      <text x="410" y="195" text-anchor="middle" fill="#fff" font-size="13" font-weight="bold">ConcreteMediator</text>
+      <text x="410" y="213" text-anchor="middle" fill="#8898aa" font-size="10">- colleagueA</text>
+      <text x="410" y="226" text-anchor="middle" fill="#8898aa" font-size="10">+ mediate(event)</text>
+
+      <!-- Mediator → ConcreteMediator (herencia) -->
+      <line x1="410" y1="90" x2="410" y2="155" stroke="#00e5ff" stroke-width="1.4" stroke-dasharray="5,4" marker-end="url(#arr)"/>
+      <text x="420" y="128" fill="#8898aa" font-size="9">extends</text>
+
+      <!-- ColleagueA -->
+      <rect x="30" y="155" width="185" height="80" rx="8" fill="#0f1829" stroke="#00e5ff" stroke-width="1.2"/>
+      <text x="122" y="177" text-anchor="middle" fill="#00e5ff" font-size="10">«abstract»</text>
+      <text x="122" y="196" text-anchor="middle" fill="#fff" font-size="13" font-weight="bold">ColleagueA</text>
+      <text x="122" y="213" text-anchor="middle" fill="#8898aa" font-size="10">- mediator: Mediator</text>
+      <text x="122" y="226" text-anchor="middle" fill="#8898aa" font-size="10">+ changed()</text>
+
+      <!-- ColleagueB -->
+      <rect x="607" y="155" width="185" height="80" rx="8" fill="#0f1829" stroke="#00e5ff" stroke-width="1.2"/>
+      <text x="699" y="177" text-anchor="middle" fill="#00e5ff" font-size="10">«abstract»</text>
+      <text x="699" y="196" text-anchor="middle" fill="#fff" font-size="13" font-weight="bold">ColleagueB</text>
+      <text x="699" y="213" text-anchor="middle" fill="#8898aa" font-size="10">- mediator: Mediator</text>
+      <text x="699" y="226" text-anchor="middle" fill="#8898aa" font-size="10">+ changed()</text>
+
+      <!-- ConcreteMediator → ColleagueA -->
+      <line x1="300" y1="195" x2="215" y2="195" stroke="#7c3aed" stroke-width="1.3" marker-end="url(#darr)"/>
+      <text x="230" y="186" fill="#8898aa" font-size="9">knows</text>
+
+      <!-- ConcreteMediator → ColleagueB -->
+      <line x1="520" y1="195" x2="607" y2="195" stroke="#7c3aed" stroke-width="1.3" marker-end="url(#darr)"/>
+      <text x="533" y="186" fill="#8898aa" font-size="9">knows</text>
+
+      <!-- ColleagueA → Mediator (notify) -->
+      <line x1="122" y1="155" x2="320" y2="90" stroke="#00e5ff" stroke-width="1" stroke-dasharray="3,3" marker-end="url(#arr)"/>
+      <text x="190" y="108" fill="#8898aa" font-size="9">notify</text>
+
+      <!-- ColleagueB → Mediator (notify) -->
+      <line x1="699" y1="155" x2="505" y2="90" stroke="#00e5ff" stroke-width="1" stroke-dasharray="3,3" marker-end="url(#arr)"/>
+      <text x="615" y="108" fill="#8898aa" font-size="9">notify</text>
+
+      <!-- Legend -->
+      <text x="30" y="300" fill="#4a5568" font-size="9">─ ─  extends / implements</text>
+      <text x="200" y="300" fill="#4a5568" font-size="9">──▶  knows (asociación)</text>
+      <text x="380" y="300" fill="#4a5568" font-size="9">- -▶  notifica al mediador</text>
+    </svg>
+  </div>
+
+  <!-- Participantes -->
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:.7rem;width:100%;margin-top:.6rem;">
+    <div style="background:rgba(0,229,255,.06);border:1px solid rgba(0,229,255,.3);border-radius:10px;padding:.75rem 1rem;">
+      <p style="margin:0 0 .3rem;font-size:.75rem;font-weight:700;color:var(--accent);font-family:'JetBrains Mono',monospace;text-align:left;">1. Interfaz Mediator</p>
+      <p style="margin:0;font-size:.75rem;color:var(--text);line-height:1.5;text-align:left;">Declara los métodos de comunicación con los componentes. Típicamente incluye un único método de notificación.</p>
+    </div>
+    <div style="background:rgba(124,58,237,.08);border:1px solid rgba(124,58,237,.35);border-radius:10px;padding:.75rem 1rem;">
+      <p style="margin:0 0 .3rem;font-size:.75rem;font-weight:700;color:#a78bfa;font-family:'JetBrains Mono',monospace;text-align:left;">2. Concrete Mediator</p>
+      <p style="margin:0;font-size:.75rem;color:var(--text);line-height:1.5;text-align:left;">Encapsula la lógica de comunicación y las relaciones entre los componentes. Conoce y mantiene referencias a los componentes.</p>
+    </div>
+    <div style="background:rgba(0,229,255,.04);border:1px solid rgba(0,229,255,.2);border-radius:10px;padding:.75rem 1rem;">
+      <p style="margin:0 0 .3rem;font-size:.75rem;font-weight:700;color:var(--accent);font-family:'JetBrains Mono',monospace;text-align:left;">3. Componentes (Colleagues)</p>
+      <p style="margin:0;font-size:.75rem;color:var(--text);line-height:1.5;text-align:left;">Clases con lógica de negocio. Tienen una referencia a su mediador y no se comunican con otros componentes directamente.</p>
+    </div>
+  </div>
+
+  <div class="slide-num">04 / 07</div>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════ SLIDE 5 – CÓDIGO ═══════════════════════════════════ -->
+<section>
+<div class="slide-inner" style="padding-top:2.2rem; padding-bottom:1.8rem;">
+  <div class="orb orb-tl"></div>
+
+  <span class="slide-tag">Ejemplo en Java — Sistema de Chat</span>
+  <h2 class="section-title" style="font-size:1.8rem;margin-bottom:.8rem;">Mediator en Práctica</h2>
+
+  <div class="code-wrap">
+  <pre><span class="cm">// ── 1. Interfaz Mediator ──────────────────────────────────</span>
+<span class="kw">interface</span> <span class="ty">ChatMediator</span> {
+    <span class="kw">void</span> <span class="fn">sendMessage</span>(<span class="ty">String</span> msg, <span class="ty">User</span> sender);
+    <span class="kw">void</span> <span class="fn">addUser</span>(<span class="ty">User</span> user);
+}
+
+<span class="cm">// ── 2. ConcreteMediator ───────────────────────────────────</span>
+<span class="kw">class</span> <span class="ty">ChatRoom</span> <span class="kw">implements</span> <span class="ty">ChatMediator</span> {
+    <span class="kw">private</span> <span class="ty">List</span>&lt;<span class="ty">User</span>&gt; users = <span class="kw">new</span> <span class="ty">ArrayList</span>&lt;&gt;();
+
+    <span class="kw">public void</span> <span class="fn">addUser</span>(<span class="ty">User</span> u)  { users.<span class="fn">add</span>(u); }
+
+    <span class="kw">public void</span> <span class="fn">sendMessage</span>(<span class="ty">String</span> msg, <span class="ty">User</span> sender) {
+        <span class="kw">for</span> (<span class="ty">User</span> u : users) {
+            <span class="kw">if</span> (u != sender) u.<span class="fn">receive</span>(msg);  <span class="cm">// no se conocen entre sí</span>
+        }
+    }
+}
+
+<span class="cm">// ── 3. Colleague ──────────────────────────────────────────</span>
+<span class="kw">class</span> <span class="ty">User</span> {
+    <span class="kw">private final</span> <span class="ty">String</span> name;
+    <span class="kw">private final</span> <span class="ty">ChatMediator</span> mediator;  <span class="cm">// solo conoce al mediador</span>
+
+    <span class="ty">User</span>(<span class="ty">String</span> name, <span class="ty">ChatMediator</span> m) { <span class="kw">this</span>.name = name; mediator = m; }
+
+    <span class="kw">public void</span> <span class="fn">send</span>(<span class="ty">String</span> msg) {
+        <span class="ty">System</span>.out.<span class="fn">println</span>(name + <span class="str">" → [Mediador] → todos: "</span> + msg);
+        mediator.<span class="fn">sendMessage</span>(msg, <span class="kw">this</span>);
+    }
+    <span class="kw">public void</span> <span class="fn">receive</span>(<span class="ty">String</span> msg) {
+        <span class="ty">System</span>.out.<span class="fn">println</span>(name + <span class="str">" recibió: "</span> + msg);
+    }
+}
+
+<span class="cm">// ── 4. Cliente ────────────────────────────────────────────</span>
+<span class="kw">public class</span> <span class="ty">Main</span> {
+    <span class="kw">public static void</span> <span class="fn">main</span>(<span class="ty">String</span>[] args) {
+        <span class="ty">ChatMediator</span> sala = <span class="kw">new</span> <span class="ty">ChatRoom</span>();
+        <span class="ty">User</span> ana  = <span class="kw">new</span> <span class="ty">User</span>(<span class="str">"Ana"</span>,  sala);
+        <span class="ty">User</span> bob  = <span class="kw">new</span> <span class="ty">User</span>(<span class="str">"Bob"</span>,  sala);
+        <span class="ty">User</span> luis = <span class="kw">new</span> <span class="ty">User</span>(<span class="str">"Luis"</span>, sala);
+        sala.<span class="fn">addUser</span>(ana); sala.<span class="fn">addUser</span>(bob); sala.<span class="fn">addUser</span>(luis);
+        ana.<span class="fn">send</span>(<span class="str">"¡Hola a todos!"</span>);
+    }
+}</pre>
+  </div>
+
+  <div class="slide-num">05 / 07</div>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════ SLIDE 6 – VENTAJAS Y DESVENTAJAS ═══════════════════════════════════ -->
+<section>
+<div class="slide-inner">
+  <div class="orb orb-tl"></div>
+  <div class="orb orb-br"></div>
+
+  <span class="slide-tag">Trade-offs del patrón</span>
+  <h2 class="section-title">Ventajas y Desventajas</h2>
+
+  <div class="pros-cons" style="justify-items:center;">
+    <div class="pros">
+      <h4>✔ Ventajas</h4>
+      <ul>
+        <li>Elimina dependencias directas entre Colleagues, reduciendo el acoplamiento de N² a N.</li>
+        <li>Favorece el principio de responsabilidad única: la lógica de coordinación vive en un solo lugar.</li>
+        <li>Las clases Colleague son más fáciles de reutilizar de forma independiente.</li>
+        <li>Cambiar el comportamiento de interacción requiere solo cambiar o extender el ConcreteMediator.</li>
+        <li>Relaciones many-to-many se convierten en one-to-many (más fáciles de mantener).</li>
+      </ul>
+    </div>
+    <div class="cons">
+      <h4>✗ Desventajas</h4>
+      <ul>
+        <li>El Mediator puede convertirse en un <em>God Object</em>: un monolito que concentra demasiada lógica.</li>
+        <li>A medida que crece el sistema, el Mediator se vuelve complejo y difícil de mantener.</li>
+        <li>Puede ser overkill en sistemas con pocas interacciones entre objetos.</li>
+        <li>La depuración puede ser más difícil porque el flujo de control es menos obvio.</li>
+      </ul>
+    </div>
+  </div>
+
+
+  <div class="slide-num">06 / 07</div>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════ SLIDE 7 – CONCLUSIÓN ═══════════════════════════════════ -->
+<section>
+<div class="slide-inner">
+  <div class="orb orb-tl"></div>
+  <div class="orb orb-br"></div>
+
+  <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;gap:1.8rem;text-align:center;margin:auto;">
+    <div style="font-size:5.5rem;line-height:1;">🎓</div>
+    <h2 style="font-size:4rem;font-weight:800;margin:0;background:linear-gradient(120deg,#fff 30%,var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;line-height:1.1;">
+      ¡Muchas Gracias!
+    </h2>
+    <p style="font-size:1.05rem;color:var(--muted);margin:0;font-family:'JetBrains Mono',monospace;letter-spacing:.05em;">
+      Danna Gabriela Rojas Bernal
+    </p>
+    <div style="width:80px;height:2px;background:linear-gradient(90deg,var(--accent2),var(--accent));border-radius:2px;"></div>
+    <p style="font-size:.78rem;color:var(--muted);margin:0;">
+      Design Patterns — Gamma, Helm, Johnson &amp; Vlissides (1994)
+    </p>
+  </div>
+
+  <div class="slide-num">07 / 07</div>
+</div>
+</section>
+
+</div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.6.1/reveal.min.js"></script>
+<script>
+Reveal.initialize({
+  hash: true,
+  progress: true,
+  slideNumber: false,
+  transition: 'fade',
+  transitionSpeed: 'fast',
+  backgroundTransition: 'fade',
+  controls: true,
+  keyboard: true,
+  overview: true,
+  center: false,
+});
+</script>
+
+<!-- ═════════════════════════════════════════════════════════════════════════
+     GUIÓN DE APOYO – 10 MINUTOS
+     ═════════════════════════════════════════════════════════════════════════
+     Diapositiva 1 · PORTADA · ~0:45
+     ───────────────────────────────────────────────────────────────────────
+     "Buenos días / Buenas tardes. Mi nombre es [nombre] y hoy voy a
+     presentarles el Patrón Mediator, uno de los 23 patrones de diseño
+     del libro 'Design Patterns' de Gamma, Helm, Johnson y Vlissides,
+     también conocidos como la Banda de los Cuatro o GoF.
+     Este patrón pertenece a la categoría de patrones de comportamiento
+     y se encuentra en la página 273 del libro. A lo largo de esta
+     presentación vamos a entender qué problema resuelve, cómo está
+     estructurado, veremos código en Java y discutiremos sus ventajas
+     y limitaciones."
+
+     Diapositiva 2 · EL PROBLEMA · ~1:30
+     ───────────────────────────────────────────────────────────────────────
+     "Imaginemos un sistema en el que varios objetos necesitan coordinarse
+     entre sí. Si cada objeto conoce y habla directamente con todos los
+     demás, el número de conexiones crece de forma cuadrática: con N
+     objetos tenemos potencialmente N×N dependencias.
+     El libro ilustra esto con los diálogos de una interfaz gráfica: un
+     campo de texto, una lista desplegable y varios botones que se afectan
+     mutuamente. Cuando el usuario selecciona una entrada en la lista,
+     el campo de texto debe actualizarse; cuando el campo está vacío,
+     ciertos botones deben deshabilitarse. Si cada widget conoce a todos
+     los demás, el sistema se vuelve monolítico, rígido y difícil de
+     reutilizar.
+     Este es exactamente el problema que el patrón Mediator viene a
+     resolver."
+
+     Diapositiva 3 · INTENCIÓN · ~1:30
+     ───────────────────────────────────────────────────────────────────────
+     "La intención formal del patrón, tal como la define el libro, es:
+     'Definir un objeto que encapsule cómo interactúa un conjunto de
+     objetos. El Mediator promueve el bajo acoplamiento evitando que los
+     objetos se refieran entre sí explícitamente, y permite variar su
+     interacción de forma independiente.'
+     En términos prácticos, los objetos dejan de conocerse entre sí.
+     Solo conocen al Mediador. Es el Mediador quien coordina y dirige
+     toda la lógica de interacción, actuando como un hub central.
+     El patrón es útil cuando: las interdependencias entre objetos son
+     complejas y difíciles de entender; cuando reutilizar un objeto
+     implica arrastrar muchas dependencias; o cuando queremos cambiar
+     el comportamiento de coordinación sin crear muchas subclases."
+
+     Diapositiva 4 · ESTRUCTURA · ~1:45
+     ───────────────────────────────────────────────────────────────────────
+     "Veamos la estructura del patrón. Tenemos cuatro actores principales.
+     Primero, el Mediator, que es una interfaz que define cómo los
+     Colleagues se comunican con él; generalmente expone un método como
+     'mediate' o 'widgetChanged'.
+     Segundo, el ConcreteMediator, que implementa esa interfaz,
+     conoce a todos los Colleagues y coordina sus interacciones.
+     Tercero y cuarto, los Colleagues, que son los objetos que
+     queremos desacoplar. Cada uno solo mantiene una referencia al
+     Mediador, nunca a otro Colleague.
+     La comunicación es así: cuando un Colleague cambia de estado,
+     notifica al Mediador. El Mediador determina quién más debe reaccionar
+     y llama al método correspondiente de ese otro Colleague.
+     La clave está en esa inversión: en lugar de que A llame a B
+     directamente, A le dice al Mediador que cambió, y el Mediador
+     decide llamar a B."
+
+     Diapositiva 5 · CÓDIGO · ~2:30
+     ───────────────────────────────────────────────────────────────────────
+     "Veamos esto en código. Modelamos un sistema de chat con tres
+     componentes.
+     Primero, la interfaz ChatMediator con dos métodos: sendMessage
+     y addUser.
+     Segundo, la clase ChatRoom, que es nuestro ConcreteMediator. Mantiene
+     una lista de usuarios y cuando recibe un mensaje, lo distribuye
+     a todos excepto al emisor. Observen que los usuarios no se llaman
+     entre sí directamente.
+     Tercero, la clase User, que es nuestro Colleague. Solo conoce al
+     mediador. Cuando quiere enviar un mensaje, le habla al mediador,
+     no a otro usuario.
+     En el main, creamos la sala —el mediador— y tres usuarios. Cuando
+     Ana llama a 'send', el flujo es: Ana notifica al mediador, el
+     mediador recorre su lista y llama a 'receive' en Bob y Luis.
+     Ana no sabe que Bob existe; Bob no sabe que Luis existe.
+     Toda la lógica de distribución vive en ChatRoom.
+     Esto es exactamente lo que el patrón busca: desacoplar a los colegas
+     mediante un objeto intermediario."
+
+     Diapositiva 6 · VENTAJAS Y DESVENTAJAS · ~1:30
+     ───────────────────────────────────────────────────────────────────────
+     "Analicemos el trade-off de este patrón.
+     En cuanto a ventajas: reduce el acoplamiento de forma drástica,
+     las relaciones N×N se convierten en relaciones 1×N que son más
+     fáciles de razonar. Cada Colleague puede ser reutilizado de forma
+     independiente. Y cambiar el comportamiento de la coordinación
+     requiere solo modificar o extender el ConcreteMediator, sin tocar
+     a los Colleagues.
+     En cuanto a desventajas: el propio libro advierte que el Mediator
+     puede volverse excesivamente complejo. Si centralizamos demasiada
+     lógica en él, se convierte en lo que se conoce como un God Object:
+     un monolito difícil de mantener. Es el clásico trade-off de este
+     patrón — trocamos complejidad de interacción por complejidad en
+     el mediador.
+     También vale la pena mencionar que el Mediator se implementa
+     frecuentemente con el patrón Observer: los Colleagues actúan como
+     sujetos y notifican al Mediador de sus cambios de estado."
+
+     Diapositiva 7 · CONCLUSIÓN · ~0:30
+     ───────────────────────────────────────────────────────────────────────
+     "Para cerrar, el patrón Mediator nos enseña que a veces la solución
+     al desorden de comunicaciones no es ordenar las comunicaciones
+     directas, sino eliminarlas, reemplazándolas con un intermediario
+     bien diseñado.
+     Como toda herramienta, su valor depende del contexto: es poderoso
+     en sistemas con muchas interacciones complejas, pero puede ser
+     sobrediseño en sistemas simples.
+     Eso es todo de mi parte. Quedo atento a sus preguntas."
+
+     TIEMPO TOTAL ESTIMADO:
+     Diapositiva 1 → 0:45
+     Diapositiva 2 → 1:30  (acum 2:15)
+     Diapositiva 3 → 1:30  (acum 3:45)
+     Diapositiva 4 → 1:45  (acum 5:30)
+     Diapositiva 5 → 2:30  (acum 8:00)
+     Diapositiva 6 → 1:30  (acum 9:30)
+     Diapositiva 7 → 0:30  (acum 10:00)
+     ═════════════════════════════════════════════════════════════════════ -->
+</body>
+</html>

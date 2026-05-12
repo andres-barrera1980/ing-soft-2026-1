@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clase: Patrón Cadena de Responsabilidad</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <!-- PrismJS para el código Java -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+    <!-- AOS Animation Library -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['Fira Code', 'monospace'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            900: '#0c4a6e',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom Scrollbar para un look más tech */
+        ::-webkit-scrollbar { width: 10px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #0ea5e9; border-radius: 5px; }
+        ::-webkit-scrollbar-thumb:hover { background: #0284c7; }
+        
+        body { background-color: #0f172a; color: #f8fafc; }
+        .gradient-text {
+            background: linear-gradient(to right, #38bdf8, #818cf8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .glass-card {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-brand-500 selection:text-white">
+
+    <!-- Navbar / Progress Indicator -->
+    <div class="fixed top-0 left-0 w-full h-1 bg-gray-800 z-50">
+        <div class="h-full bg-brand-500" id="progressBar" style="width: 0%"></div>
+    </div>
+
+    <!-- HERO SECTION -->
+    <header class="min-h-screen flex flex-col justify-center items-center text-center px-4 relative overflow-hidden">
+        <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-5"></div>
+        <div class="absolute top-10 left-10 text-gray-400 text-sm font-mono" data-aos="fade-down">
+            &gt; Fundamentos de Ing. de Software<br>
+            &gt; Unidad: Diseño Arquitectónico y Patrones
+        </div>
+        
+        <h1 class="text-5xl md:text-7xl font-extrabold mb-6 tracking-tight" data-aos="zoom-in">
+            Patrón <br/>
+            <span class="gradient-text">Chain of Responsibility</span>
+        </h1>
+        <p class="text-xl md:text-2xl text-gray-300 max-w-2xl mb-12 font-light" data-aos="fade-up" data-aos-delay="200">
+            Deja de escribir bloques interminables de <code>if-else</code>. Aprende a pasar "la papa caliente" con elegancia en tu código.
+        </p>
+        
+        <a href="#explicacion" class="animate-bounce p-4 rounded-full bg-brand-600 hover:bg-brand-500 transition-colors" data-aos="fade-up" data-aos-delay="400">
+            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
+        </a>
+    </header>
+
+    <!-- SECCIÓN: EXPLICACIÓN Y ANALOGÍA -->
+    <section id="explicacion" class="py-24 px-6 max-w-5xl mx-auto">
+        <div class="grid md:grid-cols-2 gap-12 items-center">
+            <div data-aos="fade-right">
+                <h2 class="text-3xl md:text-4xl font-bold mb-6 text-brand-500">¿Qué es y cómo funciona?</h2>
+                <p class="text-lg text-gray-300 mb-4 leading-relaxed">
+                    El patrón <strong>Cadena de Responsabilidad (Comportamiento)</strong> te permite pasar solicitudes a lo largo de una cadena de manejadores (handlers). 
+                </p>
+                <p class="text-lg text-gray-300 leading-relaxed">
+                    Al recibir una solicitud, cada manejador decide si la procesa o si la pasa al siguiente manejador en la cadena. ¡Es como un filtro en cascada!
+                </p>
+            </div>
+            
+            <!-- Analogía Card -->
+            <div class="glass-card p-8 rounded-2xl shadow-2xl relative" data-aos="fade-left">
+                <div class="absolute -top-4 -right-4 bg-yellow-500 text-gray-900 font-bold px-4 py-1 rounded-full text-sm transform rotate-12">
+                    ¡La Analogía!
+                </div>
+                <h3 class="text-xl font-bold mb-4 text-white">Call Center de Soporte Técnico 🎧</h3>
+                <ol class="space-y-4 text-gray-300 font-medium">
+                    <li class="flex items-center gap-3">
+                        <span class="bg-brand-900 text-brand-100 w-8 h-8 rounded-full flex items-center justify-center font-bold">1</span>
+                        Llamas porque tu internet no funciona. Responde un <strong>Bot (Nivel 1)</strong>.
+                    </li>
+                    <li class="flex items-center gap-3">
+                        <span class="bg-brand-900 text-brand-100 w-8 h-8 rounded-full flex items-center justify-center font-bold">2</span>
+                        Si es solo reiniciar, el bot lo arregla. Si no, te pasa con un <strong>Humano (Nivel 2)</strong>.
+                    </li>
+                    <li class="flex items-center gap-3">
+                        <span class="bg-brand-900 text-brand-100 w-8 h-8 rounded-full flex items-center justify-center font-bold">3</span>
+                        Si el humano detecta que hay un cable roto en tu cuadra, lo pasa a los <strong>Técnicos de Calle (Nivel 3)</strong>.
+                    </li>
+                </ol>
+                <p class="mt-6 text-sm text-gray-400 italic">Tú (el cliente) no necesitas saber quién lo arregla, solo quieres que la cadena encuentre al responsable.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECCIÓN: PARTICIPANTES -->
+    <section class="py-24 bg-gray-900 px-6">
+        <div class="max-w-5xl mx-auto">
+            <h2 class="text-3xl md:text-4xl font-bold mb-12 text-center text-white" data-aos="fade-up">Los Participantes</h2>
+            
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Handler -->
+                <div class="glass-card p-6 rounded-xl border-t-4 border-t-brand-500 hover:-translate-y-2 transition-transform duration-300" data-aos="fade-up" data-aos-delay="100">
+                    <div class="text-brand-400 mb-4">
+                        <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-2">Handler</h3>
+                    <p class="text-sm text-gray-400">Define una interfaz (o clase abstracta) para tratar las peticiones. Opcionalmente implementa el enlace al sucesor.</p>
+                </div>
+
+                <!-- ConcreteHandler -->
+                <div class="glass-card p-6 rounded-xl border-t-4 border-t-purple-500 hover:-translate-y-2 transition-transform duration-300" data-aos="fade-up" data-aos-delay="200">
+                    <div class="text-purple-400 mb-4">
+                        <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-2">ConcreteHandler</h3>
+                    <p class="text-sm text-gray-400">Maneja la petición si es su responsabilidad; de lo contrario, la reenvía a su sucesor en la cadena.</p>
+                </div>
+
+                <!-- Client -->
+                <div class="glass-card p-6 rounded-xl border-t-4 border-t-green-500 hover:-translate-y-2 transition-transform duration-300" data-aos="fade-up" data-aos-delay="300">
+                    <div class="text-green-400 mb-4">
+                        <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-2">Client</h3>
+                    <p class="text-sm text-gray-400">Inicia la petición al primer objeto ConcreteHandler de la cadena. ¡No sabe qué objeto la resolverá finalmente!</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECCIÓN: CÓDIGO (JAVA) -->
+    <section class="py-24 px-6 max-w-5xl mx-auto">
+        <h2 class="text-3xl md:text-4xl font-bold mb-4 text-center text-brand-500" data-aos="fade-up">¡Manos a la obra! (Ejemplo en Java)</h2>
+        <p class="text-center text-gray-400 mb-10 max-w-2xl mx-auto" data-aos="fade-up" data-aos-delay="100">
+            Vamos a codificar nuestro ejemplo del Call Center. Fíjate cómo logramos bajo acoplamiento al no conectar el cliente directamente con los niveles superiores.
+        </p>
+
+        <div class="rounded-xl overflow-hidden shadow-2xl border border-gray-700" data-aos="zoom-in" data-aos-delay="200">
+            <div class="bg-gray-800 px-4 py-2 flex items-center gap-2">
+                <div class="w-3 h-3 rounded-full bg-red-500"></div>
+                <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
+                <div class="w-3 h-3 rounded-full bg-green-500"></div>
+                <span class="text-xs text-gray-400 ml-2 font-mono">CallCenterSupport.java</span>
+            </div>
+<pre><code class="language-java">
+// 1. La clase Handler abstracta
+abstract class SupportHandler {
+    protected SupportHandler nextHandler;
+
+    public void setNextHandler(SupportHandler nextHandler) {
+        this.nextHandler = nextHandler;
+    }
+
+    public abstract void handleRequest(String issueSeverity);
+}
+
+// 2. ConcreteHandler: Nivel 1 (Bot)
+class Level1Support extends SupportHandler {
+    @Override
+    public void handleRequest(String issueSeverity) {
+        if (issueSeverity.equals("LOW")) {
+            System.out.println("🤖 Bot Nivel 1: Problema resuelto. Por favor reinicie su router.");
+        } else if (nextHandler != null) {
+            System.out.println("🤖 Bot Nivel 1: Es muy complejo. Pasando a humano...");
+            nextHandler.handleRequest(issueSeverity);
+        }
+    }
+}
+
+// 2. ConcreteHandler: Nivel 2 (Humano)
+class Level2Support extends SupportHandler {
+    @Override
+    public void handleRequest(String issueSeverity) {
+        if (issueSeverity.equals("MEDIUM")) {
+            System.out.println("👨‍💻 Agente Nivel 2: He reconfigurado sus credenciales. Problema resuelto.");
+        } else if (nextHandler != null) {
+            System.out.println("👨‍💻 Agente Nivel 2: Necesitamos enviar técnicos. Escalando...");
+            nextHandler.handleRequest(issueSeverity);
+        }
+    }
+}
+
+// 2. ConcreteHandler: Nivel 3 (Terreno)
+class Level3Support extends SupportHandler {
+    @Override
+    public void handleRequest(String issueSeverity) {
+        if (issueSeverity.equals("HIGH")) {
+            System.out.println("🚐 Equipo Nivel 3: Vamos en camino a reparar la fibra óptica cortada.");
+        } else {
+            System.out.println("❌ Soporte: El problema no puede ser manejado.");
+        }
+    }
+}
+
+// 3. Client: ¡Haciendo las llamadas!
+public class Main {
+    public static void main(String[] args) {
+        // Configuramos la cadena
+        SupportHandler bot = new Level1Support();
+        SupportHandler agent = new Level2Support();
+        SupportHandler fieldTeam = new Level3Support();
+
+        bot.setNextHandler(agent);
+        agent.setNextHandler(fieldTeam);
+
+        // Simulamos clientes
+        System.out.println("--- Cliente 1 (No le carga Netflix) ---");
+        bot.handleRequest("LOW");
+
+        System.out.println("\n--- Cliente 2 (Se le desconfiguró la IP) ---");
+        bot.handleRequest("MEDIUM");
+
+        System.out.println("\n--- Cliente 3 (Un camión rompió el cable en su calle) ---");
+        bot.handleRequest("HIGH");
+    }
+}
+</code></pre>
+        </div>
+    </section>
+
+    <!-- SECCIÓN: PROS Y CONTRAS -->
+    <section class="py-24 bg-gray-900 px-6">
+        <div class="max-w-5xl mx-auto">
+            <h2 class="text-3xl font-bold mb-12 text-center text-white" data-aos="fade-up">Pros y Contras (El Análisis Crítico)</h2>
+            
+            <div class="grid md:grid-cols-2 gap-8">
+                <!-- Pros -->
+                <div class="glass-card p-8 rounded-2xl border-l-4 border-l-green-500" data-aos="fade-right">
+                    <h3 class="text-2xl font-bold text-green-400 mb-6 flex items-center gap-2">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                        Ventajas
+                    </h3>
+                    <ul class="space-y-4 text-gray-300">
+                        <li class="flex items-start gap-3">
+                            <span class="text-green-500 mt-1">✔</span>
+                            <span><strong>Reduce el acoplamiento:</strong> El cliente no sabe qué clase específica manejará su petición.</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <span class="text-green-500 mt-1">✔</span>
+                            <span><strong>Principio Open/Closed:</strong> Puedes introducir nuevos manejadores en el código sin romper el cliente existente.</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <span class="text-green-500 mt-1">✔</span>
+                            <span><strong>Flexibilidad:</strong> Puedes alterar dinámicamente la cadena de responsabilidades en tiempo de ejecución.</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Contras -->
+                <div class="glass-card p-8 rounded-2xl border-l-4 border-l-red-500" data-aos="fade-left">
+                    <h3 class="text-2xl font-bold text-red-400 mb-6 flex items-center gap-2">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                        Desventajas
+                    </h3>
+                    <ul class="space-y-4 text-gray-300">
+                        <li class="flex items-start gap-3">
+                            <span class="text-red-500 mt-1">✖</span>
+                            <span><strong>Recepción no garantizada:</strong> Si la petición llega al final de la cadena y nadie la atiende, se perderá silenciosamente.</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <span class="text-red-500 mt-1">✖</span>
+                            <span><strong>Trazabilidad difícil:</strong> Debuggear una cadena muy larga para saber dónde falló algo puede dar dolores de cabeza.</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <span class="text-red-500 mt-1">✖</span>
+                            <span><strong>Costos de rendimiento:</strong> Aunque mínimos, recorrer una cadena profunda puede impactar tiempos de respuesta.</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECCIÓN: TALLER / ACTIVIDAD -->
+    <section class="py-24 px-6 max-w-4xl mx-auto text-center">
+        <h2 class="text-3xl font-bold mb-6 text-brand-500" data-aos="zoom-in">¡Tu turno! (Actividad de Taller) 🚀</h2>
+        <div class="glass-card p-8 rounded-2xl border border-brand-500 shadow-2xl" data-aos="fade-up">
+            <p class="text-lg text-gray-200 mb-6">
+                <strong>Reto:</strong> Imagina un sistema de <strong>Aprobación de Gastos</strong> en una empresa de software.
+            </p>
+            <ul class="text-left text-gray-300 space-y-3 mb-8 bg-gray-800 p-6 rounded-lg">
+                <li>👉 Gastos menores a $100 los aprueba el <em>Team Leader</em>.</li>
+                <li>👉 Gastos entre $101 y $1,000 los aprueba el <em>Gerente de Departamento</em>.</li>
+                <li>👉 Gastos superiores a $1,000 los aprueba el <em>CEO</em>.</li>
+            </ul>
+            <p class="text-md text-gray-400 mb-6">En grupos de 3, diseñen el diagrama UML y escriban el esqueleto en código de este sistema usando Chain of Responsibility. ¡Tienen 20 minutos!</p>
+            <button class="bg-brand-600 hover:bg-brand-500 text-white font-bold py-3 px-8 rounded-full transition-all transform hover:scale-105">
+                Descargar Plantilla Base (.java)
+            </button>
+        </div>
+    </section>
+
+    <footer class="py-8 text-center text-gray-500 border-t border-gray-800 font-mono text-sm">
+        Material diseñado para Fundamentos de Ingeniería de Software. <br/> Basado en principios SWEBOK v4.
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js"></script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        // Inicializar animaciones de scroll
+        AOS.init({
+            once: true,
+            offset: 50,
+            duration: 800,
+        });
+
+        // Barra de progreso de lectura
+        window.onscroll = function() {
+            var winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            var height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            var scrolled = (winScroll / height) * 100;
+            document.getElementById("progressBar").style.width = scrolled + "%";
+        };
+    </script>
+</body>
+</html>

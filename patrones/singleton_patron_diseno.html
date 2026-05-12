@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Singleton · Patrón de Diseño GoF</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #0b0f1c;
+  --surface:   #111827;
+  --surface2:  #1a2236;
+  --border:    #1e2d45;
+  --blue:      #3b82f6;
+  --cyan:      #06b6d4;
+  --green:     #10b981;
+  --red:       #ef4444;
+  --orange:    #f59e0b;
+  --purple:    #8b5cf6;
+  --text:      #e2e8f0;
+  --muted:     #64748b;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.7;
+  font-size: 16px;
+}
+
+/* ─── HERO ─── */
+.hero {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 0 8vw;
+  position: relative;
+  overflow: hidden;
+  background: radial-gradient(ellipse 80% 60% at 70% 40%, #0d2247 0%, var(--bg) 70%);
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  right: -5vw; top: -10vh;
+  width: 55vw; height: 55vw;
+  border-radius: 50%;
+  border: 1.5px solid rgba(6,182,212,0.18);
+  pointer-events: none;
+}
+.hero::after {
+  content: '';
+  position: absolute;
+  right: 6vw; bottom: -8vh;
+  width: 38vw; height: 38vw;
+  border-radius: 50%;
+  border: 1.5px solid rgba(6,182,212,0.1);
+  pointer-events: none;
+}
+.hero-lock {
+  position: absolute;
+  right: 12vw; top: 50%;
+  transform: translateY(-55%);
+  opacity: 0.9;
+  pointer-events: none;
+}
+.hero-lock svg {
+  width: clamp(80px, 12vw, 160px);
+  fill: var(--cyan);
+  filter: drop-shadow(0 0 48px rgba(6,182,212,0.35));
+}
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(6,182,212,0.12);
+  border: 1px solid rgba(6,182,212,0.3);
+  color: var(--cyan);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  padding: 7px 16px;
+  border-radius: 40px;
+  margin-bottom: 32px;
+}
+.hero-badge::before { content: '◆'; font-size: 8px; }
+.hero h1 {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: clamp(52px, 9vw, 120px);
+  line-height: 0.95;
+  color: #fff;
+  letter-spacing: -0.03em;
+  margin-bottom: 20px;
+}
+.hero-sub {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(18px, 2.5vw, 30px);
+  font-weight: 400;
+  color: var(--cyan);
+  font-style: italic;
+  margin-bottom: 20px;
+}
+.hero-rule {
+  width: 80px; height: 3px;
+  background: var(--blue);
+  margin-bottom: 24px;
+  border-radius: 2px;
+}
+.hero-desc {
+  font-size: clamp(14px, 1.3vw, 17px);
+  color: #94a3b8;
+  max-width: 480px;
+  margin-bottom: 48px;
+}
+.hero-tags { display: flex; gap: 10px; flex-wrap: wrap; }
+.tag {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  padding: 6px 14px;
+  border-radius: 4px;
+}
+.hero-scroll {
+  position: absolute;
+  bottom: 32px; left: 50%;
+  transform: translateX(-50%);
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  color: var(--muted); font-size: 11px; letter-spacing: 0.12em;
+  animation: bounce 2s infinite;
+}
+.hero-scroll::after { content: '↓'; font-size: 20px; color: var(--cyan); }
+@keyframes bounce {
+  0%,100% { transform: translateX(-50%) translateY(0); }
+  50%      { transform: translateX(-50%) translateY(6px); }
+}
+
+/* ─── LAYOUT ─── */
+main { max-width: 900px; margin: 0 auto; padding: 80px 24px 120px; }
+
+/* ─── SECTION HEADERS ─── */
+.section-tag {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; letter-spacing: 0.18em;
+  color: var(--cyan); text-transform: uppercase;
+  margin-bottom: 12px;
+}
+.section-tag::before {
+  content: '';
+  display: inline-block;
+  width: 24px; height: 1.5px;
+  background: var(--cyan);
+}
+h2 {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: clamp(26px, 4vw, 40px);
+  line-height: 1.15;
+  color: #fff;
+  letter-spacing: -0.02em;
+  margin-bottom: 32px;
+}
+.section-sep {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 72px 0;
+}
+
+/* ─── QUOTE ─── */
+.blockquote {
+  background: var(--surface);
+  border-left: 4px solid var(--cyan);
+  border-radius: 0 8px 8px 0;
+  padding: 28px 32px;
+  margin-bottom: 40px;
+  position: relative;
+}
+.blockquote::before {
+  content: '"';
+  position: absolute;
+  top: -10px; left: 24px;
+  font-size: 64px;
+  font-family: 'Syne', sans-serif;
+  color: var(--cyan); opacity: 0.3;
+  line-height: 1;
+}
+.blockquote p { font-size: 17px; color: #cbd5e1; line-height: 1.6; font-style: italic; }
+.blockquote strong { color: var(--cyan); font-style: normal; }
+
+/* ─── CARDS 3-col ─── */
+.cards-3 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-top: 3px solid var(--blue);
+  border-radius: 8px;
+  padding: 24px;
+  display: flex; flex-direction: column; gap: 10px;
+  transition: border-color 0.2s, transform 0.2s;
+}
+.card:hover { transform: translateY(-3px); border-top-color: var(--cyan); }
+.card.green { border-top-color: var(--green); }
+.card.cyan  { border-top-color: var(--cyan); }
+.card-icon { font-size: 24px; }
+.card h3 { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; color: #fff; }
+.card p   { font-size: 14px; color: #94a3b8; line-height: 1.5; }
+.card .source { font-size: 12px; color: var(--muted); margin-top: auto; padding-top: 8px; font-style: italic; }
+
+/* ─── UML ─── */
+.uml-wrap {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px; align-items: start;
+}
+@media (max-width: 640px) { .uml-wrap { grid-template-columns: 1fr; } }
+.uml-box {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px; overflow: hidden;
+  font-family: 'JetBrains Mono', monospace; font-size: 14px;
+}
+.uml-head {
+  background: var(--surface2); padding: 12px 20px;
+  text-align: center; border-bottom: 1px solid var(--border);
+  color: var(--cyan); font-weight: 700;
+}
+.uml-section { padding: 14px 20px; border-bottom: 1px solid var(--border); }
+.uml-label { font-size: 11px; color: var(--muted); font-style: italic; margin-bottom: 8px; font-family: 'DM Sans', sans-serif; }
+.uml-line { padding: 2px 0; }
+.neg { color: #f59e0b; }
+.pos { color: var(--green); }
+.uml-notes { display: flex; flex-direction: column; gap: 12px; }
+.uml-note {
+  background: var(--surface); border: 1px solid var(--border);
+  border-left: 4px solid var(--blue);
+  border-radius: 0 8px 8px 0; padding: 16px 20px;
+}
+.uml-note.cyan  { border-left-color: var(--cyan); }
+.uml-note.green { border-left-color: var(--green); }
+.uml-note h4 { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; color: #fff; margin-bottom: 4px; }
+.uml-note p  { font-size: 13px; color: #94a3b8; line-height: 1.4; }
+
+/* ─── CODE ─── */
+.code-block {
+  background: #0d1117; border: 1px solid var(--border);
+  border-radius: 10px; overflow: hidden; margin-bottom: 16px;
+}
+.code-topbar {
+  background: var(--surface); padding: 12px 20px;
+  display: flex; align-items: center; gap: 8px;
+  border-bottom: 1px solid var(--border);
+  font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--muted);
+}
+.code-topbar::before { content: '●  ●  ●'; color: #374151; margin-right: 8px; }
+.code-body {
+  padding: 24px;
+  font-family: 'JetBrains Mono', monospace; font-size: 13.5px; line-height: 1.7;
+  overflow-x: auto;
+}
+.code-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+@media (max-width: 640px) { .code-2col { grid-template-columns: 1fr; } }
+.kw    { color: #c792ea; }
+.kw2   { color: #82aaff; }
+.cls   { color: #ffcb6b; }
+.cmt   { color: #546e7a; font-style: italic; }
+.null-kw { color: #f78c6c; }
+.mth   { color: #82aaff; }
+.code-tags { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; }
+.code-tag {
+  background: var(--surface); border: 1px solid var(--border);
+  border-left: 3px solid var(--orange);
+  border-radius: 0 6px 6px 0; padding: 10px 16px;
+  flex: 1; min-width: 160px;
+}
+.code-tag.cyan  { border-left-color: var(--cyan); }
+.code-tag.green { border-left-color: var(--green); }
+.code-tag.blue  { border-left-color: var(--blue); }
+.code-tag h4 { font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 700; color: #fff; margin-bottom: 3px; }
+.code-tag p  { font-size: 12px; color: #94a3b8; line-height: 1.4; }
+.code-warning {
+  background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.25);
+  border-radius: 6px; padding: 10px 16px; font-size: 13px; color: #f59e0b;
+  display: flex; align-items: center; gap: 8px; margin-bottom: 32px;
+}
+
+/* ─── USE CASES ─── */
+.usecase-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+}
+.usecase-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-top: 3px solid var(--blue); border-radius: 8px;
+  padding: 22px; display: flex; flex-direction: column; gap: 10px;
+  transition: transform 0.2s;
+}
+.usecase-card:hover { transform: translateY(-3px); }
+.usecase-card.c1 { border-top-color: var(--blue); }
+.usecase-card.c2 { border-top-color: var(--cyan); }
+.usecase-card.c3 { border-top-color: var(--green); }
+.usecase-card.c4 { border-top-color: var(--orange); }
+.usecase-card.c5 { border-top-color: var(--purple); }
+.usecase-card.c6 { border-top-color: var(--red); }
+.usecase-head { display: flex; align-items: center; gap: 12px; }
+.usecase-icon { font-size: 22px; }
+.usecase-head h3 { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; color: #fff; }
+.usecase-card p { font-size: 13.5px; color: #94a3b8; line-height: 1.5; }
+
+/* ─── PROS / CONS ─── */
+.pros-cons { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+@media (max-width: 600px) { .pros-cons { grid-template-columns: 1fr; } }
+.col-header {
+  display: flex; align-items: center; gap: 10px;
+  font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 800;
+  letter-spacing: 0.1em; color: #fff;
+  padding: 14px 18px; border-radius: 8px 8px 0 0;
+}
+.col-header.green { background: var(--green); }
+.col-header.red   { background: var(--red); }
+.pc-list {
+  background: var(--surface); border: 1px solid var(--border);
+  border-top: none; border-radius: 0 0 8px 8px; overflow: hidden;
+}
+.pc-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 13px 18px; border-bottom: 1px solid var(--border);
+  font-size: 14px; color: #cbd5e1;
+}
+.pc-item:last-child { border-bottom: none; }
+.pc-dot { width: 4px; height: 36px; border-radius: 2px; flex-shrink: 0; }
+.pc-dot.green { background: var(--green); }
+.pc-dot.red   { background: var(--red); }
+
+/* ─── TABLE ─── */
+.alt-table { width: 100%; border-collapse: collapse; font-size: 14px; margin-bottom: 16px; }
+.alt-table thead tr { background: var(--surface2); }
+.alt-table thead th {
+  padding: 14px 20px; text-align: left;
+  font-family: 'Syne', sans-serif; font-weight: 700; font-size: 13px;
+  color: #fff; letter-spacing: 0.04em; border-bottom: 2px solid var(--border);
+}
+.alt-table tbody tr { border-bottom: 1px solid var(--border); transition: background 0.15s; }
+.alt-table tbody tr:hover { background: var(--surface); }
+.alt-table td { padding: 14px 20px; color: #cbd5e1; }
+.alt-table td:nth-child(2) { color: var(--blue); font-weight: 600; }
+.alt-table td:nth-child(3) { color: var(--green); font-style: italic; }
+.tip-box {
+  background: rgba(6,182,212,0.07); border: 1px solid rgba(6,182,212,0.2);
+  border-radius: 8px; padding: 14px 20px; font-size: 14px; color: #94a3b8;
+  display: flex; align-items: flex-start; gap: 10px;
+}
+.tip-box span { flex-shrink: 0; font-size: 18px; }
+
+/* ─── CONCLUSIONS ─── */
+.conclusions { display: flex; flex-direction: column; gap: 16px; margin-bottom: 32px; }
+.conclusion-item {
+  display: flex; align-items: flex-start; gap: 20px;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 8px; padding: 22px 24px; transition: border-color 0.2s;
+}
+.conclusion-item:hover { border-color: var(--cyan); }
+.conclusion-num {
+  background: var(--blue); color: #fff;
+  font-family: 'Syne', sans-serif; font-weight: 800; font-size: 18px;
+  width: 42px; height: 42px; border-radius: 6px;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.conclusion-item h4 { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; color: var(--cyan); margin-bottom: 4px; }
+.conclusion-item p  { font-size: 14px; color: #94a3b8; line-height: 1.5; }
+.final-quote {
+  text-align: center; font-size: 16px; font-style: italic;
+  color: #64748b; padding: 32px;
+  border: 1px solid var(--border); border-radius: 8px; background: var(--surface);
+}
+.final-quote::before { content: '«'; color: var(--cyan); }
+.final-quote::after  { content: '»'; color: var(--cyan); }
+
+/* ─── FOOTER ─── */
+footer {
+  text-align: center; padding: 48px 24px;
+  border-top: 1px solid var(--border);
+  color: var(--muted); font-family: 'JetBrains Mono', monospace;
+  font-size: 12px; letter-spacing: 0.08em;
+}
+
+/* ─── FADE IN ─── */
+.fade-in { opacity: 0; transform: translateY(20px); transition: opacity 0.5s ease, transform 0.5s ease; }
+.fade-in.visible { opacity: 1; transform: none; }
+</style>
+</head>
+<body>
+
+<section class="hero">
+  <div class="hero-badge">Patrones de Diseño GoF · Patrón Creacional</div>
+  <h1>Singleton</h1>
+  <div class="hero-sub">Instancia Única</div>
+  <div class="hero-rule"></div>
+  <p class="hero-desc">Garantiza una sola instancia global de una clase y proporciona un punto de acceso controlado a ella.</p>
+  <div class="hero-tags">
+    <span class="tag">creacional</span>
+    <span class="tag">GoF · 1994</span>
+    <span class="tag">thread-safe</span>
+    <span class="tag">lazy-init</span>
+  </div>
+  <div class="hero-lock">
+    <svg viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM12 17c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
+  </div>
+  <div class="hero-scroll">SCROLL</div>
+</section>
+
+<main>
+
+  <!-- 01 DEFINICIÓN -->
+  <section id="definicion" class="fade-in">
+    <div class="section-tag">01 · Definición</div>
+    <h2>¿Qué es el Singleton?</h2>
+    <div class="blockquote">
+      <p>Garantiza que una clase tenga <strong>una sola instancia</strong> y proporciona un punto de acceso global a ella.</p>
+    </div>
+    <div class="cards-3">
+      <div class="card">
+        <div class="card-icon">🔒</div>
+        <h3>Una sola instancia</h3>
+        <p>Restringe la creación de múltiples objetos de la misma clase en toda la aplicación.</p>
+        <div class="source">Gang of Four · Design Patterns (1994)</div>
+      </div>
+      <div class="card cyan">
+        <div class="card-icon">🔑</div>
+        <h3>Acceso global</h3>
+        <p>Provee un punto de acceso único y controlado desde cualquier parte del código.</p>
+      </div>
+      <div class="card green">
+        <div class="card-icon">🛡️</div>
+        <h3>Lazy initialization</h3>
+        <p>El objeto se crea solo cuando se necesita por primera vez — inicialización diferida.</p>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-sep">
+
+  <!-- 02 ESTRUCTURA -->
+  <section id="estructura" class="fade-in">
+    <div class="section-tag">02 · Estructura</div>
+    <h2>Diagrama UML</h2>
+    <div class="uml-wrap">
+      <div class="uml-box">
+        <div class="uml-head">«class» Singleton</div>
+        <div class="uml-section">
+          <div class="uml-label">Atributos</div>
+          <div class="uml-line"><span class="neg">- </span>instance: Singleton</div>
+        </div>
+        <div class="uml-section">
+          <div class="uml-label">Métodos</div>
+          <div class="uml-line"><span class="neg">- </span>Singleton()</div>
+          <div class="uml-line"><span class="pos">+ </span>getInstance(): Singleton</div>
+        </div>
+      </div>
+      <div class="uml-notes">
+        <div class="uml-note">
+          <h4>Constructor privado</h4>
+          <p>Impide que otras clases instancien el objeto directamente con <code>new</code>.</p>
+        </div>
+        <div class="uml-note cyan">
+          <h4>Atributo estático</h4>
+          <p>Almacena la única instancia; es propiedad de la clase, no de un objeto.</p>
+        </div>
+        <div class="uml-note green">
+          <h4>Método getInstance()</h4>
+          <p>Punto de acceso global. Crea la instancia si no existe, o la retorna.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-sep">
+
+  <!-- 03 CÓDIGO -->
+  <section id="codigo" class="fade-in">
+    <div class="section-tag">03 · Código</div>
+    <h2>Implementación en múltiples lenguajes</h2>
+
+    <div class="code-block">
+      <div class="code-topbar">Singleton.java · Implementación Thread-Safe</div>
+      <div class="code-body"><span class="kw">public class</span> <span class="cls">Singleton</span> {<br>
+&nbsp;&nbsp;<span class="kw">private static</span> <span class="kw2">volatile</span> <span class="cls">Singleton</span> instance;<br><br>
+&nbsp;&nbsp;<span class="kw">private</span> <span class="mth">Singleton</span>() {} <span class="cmt">// Constructor privado</span><br><br>
+&nbsp;&nbsp;<span class="kw">public static synchronized</span> <span class="cls">Singleton</span> <span class="mth">getInstance</span>() {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if</span> (instance == <span class="null-kw">null</span>) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;instance = <span class="kw">new</span> <span class="cls">Singleton</span>();<br>
+&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span> instance;<br>
+&nbsp;&nbsp;}<br>
+}</div>
+    </div>
+
+    <div class="code-tags">
+      <div class="code-tag"><h4>volatile</h4><p>Garantiza visibilidad entre hilos (thread-safe).</p></div>
+      <div class="code-tag cyan"><h4>synchronized</h4><p>Bloqueo para evitar condiciones de carrera.</p></div>
+      <div class="code-tag green"><h4>Constructor privado</h4><p>Evita instanciación externa.</p></div>
+      <div class="code-tag blue"><h4>Lazy loading</h4><p>Instancia creada solo en la primera llamada.</p></div>
+    </div>
+    <div class="code-warning">⚠ Double-Checked Locking es preferible para mejor rendimiento en Java 5+</div>
+
+    <div class="code-2col">
+      <div class="code-block" style="margin-bottom:0">
+        <div class="code-topbar">singleton.py</div>
+        <div class="code-body"><span class="kw">class</span> <span class="cls">SingletonMeta</span>(<span class="kw2">type</span>):<br>
+&nbsp;&nbsp;_instances = {}<br><br>
+&nbsp;&nbsp;<span class="kw">def</span> <span class="mth">__call__</span>(cls, *args, **kw):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if</span> cls <span class="kw">not in</span> cls._instances:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;cls._instances[cls] = \<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw2">super</span>().<span class="mth">__call__</span>(*args, **kw)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span> cls._instances[cls]<br><br>
+<span class="kw">class</span> <span class="cls">Singleton</span>(metaclass=<span class="cls">SingletonMeta</span>):<br>
+&nbsp;&nbsp;<span class="kw">pass</span></div>
+      </div>
+      <div class="code-block" style="margin-bottom:0">
+        <div class="code-topbar">singleton.js</div>
+        <div class="code-body"><span class="kw">class</span> <span class="cls">Singleton</span> {<br>
+&nbsp;&nbsp;<span class="kw2">static</span> #instance = <span class="null-kw">null</span>;<br><br>
+&nbsp;&nbsp;<span class="mth">constructor</span>() {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if</span> (<span class="cls">Singleton</span>.#instance) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span> <span class="cls">Singleton</span>.#instance;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="cls">Singleton</span>.#instance = <span class="kw2">this</span>;<br>
+&nbsp;&nbsp;}<br><br>
+&nbsp;&nbsp;<span class="kw2">static</span> <span class="mth">getInstance</span>() {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span> <span class="kw2">this</span>.#instance ??<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">new</span> <span class="cls">Singleton</span>();<br>
+&nbsp;&nbsp;}<br>
+}</div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-sep">
+
+  <!-- 04 CASOS DE USO -->
+  <section id="casos" class="fade-in">
+    <div class="section-tag">04 · Casos de Uso</div>
+    <h2>¿Dónde se usa el Singleton?</h2>
+    <div class="usecase-grid">
+      <div class="usecase-card c1">
+        <div class="usecase-head"><span class="usecase-icon">🖨️</span><h3>Logger / Sistema de Log</h3></div>
+        <p>Un único sistema de registro evita conflictos de escritura y garantiza consistencia en los registros.</p>
+      </div>
+      <div class="usecase-card c2">
+        <div class="usecase-head"><span class="usecase-icon">🗄️</span><h3>Pool de Conexiones BD</h3></div>
+        <p>Gestión centralizada de conexiones a bases de datos. Evita crear múltiples conexiones costosas.</p>
+      </div>
+      <div class="usecase-card c3">
+        <div class="usecase-head"><span class="usecase-icon">⚙️</span><h3>Configuración Global</h3></div>
+        <p>Lectura de archivos .env o config.json una sola vez; accesible desde cualquier módulo.</p>
+      </div>
+      <div class="usecase-card c4">
+        <div class="usecase-head"><span class="usecase-icon">🎮</span><h3>Game Manager</h3></div>
+        <p>En videojuegos, maneja el estado global: puntuación, vidas, nivel actual y configuración.</p>
+      </div>
+      <div class="usecase-card c5">
+        <div class="usecase-head"><span class="usecase-icon">🔀</span><h3>Cache / Estado Compartido</h3></div>
+        <p>Almacén de caché en memoria compartido entre componentes sin duplicar datos.</p>
+      </div>
+      <div class="usecase-card c6">
+        <div class="usecase-head"><span class="usecase-icon">🛡️</span><h3>Auth Manager</h3></div>
+        <p>Gestión de sesión de usuario: token, permisos y estado de autenticación centralizado.</p>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-sep">
+
+  <!-- 05 ANÁLISIS -->
+  <section id="analisis" class="fade-in">
+    <div class="section-tag">05 · Análisis Crítico</div>
+    <h2>Ventajas y Desventajas</h2>
+    <div class="pros-cons">
+      <div>
+        <div class="col-header green">✔ &nbsp;VENTAJAS</div>
+        <div class="pc-list">
+          <div class="pc-item"><div class="pc-dot green"></div>Garantiza una única instancia en toda la app</div>
+          <div class="pc-item"><div class="pc-dot green"></div>Acceso global sin necesidad de pasar referencias</div>
+          <div class="pc-item"><div class="pc-dot green"></div>Lazy initialization: ahorra recursos si no se usa</div>
+          <div class="pc-item"><div class="pc-dot green"></div>Control centralizado del recurso compartido</div>
+          <div class="pc-item"><div class="pc-dot green"></div>Fácil de implementar en la mayoría de lenguajes</div>
+        </div>
+      </div>
+      <div>
+        <div class="col-header red">✘ &nbsp;DESVENTAJAS</div>
+        <div class="pc-list">
+          <div class="pc-item"><div class="pc-dot red"></div>Dificulta las pruebas unitarias (mocking complejo)</div>
+          <div class="pc-item"><div class="pc-dot red"></div>Introduce estado global — viola principio SRP</div>
+          <div class="pc-item"><div class="pc-dot red"></div>Problemas en entornos multihilo si no es thread-safe</div>
+          <div class="pc-item"><div class="pc-dot red"></div>Acoplamiento oculto entre módulos</div>
+          <div class="pc-item"><div class="pc-dot red"></div>Considerado anti-patrón en algunos contextos</div>
+        </div>
+      </div>
+    </div>
+
+    <hr class="section-sep" style="margin: 48px 0 40px;">
+    <div class="section-tag">05 · Alternativas</div>
+    <h2>¿Cuándo usar algo diferente?</h2>
+    <table class="alt-table">
+      <thead>
+        <tr>
+          <th>Singleton hace...</th>
+          <th>Mejor alternativa</th>
+          <th>Beneficio</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Estado global mutable</td><td>Inyección de Dependencias (DI)</td><td>Más testeable, bajo acoplamiento</td></tr>
+        <tr><td>Cache compartida</td><td>Context / Provider (React, etc.)</td><td>Scope controlado, sin estado global</td></tr>
+        <tr><td>Config del sistema</td><td>Módulo / Namespace exportado</td><td>Inmutable, carga única sin clase</td></tr>
+        <tr><td>Pool de conexiones</td><td>Factory + IoC Container</td><td>Ciclo de vida gestionado por framework</td></tr>
+      </tbody>
+    </table>
+    <div class="tip-box">
+      <span>💡</span>
+      El Singleton no está mal; el problema es usarlo cuando no se necesita estado global real.
+    </div>
+  </section>
+
+  <hr class="section-sep">
+
+  <!-- 06 CONCLUSIONES -->
+  <section id="conclusiones" class="fade-in">
+    <div class="section-tag">06 · Conclusiones</div>
+    <h2>Lo que debes recordar</h2>
+    <div class="conclusions">
+      <div class="conclusion-item">
+        <div class="conclusion-num">1</div>
+        <div><h4>Úsalo cuando necesites realmente una instancia única</h4><p>Logging, configuración, conexiones BD son buenos candidatos.</p></div>
+      </div>
+      <div class="conclusion-item">
+        <div class="conclusion-num">2</div>
+        <div><h4>Hazlo thread-safe desde el inicio</h4><p>volatile + synchronized en Java; locks en Python para entornos concurrentes.</p></div>
+      </div>
+      <div class="conclusion-item">
+        <div class="conclusion-num">3</div>
+        <div><h4>Evítalo si solo buscas comodidad</h4><p>Estado global oculta dependencias y dificulta el testing.</p></div>
+      </div>
+      <div class="conclusion-item">
+        <div class="conclusion-num">4</div>
+        <div><h4>Considera la Inyección de Dependencias (DI)</h4><p>En proyectos grandes, un IoC container gestiona mejor el ciclo de vida.</p></div>
+      </div>
+    </div>
+    <div class="final-quote">Singleton es un patrón clásico del GoF — úsalo con criterio, no como conveniencia.</div>
+  </section>
+
+</main>
+
+<footer>Patrones de Diseño GoF · Ingeniería de Software · Singleton — Patrón Creacional</footer>
+
+<script>
+  const observer = new IntersectionObserver(
+    entries => entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); }),
+    { threshold: 0.08 }
+  );
+  document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>

@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patrón de Diseño: Composite en Java</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+    <style>
+        pre[class*="language-"] { border-radius: 0.5rem; margin-top: 1.5rem; margin-bottom: 1.5rem; }
+        .section-card { background: white; border-radius: 1rem; padding: 2.5rem; box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1); border: 1px solid #e2e8f0; margin-bottom: 2.5rem; }
+        .feature-badge { background: #f0fdfa; border: 1px solid #ccfbf1; color: #115e59; padding: 0.5rem 1rem; border-radius: 9999px; font-size: 0.875rem; font-weight: 600; }
+        .accent-border { border-left: 4px solid #14b8a6; padding-left: 1.5rem; }
+        .method-card { background: #f8fafc; border: 1px solid #e2e8f0; padding: 1rem; border-radius: 0.75rem; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased">
+
+    <!-- Encabezado -->
+    <header class="bg-teal-800 text-white shadow-2xl py-12 px-6">
+        <div class="max-w-4xl mx-auto flex justify-between items-center">
+            <div>
+                <h1 class="text-5xl font-extrabold mb-4 tracking-tight">Patrón Composite</h1>
+                <p class="text-teal-200 text-lg font-light">Dominando las jerarquías Parte-Todo en Java</p>
+            </div>
+            <div class="text-right border-l border-teal-700 pl-8">
+                <p class="text-teal-400 text-xs uppercase tracking-widest font-bold">Documentación por</p>
+                <p class="text-2xl font-serif italic text-white">Diego Torres</p>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto px-6 py-12">
+
+        <!-- 1. Introducción -->
+        <section class="section-card">
+            <h2 class="text-3xl font-bold text-teal-800 mb-6 flex items-center">
+                <span class="mr-3 text-teal-500/50">01.</span> Introducción
+            </h2>
+            <div class="accent-border">
+                <p class="text-slate-600 leading-relaxed text-lg">
+                    En la ingeniería de software, representar jerarquías complejas suele ser un reto arquitectónico. El patrón <strong>Composite</strong> surge como la solución definitiva para manejar estructuras tipo árbol, permitiendo que el sistema ignore la distinción técnica entre un objeto individual y un grupo de objetos. Esta abstracción reduce drásticamente la presencia de condicionales y acoplamiento innecesario.
+                </p>
+            </div>
+        </section>
+
+        <!-- 2. ¿Qué es el patrón? -->
+        <section class="section-card">
+            <h2 class="text-3xl font-bold text-teal-800 mb-6 flex items-center">
+                <span class="mr-3 text-teal-500/50">02.</span> ¿Qué es el Patrón Composite?
+            </h2>
+            <p class="text-slate-600 mb-6 leading-relaxed">
+                Es un patrón de diseño <strong>estructural</strong> que permite componer objetos en estructuras de árbol para representar jerarquías de "parte-todo". Su esencia radica en que tanto los componentes básicos (Hojas) como los contenedores (Compuestos) comparten una <strong>interfaz común</strong>. Esto permite que el código cliente sea agnóstico a la estructura interna del árbol, tratando a cada nodo con el mismo respeto y protocolo.
+            </p>
+        </section>
+
+        <!-- 3. Características -->
+        <section class="section-card">
+            <h2 class="text-3xl font-bold text-teal-800 mb-8 flex items-center">
+                <span class="mr-3 text-teal-500/50">03.</span> Características
+            </h2>
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="flex flex-col items-center text-center p-4 bg-slate-50 rounded-lg">
+                    <span class="feature-badge mb-2">Recursividad</span>
+                    <p class="text-[11px] text-slate-500 font-medium">Contenedores que pueden albergar otros contenedores.</p>
+                </div>
+                <div class="flex flex-col items-center text-center p-4 bg-slate-50 rounded-lg">
+                    <span class="feature-badge mb-2">Uniformidad</span>
+                    <p class="text-[11px] text-slate-500 font-medium">Trato igualitario para hojas y compuestos.</p>
+                </div>
+                <div class="flex flex-col items-center text-center p-4 bg-slate-50 rounded-lg">
+                    <span class="feature-badge mb-2">Transparencia</span>
+                    <p class="text-[11px] text-slate-500 font-medium">El cliente desconoce la estructura interna.</p>
+                </div>
+                <div class="flex flex-col items-center text-center p-4 bg-slate-50 rounded-lg">
+                    <span class="feature-badge mb-2">Jerarquía</span>
+                    <p class="text-[11px] text-slate-500 font-medium">Representación perfecta de "Parte-Todo".</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. Diagrama de Clases -->
+        <section class="section-card">
+            <h2 class="text-3xl font-bold text-teal-800 mb-6 flex items-center">
+                <span class="mr-3 text-teal-500/50">04.</span> Diagrama de Clases
+            </h2>
+            <p class="text-slate-600 mb-6 leading-relaxed">
+                La arquitectura del patrón se define por la relación de herencia y composición entre sus elementos principales:
+            </p>
+            <div class="bg-slate-50 border border-slate-200 p-8 rounded-2xl font-mono text-[13px] overflow-x-auto text-slate-700 whitespace-pre shadow-inner">
+                ┌──────────────────────┐
+                │ ComponenteArchivo    │
+                │----------------------│
+                │ + mostrarDetalles()  │
+                └──────────┬───────────┘
+                           ▲
+                ┌──────────┴──────────┐
+                │                     │
+    ┌─────────────────────┐   ┌────────────────────────┐
+    │       Archivo       │   │        Carpeta         │
+    │---------------------│   │------------------------│
+    │ - nombre : String   │   │ - nombre : String      │
+    │ - tamaño : int      │   │ - hijos : List&lt;ComponenteArchivo&gt; │
+    │---------------------│   │------------------------│
+    │ + mostrarDetalles() │   │ + agregar()            │
+    └─────────────────────┘   │ + eliminar()           │
+                              │ + mostrarDetalles()    │
+                              └──────────┬─────────────┘
+                                         │
+                                         │ contiene
+                                         ▼
+                                  ComponenteArchivo
+            </div>
+        </section>
+
+        <!-- 5. Ejemplo Conceptual -->
+        <section class="section-card">
+            <h2 class="text-3xl font-bold text-teal-800 mb-6 flex items-center">
+                <span class="mr-3 text-teal-500/50">05.</span> Ejemplo Conceptual
+            </h2>
+            <p class="text-slate-600 mb-6 italic">Representación de un sistema de archivos tradicional mediante árbol de texto:</p>
+            <div class="bg-slate-800 text-teal-400 p-8 rounded-2xl font-mono text-sm shadow-2xl relative">
+                <span class="text-yellow-500">ROOT (Composite)</span><br>
+                ├── <span class="text-blue-400">Binarios (Composite)</span><br>
+                │   ├── java.exe <span class="text-slate-500">(Leaf)</span><br>
+                │   └── javac.exe <span class="text-slate-500">(Leaf)</span><br>
+                ├── <span class="text-blue-400">Librerías (Composite)</span><br>
+                │   ├── <span class="text-blue-400">Core (Composite)</span><br>
+                │   │   └── rt.jar <span class="text-slate-500">(Leaf)</span><br>
+                │   └── log4j.jar <span class="text-slate-500">(Leaf)</span><br>
+                └── readme.txt <span class="text-slate-500">(Leaf)</span>
+            </div>
+        </section>
+
+        <!-- 6. Implementación en Java -->
+        <section class="section-card">
+            <h2 class="text-3xl font-bold text-teal-800 mb-6 flex items-center">
+                <span class="mr-3 text-teal-500/50">06.</span> Implementación en Java
+            </h2>
+            <p class="text-slate-600 mb-4 font-medium text-sm">Código fuente diseñado siguiendo el contrato del patrón:</p>
+<pre><code class="language-java">// Componente: Define el contrato común para todos los nodos
+interface SistemaArchivo {
+    void listar(String indentacion);
+}
+
+// Hoja: Elemento terminal que realiza el trabajo real
+class Archivo implements SistemaArchivo {
+    private String nombre;
+
+    public Archivo(String nombre) { this.nombre = nombre; }
+
+    @Override
+    public void listar(String indent) {
+        System.out.println(indent + "📄 " + nombre);
+    }
+}
+
+// Composite: Contenedor que gestiona una lista de componentes
+import java.util.*;
+
+class Carpeta implements SistemaArchivo {
+    private String nombre;
+    private List&lt;SistemaArchivo&gt; contenidos = new ArrayList&lt;&gt;();
+
+    public Carpeta(String nombre) { this.nombre = nombre; }
+
+    public void agregar(SistemaArchivo sa) { contenidos.add(sa); }
+
+    @Override
+    public void listar(String indent) {
+        System.out.println(indent + "📂 [" + nombre + "]");
+        for (SistemaArchivo item : contenidos) {
+            item.listar(indent + "   ");
+        }
+    }
+}</code></pre>
+        </section>
+
+        <!-- 7. Recorrido del Árbol -->
+        <section class="section-card">
+            <h2 class="text-3xl font-bold text-teal-800 mb-6 flex items-center">
+                <span class="mr-3 text-teal-500/50">07.</span> Recorrido del Árbol
+            </h2>
+            <p class="text-slate-600 mb-6 leading-relaxed">
+                Puedes recorrer el árbol de varias formas dependiendo de tus necesidades:
+            </p>
+            <div class="grid md:grid-cols-2 gap-4">
+                <div class="method-card">
+                    <h4 class="font-bold text-teal-700 mb-2">Depth First Search (DFS)</h4>
+                    <p class="text-xs text-slate-500">Explora lo más profundo posible por cada rama antes de retroceder. Es la forma más natural y eficiente para jerarquías recursivas, ya que utiliza la pila de llamadas del sistema.</p>
+                </div>
+                <div class="method-card">
+                    <h4 class="font-bold text-teal-700 mb-2">Breadth First Search (BFS)</h4>
+                    <p class="text-xs text-slate-500">Explora nivel por nivel (primero todos los hijos directos, luego los nietos). Funciona procesando los nodos de forma horizontal antes de bajar al siguiente nivel de profundidad.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 8. Ventajas y Desventajas -->
+        <section class="section-card">
+            <h2 class="text-3xl font-bold text-teal-800 mb-8 flex items-center">
+                <span class="mr-3 text-teal-500/50">08.</span> Ventajas y Desventajas
+            </h2>
+            <div class="grid md:grid-cols-2 gap-10">
+                <div class="space-y-4">
+                    <h3 class="text-xl font-bold text-emerald-700 flex items-center">
+                        <span class="mr-2">✔️</span> Ventajas
+                    </h3>
+                    <ul class="space-y-3 text-sm text-slate-600 border-t border-emerald-100 pt-4">
+                        <li><strong>Polimorfismo:</strong> Permite recorrer estructuras complejas recursivamente con una sola llamada inicial.</li>
+                        <li><strong>Escalabilidad:</strong> Se pueden agregar nuevas clases Hoja o Compuesto sin modificar el cliente.</li>
+                        <li><strong>Código Limpio:</strong> Elimina bloques repetitivos de validación de tipos de objetos.</li>
+                    </ul>
+                </div>
+                <div class="space-y-4">
+                    <h3 class="text-xl font-bold text-rose-700 flex items-center">
+                        <span class="mr-2">❌</span> Desventajas
+                    </h3>
+                    <ul class="space-y-3 text-sm text-slate-600 border-t border-rose-100 pt-4">
+                        <li><strong>Dificultad de Restricción:</strong> Puede ser complejo limitar qué tipos de hijos se permiten en un compuesto específico.</li>
+                        <li><strong>Sobrediseño:</strong> En jerarquías muy simples, puede añadir una capa de abstracción innecesaria.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- 9. Usos Cotidianos -->
+        <section class="section-card">
+            <h2 class="text-3xl font-bold text-teal-800 mb-8 flex items-center">
+                <span class="mr-3 text-teal-500/50">09.</span> Usos Cotidianos
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="p-6 bg-slate-50 rounded-xl border border-slate-200">
+                    <div class="text-2xl mb-2">🌐</div>
+                    <h4 class="font-bold text-teal-900 mb-1 text-sm">DOM HTML</h4>
+                    <p class="text-[11px] text-slate-500">Estructura fundamental de la web donde elementos contienen otros elementos.</p>
+                </div>
+                <div class="p-6 bg-slate-50 rounded-xl border border-slate-200">
+                    <div class="text-2xl mb-2">📦</div>
+                    <h4 class="font-bold text-teal-900 mb-1 text-sm">Logística</h4>
+                    <p class="text-[11px] text-slate-500">Manejo de inventarios con empaques anidados (Caja > Paquete > Producto).</p>
+                </div>
+                <div class="p-6 bg-slate-50 rounded-xl border border-slate-200">
+                    <div class="text-2xl mb-2">🎨</div>
+                    <h4 class="font-bold text-teal-900 mb-1 text-sm">Motores Gráficos</h4>
+                    <p class="text-[11px] text-slate-500">Agrupación de objetos 3D para aplicar transformaciones globales.</p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-slate-900 text-slate-400 py-10 text-center text-xs">
+        <p class="font-bold text-white mb-2 uppercase tracking-widest">Diego Torres - Ingeniería de Software</p>
+        <p>&copy; 2024 - Guía Profesional de Patrones de Diseño</p>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js"></script>
+</body>
+</html>

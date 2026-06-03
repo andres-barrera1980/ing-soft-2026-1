@@ -49,22 +49,5 @@ Si tuviste que hacer varias iteraciones, pega la MEJOR respuesta obtenida,
 pero menciona cuántas iteraciones hiciste.]
 
 ```
-
----
-
-### Análisis crítico de la respuesta
-
-#### 1. ¿Qué hizo bien el prompt?
-
-[Evalúa tu propio prompt, no la respuesta del LLM. ¿El contexto fue suficiente? ¿Las restricciones fueron claras? ¿El formato de salida que pediste ayudó a obtener una buena respuesta? ¿Qué parte de tu prompt fue más efectiva? Sé específico: menciona fragmentos concretos de tu prompt que funcionaron bien.]
-
-
-#### 2. ¿Qué se puede mejorar?
-
-[¿Qué le faltó a tu prompt? ¿Qué harías diferente si pudieras reformularlo? ¿El LLM entendió mal algo por falta de claridad en tu prompt? ¿La respuesta tiene errores u omisiones? ¿Qué no cubrió el LLM que tú sí sabes por lo visto en clase?]
-
-
-#### 3. Respuesta final
-
-[Escribe tu respuesta definitiva a la pregunta del parcial, integrando lo que aprendiste del LLM pero yendo más allá. Corrige errores, llena omisiones, conecta con conceptos vistos en clase. Esta es tu respuesta: demuestra que tú dominas el tema.]
+Los principios que indentifique que se violan son el principio de open/closed y el de single responsability, que yo consiero que es el mas afectado.Esto se debe a que, en el caso de open closed, es imposible querer agregar cosas nuevas sin tener que modificar lo presente. Por esa misma razon, creo que tambien se viola el de single responsibility. Esto se debe a que se guardan libros, se validan , se genera url, etc. Hay demasidas cosas que tienen funciones diferentes dentro de una misma funcion, lo que va directamente en contra de lo que es el principio, donde se delegan las funciones a centrarse en solo una funcion.
 ```

@@ -8,7 +8,6 @@
 
 ### Estudiante
 - **Nombre completo**: [Tu nombre y apellido]
-- **Código estudiantil**: [Tu código]
 
 ---
 
@@ -16,13 +15,15 @@
 
 | Campo | Valor |
 |---|---|
-| **Nombre del LLM** | [Claude / ChatGPT / Gemini / Copilot / DeepSeek / Qwen / Mistral / Otro] |
-| **Modelo específico** | [Ej: Claude Opus 4.5, GPT-4o, Gemini 2.5 Pro, etc.] |
-| **¿Por qué elegiste este LLM?** | [Justifica en 1-3 oraciones: ¿es mejor para código? ¿tiene mejor razonamiento? ¿está más actualizado? ¿es gratuito?] |
+| **Nombre del LLM** | [Claude / ChatGPT / Gemini / Copilot / DeepSeek / Qwen / Mistral / Otro / **Sin IA — respuesta propia**] |
+| **Modelo específico** | [Ej: Claude Opus 4.5, GPT-4o, Gemini 2.5 Pro, etc. Si respondes sin IA, escribe "N/A"] |
+| **¿Por qué elegiste este LLM?** | [Justifica en 1-3 oraciones. Si respondes sin IA, explica por qué decidiste no usar LLM para esta pregunta.] |
 
 ---
 
 ### Prompt utilizado
+
+> **Si respondiste sin IA, omite esta sección y ve directamente a Análisis crítico.**
 
 ```
 [Pega aquí el prompt exacto que enviaste al LLM. 
@@ -40,7 +41,7 @@ Un buen prompt incluye:
 
 ### Respuesta del LLM
 
-```
+> **Si respondiste sin IA, omite esta sección y ve directamente a Análisis crítico.**
 [Pega aquí la respuesta COMPLETA del LLM, sin editar, sin resumir.
 Incluye TODO el texto, código, explicaciones que generó el LLM.
 
@@ -53,26 +54,16 @@ pero menciona cuántas iteraciones hiciste.]
 
 ### Análisis crítico de la respuesta
 
-#### 1. ¿Qué acertó el LLM?
+#### 1. ¿Qué hizo bien el prompt?
 
-[Enumera los aspectos en los que el LLM dio una respuesta correcta, completa o particularmente buena. Sé específico: menciona fragmentos concretos, no generalidades. Ej: "El LLM identificó correctamente que el método publicarLibro() tiene 6 responsabilidades distintas (conexión a BD, validación, generación de slug, envío de email, logging, indexación) y esto viola SRP."]
-
-
-#### 2. ¿Qué errores cometió el LLM?
-
-[Identifica errores técnicos, conceptuales, o de código en la respuesta del LLM. Si el código generado no compilaría, señálalo. Si aplicó mal un patrón, explícalo. Si sugirió algo incorrecto para el contexto de OpenLib Market, dilo. Si NO encontraste errores, justifica por qué confías en que la respuesta es correcta.]
+[Evalúa tu propio prompt, no la respuesta del LLM. ¿El contexto fue suficiente? ¿Las restricciones fueron claras? ¿El formato de salida que pediste ayudó a obtener una buena respuesta? ¿Qué parte de tu prompt fue más efectiva? Sé específico: menciona fragmentos concretos de tu prompt que funcionaron bien.]
 
 
-#### 3. ¿Qué omitió el LLM?
+#### 2. ¿Qué se puede mejorar?
 
-[¿Hay algo importante que el LLM NO mencionó? Casos borde no considerados, implicaciones de diseño, trade-offs, alternativas que debió mencionar, problemas de rendimiento, seguridad, escalabilidad. Esta sección es clave: demuestra que tú ves más allá de lo que el LLM generó.]
-
-
-#### 4. Síntesis y respuesta final
-
-[Escribe tu propia respuesta a la pregunta del parcial. Esta debe ser MEJOR que la del LLM: más completa, más precisa, corrigiendo errores y llenando omisiones. Esta es tu respuesta definitiva. Relaciónala con conceptos vistos en clase (menciona las referencias del curso, presentaciones, talleres). Demuestra que tú dominas el tema, no solo que sabes copiar y pegar.]
+[¿Qué le faltó a tu prompt? ¿Qué harías diferente si pudieras reformularlo? ¿El LLM entendió mal algo por falta de claridad en tu prompt? ¿La respuesta tiene errores u omisiones? ¿Qué no cubrió el LLM que tú sí sabes por lo visto en clase?]
 
 
-#### 5. Lecciones aprendidas sobre prompting
+#### 3. Respuesta final
 
-[¿Qué aprendiste sobre cómo formular prompts? ¿Qué harías diferente la próxima vez? ¿Qué funcionó bien en tu prompt? ¿Qué cambiarías para obtener una mejor respuesta? Esta reflexión muestra tu comprensión del proceso de interacción con LLMs.]
+[Escribe tu respuesta definitiva a la pregunta del parcial, integrando lo que aprendiste del LLM pero yendo más allá. Corrige errores, llena omisiones, conecta con conceptos vistos en clase. Esta es tu respuesta: demuestra que tú dominas el tema.]

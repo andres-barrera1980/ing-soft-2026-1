@@ -101,16 +101,44 @@ public class PublicadorDeLibros {
 
 ### Análisis crítico de la respuesta
 
-#### 1. ¿Qué hizo bien el prompt?
-
-[Evalúa tu propio prompt, no la respuesta del LLM. ¿El contexto fue suficiente? ¿Las restricciones fueron claras? ¿El formato de salida que pediste ayudó a obtener una buena respuesta? ¿Qué parte de tu prompt fue más efectiva? Sé específico: menciona fragmentos concretos de tu prompt que funcionaron bien.]
+El prompt fue efectivo porque no solo copió y pegó el código, sino que brindó el contexto del proyecto (OpenLib Market) e impuso restricciones técnicas arquitectónicas muy claras (Java 21, sin frameworks externos y exigiendo inyección de dependencias). Esto obligó al LLM a entregar una solución de "Java puro" orientada a interfaces, lo cual evita que la IA genere un código acoplado con anotaciones de Spring Boot que ocultarían el verdadero rediseño.
 
 
-#### 2. ¿Qué se puede mejorar?
-
-[¿Qué le faltó a tu prompt? ¿Qué harías diferente si pudieras reformularlo? ¿El LLM entendió mal algo por falta de claridad en tu prompt? ¿La respuesta tiene errores u omisiones? ¿Qué no cubrió el LLM que tú sí sabes por lo visto en clase?]
+Aunque el LLM identificó correctamente la violación del Principio de Responsabilidad Única (SRP) y separó la base de datos, correos y logs en interfaces, cometió un pequeño error de diseño en su respuesta: dejó la lógica de validación (`validarLibro`) anidada dentro de la nueva clase orquestadora `PublicadorDeLibros`. Esto significa que si mañana cambian las reglas de negocio (ej. el libro requiere un precio obligatorio), la clase `PublicadorDeLibros` volverá a cambiar, violando de nuevo el SRP. En mi prompt debí ser más estricto exigiendo aislar TODAS las responsabilidades, incluidas las validaciones.
 
 
-#### 3. Respuesta final
+El principio principal que se viola es el **SRP (Single Responsibility Principle)**, ya que la clase original tiene infraestructura (JDBC), notificaciones (Email) y lógica de negocio (Slugs/Validación) fuertemente acopladas. 
 
-[Escribe tu respuesta definitiva a la pregunta del parcial, integrando lo que aprendiste del LLM pero yendo más allá. Corrige errores, llena omisiones, conecta con conceptos vistos en clase. Esta es tu respuesta: demuestra que tú dominas el tema.]
+Para que el refactoring sea 100% correcto y respete el SRP, no basta con lo que propuso la IA; debemos extraer también la validación a un componente independiente (`LibroValidator`). De este modo, `PublicadorDeLibros` queda exclusivamente como un caso de uso orquestador (fachada) y cumple estrictamente con SRP y DIP (Dependency Inversion Principle).
+
+```java
+public interface LibroValidator { void validar(Libro libro); }
+
+public class PublicadorDeLibros {
+    private final LibroValidator validator;
+    private final LibroRepository repository;
+    private final GeneradorSlug generadorSlug;
+    private final Notificador notificador;
+    private final BuscadorIndex buscadorIndex;
+    private final LoggerService logger;
+
+    public PublicadorDeLibros(LibroValidator validator, LibroRepository repository, GeneradorSlug generadorSlug,
+                              Notificador notificador, BuscadorIndex buscadorIndex, LoggerService logger) {
+        this.validator = validator;
+        this.repository = repository;
+        this.generadorSlug = generadorSlug;
+        this.notificador = notificador;
+        this.buscadorIndex = buscadorIndex;
+        this.logger = logger;
+    }
+
+    public void publicarLibro(Libro libro, Usuario vendedor) {
+        validator.validar(libro);
+        libro.setSlug(generadorSlug.generarPara(libro.getTitulo()));
+        repository.guardar(libro);
+        buscadorIndex.indexar(libro);
+        notificador.notificarPublicacion(vendedor, libro);
+        logger.info("Libro publicado: " + libro.getIsbn());
+    }
+}
+```

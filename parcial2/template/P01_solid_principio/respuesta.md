@@ -21,21 +21,44 @@ Idealmente, GestorLibros debería limitarse a gestionar libros y delegar esas re
 
 ### Refactor del codigo 
 ```java
-    public class GestorLibro {
+  public class GestorLibro {
 
-        public void publicarLibro(Libro libro, Usuario vendedor) {
-            validator.validar(libro);
+    private final LibroValidator validator;
+    private final LibroRepository repository;
+    private final SlugGenerator slugGenerator;
+    private final Notificador notificador;
+    private final PublicacionLogger logger;
+    private final IndexadorBusqueda indexador;
 
-            String slug = slugGenerator.generar(libro.getTitulo());
-            libro.setSlug(slug);
-
-            repository.guardar(libro);
-
-            notificador.notificarLibroPublicado(vendedor, libro);
-
-            logger.registrarPublicacion(libro, vendedor);
-
-            indexador.indexar(libro);
-        }
+    public GestorLibro(
+            LibroValidator validator,
+            LibroRepository repository,
+            SlugGenerator slugGenerator,
+            Notificador notificador,
+            PublicacionLogger logger,
+            IndexadorBusqueda indexador
+    ) {
+        this.validator = validator;
+        this.repository = repository;
+        this.slugGenerator = slugGenerator;
+        this.notificador = notificador;
+        this.logger = logger;
+        this.indexador = indexador;
     }
+
+    public void publicarLibro(Libro libro, Usuario vendedor) {
+        validator.validar(libro);
+
+        String slug = slugGenerator.generar(libro.getTitulo());
+        libro.setSlug(slug);
+
+        repository.guardar(libro);
+
+        notificador.notificarLibroPublicado(vendedor, libro);
+
+        logger.registrarPublicacion(libro, vendedor);
+
+        indexador.indexar(libro);
+    }
+}
 ```

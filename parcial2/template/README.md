@@ -38,7 +38,22 @@
 
 ## Instrucciones de entrega
 
-1. Completa cada archivo `respuesta.md` siguiendo la plantilla.
-2. Puedes responder con LLM o sin IA en cada pregunta. Si respondes sin IA, omite las secciones de prompt y respuesta.
-3. Haz **al menos 2 commits por pregunta** mostrando la evolución de tu trabajo.
-4. Haz push de esta rama a `origin` antes de la fecha límite.
+1. Copia esta carpeta `template/` a una nueva carpeta con tu `apellido-nombre` dentro de `parcial2/`.
+2. Completa cada archivo `respuesta.md` siguiendo la plantilla.
+3. Puedes responder con LLM o sin IA en cada pregunta. Si respondes sin IA, omite las secciones de prompt y respuesta.
+4. Haz **al menos 2 commits por pregunta** mostrando la evolución de tu trabajo.
+5. Haz push de tu rama a `origin` antes de la fecha límite.
+
+```
+parcial2/
+├── template/                  ← carpeta base (no modificar)
+│   ├── README.md
+│   ├── P01_solid_principio/respuesta.md
+│   ├── ...
+│   └── P13_integracion_refactoring/respuesta.md
+└── torres-diego/              ← tu carpeta de trabajo
+    ├── README.md
+    ├── P01_solid_principio/respuesta.md
+    ├── ...
+    └── P13_integracion_refactoring/respuesta.md
+```

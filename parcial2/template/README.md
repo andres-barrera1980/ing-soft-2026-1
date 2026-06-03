@@ -38,11 +38,46 @@
 
 ## Instrucciones de entrega
 
-1. Copia esta carpeta `template/` a una nueva carpeta con tu `apellido-nombre` dentro de `parcial2/`.
-2. Completa cada archivo `respuesta.md` siguiendo la plantilla.
-3. Puedes responder con LLM o sin IA en cada pregunta. Si respondes sin IA, omite las secciones de prompt y respuesta.
-4. Haz **al menos 2 commits por pregunta** mostrando la evolución de tu trabajo.
-5. Haz push de tu rama a `origin` antes de la fecha límite.
+### 1. Crear tu rama
+
+Desde la terminal, clona el repo y crea tu rama desde `develop`:
+
+```bash
+git clone git@github.com:andres-barrera1980/ing-soft-2026-1.git
+cd ing-soft-2026-1
+git checkout develop
+git checkout -b parcial2/apellido-nombre
+```
+
+Ejemplo para el estudiante **Andrés Barrera**:
+
+```bash
+git checkout -b parcial2/barrera-andres
+```
+
+### 2. Copiar las plantillas
+
+```bash
+cp -r parcial2/template parcial2/barrera-andres
+```
+
+### 3. Resolver el parcial
+
+Completa cada archivo `respuesta.md` siguiendo la plantilla. Puedes responder con LLM o sin IA en cada pregunta. Si respondes sin IA, omite las secciones de prompt y respuesta.
+
+### 4. Hacer commits
+
+Haz **al menos 2 commits por pregunta** mostrando la evolución de tu trabajo.
+
+### 5. Entregar
+
+Haz push de tu rama a `origin` antes de la fecha límite:
+
+```bash
+git add .
+git commit -m "Parcial 2 — Andrés Barrera"
+git push -u origin parcial2/barrera-andres
+```
 
 ```
 parcial2/
@@ -51,7 +86,7 @@ parcial2/
 │   ├── P01_solid_principio/respuesta.md
 │   ├── ...
 │   └── P13_integracion_refactoring/respuesta.md
-└── torres-diego/              ← tu carpeta de trabajo
+└── barrera-andres/            ← tu carpeta de trabajo
     ├── README.md
     ├── P01_solid_principio/respuesta.md
     ├── ...

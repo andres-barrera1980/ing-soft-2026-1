@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Patrón Iterator — GoF</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+  :root {
+    --bg:       #F5F3EE;
+    --surface:  #EDEAE3;
+    --border:   #D4CFC6;
+    --ink:      #1C1A17;
+    --ink-2:    #4A4640;
+    --ink-3:    #7A746E;
+    --accent:   #2C4A3E;
+    --accent-2: #4A7C68;
+    --accent-lt:#D6E8E0;
+    --warn:     #5C3D1E;
+    --warn-lt:  #F2E8D9;
+    --code-bg:  #1E1C19;
+    --code-c1:  #8BAF9A;
+    --code-c2:  #C9A96E;
+    --code-c3:  #7EB8D4;
+    --code-dim: #5A5650;
+    --code-txt: #CFC9C0;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.6;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 0;
+    padding: 0 2rem;
+    height: 52px;
+  }
+  .nav-logo {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1rem; color: var(--accent);
+    margin-right: auto;
+    letter-spacing: 0.02em;
+  }
+  .nav-links { display: flex; gap: 0; }
+  .nav-links a {
+    font-size: 0.78rem; font-weight: 500; letter-spacing: 0.04em;
+    color: var(--ink-3); text-decoration: none;
+    padding: 0 1rem; height: 52px;
+    display: flex; align-items: center;
+    border-bottom: 2px solid transparent;
+    transition: color .2s, border-color .2s;
+  }
+  .nav-links a:hover { color: var(--accent); border-color: var(--accent); }
+
+  /* ── SLIDES ── */
+  .slide {
+    min-height: 100vh;
+    padding: 7rem 4rem 5rem;
+    display: flex; flex-direction: column; justify-content: center;
+    border-bottom: 1px solid var(--border);
+    max-width: 1100px; margin: 0 auto;
+    opacity: 0; transform: translateY(28px);
+    transition: opacity .6s ease, transform .6s ease;
+  }
+  .slide.visible { opacity: 1; transform: translateY(0); }
+
+  .slide-number {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem; color: var(--ink-3);
+    letter-spacing: 0.12em; text-transform: uppercase;
+    margin-bottom: 1.2rem;
+  }
+
+  h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(3.5rem, 8vw, 6rem);
+    line-height: 1.0; color: var(--ink);
+    margin-bottom: 1.5rem;
+  }
+  h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(1.8rem, 4vw, 2.6rem);
+    color: var(--ink); margin-bottom: 1.8rem;
+    line-height: 1.2;
+  }
+  h3 {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.85rem; font-weight: 600;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--accent); margin-bottom: 0.6rem;
+  }
+
+  p { color: var(--ink-2); max-width: 68ch; }
+  p + p { margin-top: 0.8rem; }
+
+  .tag {
+    display: inline-flex; align-items: center; gap: 0.4rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem; font-weight: 500;
+    background: var(--accent-lt); color: var(--accent);
+    padding: 0.25rem 0.7rem; border-radius: 2px;
+    letter-spacing: 0.04em; margin-bottom: 1rem;
+  }
+
+  .subtitle {
+    font-size: 1.15rem; color: var(--ink-3);
+    max-width: 56ch; margin-bottom: 2.5rem;
+    font-weight: 300; line-height: 1.7;
+  }
+
+  .meta-row {
+    display: flex; gap: 2rem; margin-top: 2.5rem;
+    padding-top: 1.5rem; border-top: 1px solid var(--border);
+    flex-wrap: wrap;
+  }
+  .meta-item { display: flex; flex-direction: column; gap: 0.2rem; }
+  .meta-label { font-size: 0.72rem; color: var(--ink-3); letter-spacing: 0.06em; text-transform: uppercase; }
+  .meta-value { font-family: 'DM Mono', monospace; font-size: 0.9rem; color: var(--accent); }
+
+  /* ── QUOTE ── */
+  .quote-block {
+    border-left: 3px solid var(--accent);
+    padding: 1.2rem 1.8rem;
+    background: var(--surface);
+    margin: 1.5rem 0 2rem;
+    max-width: 72ch;
+  }
+  .quote-block p {
+    font-family: 'DM Serif Display', serif;
+    font-style: italic; font-size: 1.15rem;
+    color: var(--ink); max-width: unset;
+  }
+  .quote-block .attr {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem; color: var(--ink-3);
+    margin-top: 0.7rem; font-style: normal;
+  }
+
+  /* ── GRID CARDS ── */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; margin-top: 0.5rem; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; margin-top: 0.5rem; }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 1.4rem 1.6rem;
+    transition: border-color .2s, background .2s;
+  }
+  .card:hover { border-color: var(--accent-2); background: #EBE8E0; }
+  .card h3 { margin-bottom: 0.5rem; }
+  .card p { font-size: 0.92rem; }
+
+  .card-accent {
+    border-top: 2px solid var(--accent);
+  }
+
+  /* ── PROBLEM ── */
+  .struct-row {
+    display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1px;
+    background: var(--border); margin: 1.5rem 0;
+    border: 1px solid var(--border);
+  }
+  .struct-cell {
+    background: var(--surface);
+    padding: 1.4rem 1.4rem 1.6rem;
+  }
+  .struct-cell .emoji { font-size: 1.8rem; margin-bottom: 0.6rem; display: block; }
+  .struct-cell strong { font-size: 0.95rem; display: block; margin-bottom: 0.4rem; color: var(--ink); }
+  .struct-cell span { font-size: 0.85rem; color: var(--ink-3); }
+
+  .compare-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem; }
+  .box-warn {
+    background: var(--warn-lt); border: 1px solid #C9A87A;
+    padding: 1.2rem 1.4rem;
+  }
+  .box-ok {
+    background: var(--accent-lt); border: 1px solid var(--accent-2);
+    padding: 1.2rem 1.4rem;
+  }
+  .box-warn h3 { color: var(--warn); }
+  .box-ok h3 { color: var(--accent); }
+  .box-warn p, .box-ok p { font-size: 0.9rem; max-width: unset; }
+
+  /* ── COMPONENTS ── */
+  .comp-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--border); border: 1px solid var(--border); margin-top: 0.5rem; }
+  .comp-cell { background: var(--surface); padding: 1.4rem 1.6rem; }
+  .comp-num {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 24px; height: 24px;
+    background: var(--accent); color: white;
+    font-family: 'DM Mono', monospace; font-size: 0.75rem;
+    margin-bottom: 0.7rem;
+  }
+  .comp-cell h3 { font-size: 0.82rem; }
+  .comp-eng {
+    font-family: 'DM Mono', monospace; font-size: 0.72rem;
+    color: var(--ink-3); margin-bottom: 0.7rem; display: block;
+  }
+  .comp-cell p { font-size: 0.88rem; }
+
+  /* ── CODE ── */
+  .code-wrap {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem;
+    margin-top: 0.5rem; align-items: start;
+  }
+  pre {
+    background: var(--code-bg);
+    padding: 1.6rem 1.8rem;
+    overflow-x: auto;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.82rem; line-height: 1.75;
+    border: 1px solid #2E2C29;
+  }
+  .kw  { color: #A8C5A0; }
+  .fn  { color: var(--code-c3); }
+  .str { color: var(--code-c2); }
+  .num { color: #D4A373; }
+  .cmt { color: var(--code-dim); }
+  .txt { color: var(--code-txt); }
+
+  .tip-stack { display: flex; flex-direction: column; gap: 0.8rem; }
+  .tip {
+    background: var(--surface); border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    padding: 0.9rem 1.1rem;
+  }
+  .tip h3 { font-size: 0.78rem; margin-bottom: 0.3rem; }
+  .tip p { font-size: 0.85rem; }
+
+  /* ── LANG GRID ── */
+  .lang-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--border); border: 1px solid var(--border); margin-top: 1.2rem; }
+  .lang-cell { background: var(--surface); padding: 1.2rem 1.4rem; }
+  .lang-cell h3 { font-size: 0.8rem; margin-bottom: 0.3rem; }
+  .lang-code { font-family: 'DM Mono', monospace; font-size: 0.85rem; color: var(--accent-2); display: block; margin-bottom: 0.4rem; }
+  .lang-cell p { font-size: 0.83rem; }
+
+  .for-block {
+    background: var(--code-bg); padding: 1.1rem 1.6rem; margin: 1.2rem 0;
+    font-family: 'DM Mono', monospace; font-size: 1rem;
+    border: 1px solid #2E2C29;
+  }
+
+  /* ── PROS / CONS ── */
+  .pros-cons { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--border); border: 1px solid var(--border); }
+  .pros-panel { background: var(--surface); }
+  .cons-panel { background: var(--surface); }
+  .panel-head {
+    padding: 1rem 1.6rem;
+    border-bottom: 1px solid var(--border);
+    font-family: 'DM Mono', monospace; font-size: 0.78rem;
+    letter-spacing: 0.08em; text-transform: uppercase;
+  }
+  .pros-panel .panel-head { color: var(--accent); }
+  .cons-panel .panel-head { color: var(--warn); }
+  .panel-item {
+    padding: 1.1rem 1.6rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .panel-item:last-child { border-bottom: none; }
+  .panel-item strong { font-size: 0.88rem; display: block; margin-bottom: 0.3rem; }
+  .pros-panel .panel-item strong { color: var(--accent); }
+  .cons-panel .panel-item strong { color: var(--warn); }
+  .panel-item p { font-size: 0.85rem; max-width: unset; }
+
+  /* ── CASES ── */
+  .cases-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1px; background: var(--border); border: 1px solid var(--border); margin-top: 0.5rem; }
+  .case-cell { background: var(--surface); padding: 1.3rem 1.4rem; }
+  .case-cell .icon { font-size: 1.5rem; margin-bottom: 0.6rem; display: block; }
+  .case-cell strong { font-size: 0.88rem; display: block; margin-bottom: 0.35rem; color: var(--ink); }
+  .case-cell p { font-size: 0.83rem; }
+
+  /* ── SUMMARY ── */
+  .summary-list { display: flex; flex-direction: column; gap: 0; border: 1px solid var(--border); margin-top: 1.5rem; }
+  .summary-item {
+    display: grid; grid-template-columns: 2.5rem 1fr;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    transition: background .2s;
+  }
+  .summary-item:last-child { border-bottom: none; }
+  .summary-item:hover { background: var(--accent-lt); }
+  .summary-idx {
+    display: flex; align-items: center; justify-content: center;
+    background: var(--accent);
+    font-family: 'DM Mono', monospace; font-size: 0.75rem; color: white;
+    border-right: 1px solid var(--border);
+  }
+  .summary-text { padding: 1rem 1.4rem; font-size: 0.95rem; color: var(--ink-2); }
+  .summary-text strong { color: var(--ink); }
+
+  /* ── PROGRESS BAR ── */
+  .progress-bar {
+    position: fixed; top: 51px; left: 0; height: 2px;
+    background: var(--accent); width: 0%;
+    transition: width .1s;
+    z-index: 99;
+  }
+
+  /* ── SCROLLTOP ── */
+  .back-top {
+    position: fixed; bottom: 2rem; right: 2rem;
+    width: 40px; height: 40px;
+    background: var(--ink); color: white;
+    border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.1rem; opacity: 0;
+    transition: opacity .3s; z-index: 99;
+  }
+  .back-top.show { opacity: 1; }
+
+  @media (max-width: 700px) {
+    .slide { padding: 6rem 1.5rem 3rem; }
+    .grid-2, .grid-3, .comp-grid, .code-wrap, .lang-grid,
+    .pros-cons, .cases-grid, .compare-row, .struct-row { grid-template-columns: 1fr; }
+    nav { padding: 0 1rem; }
+    .nav-links a { padding: 0 0.5rem; font-size: 0.7rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="progress-bar" id="prog"></div>
+
+<nav>
+  <span class="nav-logo">Iterator</span>
+  <div class="nav-links">
+    <a href="#s1">Inicio</a>
+    <a href="#s2">Definición</a>
+    <a href="#s3">Problema</a>
+    <a href="#s4">Componentes</a>
+    <a href="#s5">Código</a>
+    <a href="#s6">Pros/Cons</a>
+    <a href="#s7">Casos</a>
+    <a href="#s8">Conclusión</a>
+  </div>
+</nav>
+
+<!-- ── 1. PORTADA ── -->
+<section class="slide" id="s1">
+  <div class="slide-number">01 / 08 — Patrón de Diseño</div>
+  <div class="tag">Behavioral Pattern · GoF · Pág. 257</div>
+  <h1>Iterator</h1>
+  <p class="subtitle">Recorre cualquier colección de elementos sin necesitar saber cómo está organizada por dentro.</p>
+  <div class="meta-row">
+    <div class="meta-item"><span class="meta-label">Categoría</span><span class="meta-value">Comportamiento</span></div>
+    <div class="meta-item"><span class="meta-label">También llamado</span><span class="meta-value">Cursor</span></div>
+    <div class="meta-item"><span class="meta-label">Fuente</span><span class="meta-value">Design Patterns — GoF</span></div>
+    <div class="meta-item"><span class="meta-label">Página</span><span class="meta-value">257</span></div>
+  </div>
+</section>
+
+<!-- ── 2. DEFINICIÓN ── -->
+<section class="slide" id="s2">
+  <div class="slide-number">02 / 08 — Definición</div>
+  <h2>¿Qué es el patrón Iterator?</h2>
+  <div class="quote-block">
+    <p>"Proporciona una manera de acceder secuencialmente a los elementos de una colección sin exponer su representación interna."</p>
+    <p class="attr">— Gamma, Helm, Johnson, Vlissides (Gang of Four)</p>
+  </div>
+  <div class="grid-2">
+    <div class="card card-accent">
+      <h3>¿Qué hace exactamente?</h3>
+      <p>Permite recorrer una lista, árbol o cualquier colección usando siempre los mismos métodos: <code>siguiente()</code> y <code>hayMás()</code>. No importa cómo esté guardada la información internamente — el código que la consume nunca cambia.</p>
+    </div>
+    <div class="card card-accent">
+      <h3>¿Por qué es de "comportamiento"?</h3>
+      <p>Porque define <em>cómo se comporta</em> el recorrido de una colección, separando esa responsabilidad del objeto que guarda los datos. La colección guarda, el iterador recorre — cada uno hace una sola cosa.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ── 3. PROBLEMA ── -->
+<section class="slide" id="s3">
+  <div class="slide-number">03 / 08 — El Problema</div>
+  <h2>El problema que resuelve</h2>
+  <p>Imagina que tienes una playlist de canciones. Puedes guardarla de distintas formas, y cada una se recorre de manera diferente:</p>
+
+  <div class="struct-row">
+    <div class="struct-cell">
+      <span class="emoji">[ ]</span>
+      <strong>Lista / Array</strong>
+      <span>Se recorre con un índice numérico: <code>lista[0]</code>, <code>lista[1]</code>... Hay que saber cuántos elementos tiene.</span>
+    </div>
+    <div class="struct-cell">
+      <span class="emoji">🌲</span>
+      <strong>Árbol</strong>
+      <span>Hay que usar recursividad para visitar cada rama y hoja. La lógica es completamente diferente.</span>
+    </div>
+    <div class="struct-cell">
+      <span class="emoji">🗄️</span>
+      <strong>Base de Datos</strong>
+      <span>Se necesita una consulta SQL y un cursor especial. Nada que ver con las opciones anteriores.</span>
+    </div>
+  </div>
+
+  <div class="compare-row">
+    <div class="box-warn">
+      <h3>⚠ Sin Iterator...</h3>
+      <p>Necesitas escribir código diferente para recorrer cada tipo de colección. Si la estructura cambia, tienes que cambiar TODO el código que la recorre. Frágil y difícil de mantener.</p>
+    </div>
+    <div class="box-ok">
+      <h3>✓ Con Iterator...</h3>
+      <p>Siempre usas los mismos métodos: <code>siguiente()</code> y <code>hayMás()</code>. No importa si por dentro es una lista, un árbol o una BD. El código cliente nunca cambia.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ── 4. COMPONENTES ── -->
+<section class="slide" id="s4">
+  <div class="slide-number">04 / 08 — Estructura</div>
+  <h2>Los 4 componentes del patrón</h2>
+
+  <div class="comp-grid">
+    <div class="comp-cell">
+      <div class="comp-num">1</div>
+      <h3>Iterador (interfaz)</h3>
+      <span class="comp-eng">Iterator</span>
+      <p>Define los métodos que todo iterador debe tener: <code>siguiente()</code> devuelve el próximo elemento, y <code>hayMás()</code> dice si quedan elementos. Es un contrato que todos los iteradores deben cumplir.</p>
+    </div>
+    <div class="comp-cell">
+      <div class="comp-num">2</div>
+      <h3>Iterador Concreto</h3>
+      <span class="comp-eng">ConcreteIterator</span>
+      <p>Implementa la lógica real de recorrido para una colección específica. Lleva la cuenta de en qué posición va y sabe cómo avanzar al siguiente elemento sin que nadie externo lo sepa.</p>
+    </div>
+    <div class="comp-cell">
+      <div class="comp-num">3</div>
+      <h3>Colección (interfaz)</h3>
+      <span class="comp-eng">Aggregate</span>
+      <p>Define que toda colección debe poder crear su propio iterador mediante el método <code>crearIterador()</code>. Es también un contrato, esta vez para las colecciones — garantiza que siempre haya un iterador disponible.</p>
+    </div>
+    <div class="comp-cell">
+      <div class="comp-num">4</div>
+      <h3>Colección Concreta</h3>
+      <span class="comp-eng">ConcreteAggregate</span>
+      <p>Es la colección real: una lista de canciones, un árbol de archivos, etc. Sabe cómo crear el iterador adecuado para recorrerse a sí misma, y lo entrega cuando se le pide.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ── 5. CÓDIGO ── -->
+<section class="slide" id="s5">
+  <div class="slide-number">05 / 08 — Implementación</div>
+  <h2>Ejemplo en código — Java</h2>
+
+  <div class="code-wrap">
+    <pre><span class="kw">import</span> <span class="txt">java.util.List;</span>
+
+<span class="kw">class</span> <span class="fn">IteratorLista</span> <span class="txt">{</span>
+  <span class="kw">private</span> <span class="txt">List&lt;String&gt; canciones;</span>
+  <span class="kw">private int</span> <span class="txt">pos;</span>
+
+  <span class="kw">public</span> <span class="fn">IteratorLista</span><span class="txt">(List&lt;String&gt; canciones) {</span>
+    <span class="cmt">// Guarda la lista, empieza en posición 0</span>
+    <span class="kw">this</span><span class="txt">.canciones = canciones;</span>
+    <span class="kw">this</span><span class="txt">.pos = </span><span class="num">0</span><span class="txt">;</span>
+  <span class="txt">}</span>
+
+  <span class="kw">public boolean</span> <span class="fn">hayMas</span><span class="txt">() {</span>
+    <span class="cmt">// ¿Quedan elementos por recorrer?</span>
+    <span class="kw">return</span> <span class="txt">pos &lt; canciones.size();</span>
+  <span class="txt">}</span>
+
+  <span class="kw">public</span> <span class="txt">String</span> <span class="fn">siguiente</span><span class="txt">() {</span>
+    <span class="cmt">// Devuelve el actual y avanza la posición</span>
+    <span class="kw">return</span> <span class="txt">canciones.get(pos++);</span>
+  <span class="txt">}</span>
+<span class="txt">}</span>
+
+<span class="cmt">// ── Uso ──────────────────────────</span>
+<span class="txt">List&lt;String&gt; canciones = List.of(</span>
+    <span class="str">"Hotel California"</span><span class="txt">,</span>
+    <span class="str">"Bohemian Rhapsody"</span><span class="txt">,</span>
+    <span class="str">"Stairway to Heaven"</span>
+<span class="txt">);</span>
+<span class="fn">IteratorLista</span> <span class="txt">it = </span><span class="kw">new</span> <span class="fn">IteratorLista</span><span class="txt">(canciones);</span>
+
+<span class="kw">while</span> <span class="txt">(it.</span><span class="fn">hayMas</span><span class="txt">()) {</span>
+    <span class="txt">System.out.</span><span class="fn">println</span><span class="txt">(it.</span><span class="fn">siguiente</span><span class="txt">());</span>
+<span class="txt">}</span>
+
+<span class="cmt">// Hotel California</span>
+<span class="cmt">// Bohemian Rhapsody</span>
+<span class="cmt">// Stairway to Heaven</span></pre>
+
+    <div class="tip-stack">
+      <div class="tip">
+        <h3>Constructor IteratorLista()</h3>
+        <p>Recibe la lista de canciones y guarda un contador en cero. Ese contador es la "posición actual" del iterador — es lo único que necesita recordar.</p>
+      </div>
+      <div class="tip">
+        <h3>Método hayMas()</h3>
+        <p>Compara la posición actual con el tamaño total de la lista usando <code>size()</code>. Si la posición no ha llegado al final, devuelve <code>true</code> y el bucle continúa.</p>
+      </div>
+      <div class="tip">
+        <h3>Método siguiente()</h3>
+        <p>Usa <code>get(pos++)</code> para devolver el elemento en la posición actual y avanzar el contador en un solo paso. Así siempre avanza hacia adelante.</p>
+      </div>
+      <div class="tip">
+        <h3>Cómo se usa</h3>
+        <p>Un <code>while</code> con <code>hayMas()</code> y <code>siguiente()</code> recorre toda la colección de forma limpia, sin necesitar índices ni conocer el tamaño.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── 6. PROS/CONS ── -->
+<section class="slide" id="s6">
+  <div class="slide-number">06 / 08 — Evaluación</div>
+  <h2>Ventajas y desventajas</h2>
+
+  <div class="pros-cons">
+    <div class="pros-panel">
+      <div class="panel-head">✓ Ventajas</div>
+      <div class="panel-item">
+        <strong>Oculta la complejidad interna</strong>
+        <p>El código que usa la colección no necesita saber si es un array, un árbol o una base de datos. Solo llama a <code>siguiente()</code> y listo.</p>
+      </div>
+      <div class="panel-item">
+        <strong>Responsabilidad única</strong>
+        <p>La colección se encarga de guardar datos y el iterador se encarga de recorrerlos. Cada uno hace solo una cosa — principio SOLID cumplido.</p>
+      </div>
+      <div class="panel-item">
+        <strong>Varios recorridos simultáneos</strong>
+        <p>Puedes tener dos o más iteradores sobre la misma colección al mismo tiempo, cada uno en una posición distinta e independiente.</p>
+      </div>
+      <div class="panel-item">
+        <strong>Fácil de cambiar la colección</strong>
+        <p>Si cambias la estructura interna (de lista a árbol, por ejemplo), el código que la recorre no necesita modificarse.</p>
+      </div>
+    </div>
+    <div class="cons-panel">
+      <div class="panel-head">✗ Desventajas</div>
+      <div class="panel-item">
+        <strong>Puede ser excesivo para casos simples</strong>
+        <p>Si solo tienes una lista pequeña que siempre recorres de la misma forma, crear un iterador aparte añade código innecesario sin beneficio real.</p>
+      </div>
+      <div class="panel-item">
+        <strong>Acceso más lento que por índice</strong>
+        <p>Acceder a <code>lista[5]</code> directamente es más rápido que llamar a <code>siguiente()</code> cinco veces. En colecciones muy grandes puede notarse.</p>
+      </div>
+      <div class="panel-item">
+        <strong>Más clases en el proyecto</strong>
+        <p>Necesitas crear al menos dos clases nuevas (la interfaz y el iterador concreto), lo que aumenta la cantidad de archivos a mantener.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── 8. CASOS ── -->
+<section class="slide" id="s7">
+  <div class="slide-number">07 / 08 — Aplicaciones</div>
+  <h2>¿Dónde se usa en la vida real?</h2>
+
+  <div class="cases-grid">
+    <div class="case-cell">
+      <span class="icon">🎵</span>
+      <strong>Reproductores de música</strong>
+      <p>Recorren la playlist sin importar si está en memoria, en caché o cargada desde internet. La interfaz de reproducción es siempre la misma.</p>
+    </div>
+    <div class="case-cell">
+      <span class="icon">🌐</span>
+      <strong>Historial del navegador</strong>
+      <p>Navegar atrás y adelante entre páginas visitadas con los mismos botones, sin importar cómo se almacena el historial internamente.</p>
+    </div>
+    <div class="case-cell">
+      <span class="icon">📁</span>
+      <strong>Explorador de archivos</strong>
+      <p>Listar archivos y carpetas con la misma interfaz sin importar si el sistema operativo es Windows, Mac o Linux.</p>
+    </div>
+    <div class="case-cell">
+      <span class="icon">🛒</span>
+      <strong>Carrito de compras</strong>
+      <p>Recorrer todos los productos del carrito para calcular el total o mostrar el resumen sin saber cómo están almacenados.</p>
+    </div>
+    <div class="case-cell">
+      <span class="icon">📊</span>
+      <strong>Reportes empresariales</strong>
+      <p>Iterar sobre filas de una BD, un CSV o una API con exactamente la misma lógica de negocio sin modificar el código.</p>
+    </div>
+    <div class="case-cell">
+      <span class="icon">🎮</span>
+      <strong>Videojuegos</strong>
+      <p>Recorrer enemigos activos, items del inventario o casillas del mapa con una interfaz unificada independiente de la estructura interna.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ── 9. RESUMEN ── -->
+<section class="slide" id="s8">
+  <div class="slide-number">08 / 08 — Conclusión</div>
+  <h2>Conclusión</h2>
+  <p>El patrón Iterator resuelve un problema simple y universal: necesito recorrer elementos, pero no quiero depender de cómo están guardados. Cuatro ideas clave para recordar:</p>
+
+  <div class="summary-list">
+    <div class="summary-item">
+      <div class="summary-idx">01</div>
+      <div class="summary-text"><strong>Interfaz uniforme:</strong> siempre los mismos métodos — <code>siguiente()</code> y <code>hayMás()</code> — sin importar qué tipo de colección hay por debajo.</div>
+    </div>
+    <div class="summary-item">
+      <div class="summary-idx">02</div>
+      <div class="summary-text"><strong>Encapsulamiento:</strong> la colección NO expone su estructura interna. El cliente no necesita saber si es un array, árbol o base de datos.</div>
+    </div>
+    <div class="summary-item">
+      <div class="summary-idx">03</div>
+      <div class="summary-text"><strong>Ya lo usas:</strong> el <code>for</code>/<code>foreach</code> de Python, Java y JavaScript ES el patrón Iterator implementado por el lenguaje.</div>
+    </div>
+    <div class="summary-item">
+      <div class="summary-idx">04</div>
+      <div class="summary-text"><strong>Categoría GoF:</strong> Patrón de Comportamiento (Behavioral) — <em>Design Patterns: Elements of Reusable Object-Oriented Software</em>, página 257.</div>
+    </div>
+  </div>
+
+  <div class="meta-row" style="margin-top:2rem">
+    <div class="meta-item"><span class="meta-label">Patrón</span><span class="meta-value">Iterator / Cursor</span></div>
+    <div class="meta-item"><span class="meta-label">Categoría</span><span class="meta-value">Behavioral (GoF)</span></div>
+    <div class="meta-item"><span class="meta-label">Principio aplicado</span><span class="meta-value">Single Responsibility</span></div>
+  </div>
+</section>
+
+<button class="back-top" id="backTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<script>
+  // Progress bar
+  const prog = document.getElementById('prog');
+  const backTop = document.getElementById('backTop');
+  window.addEventListener('scroll', () => {
+    const pct = window.scrollY / (document.body.scrollHeight - window.innerHeight) * 100;
+    prog.style.width = pct + '%';
+    backTop.classList.toggle('show', window.scrollY > 300);
+  });
+
+  // Intersection observer for reveal
+  const slides = document.querySelectorAll('.slide');
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.08 });
+  slides.forEach(s => obs.observe(s));
+</script>
+</body>
+</html>

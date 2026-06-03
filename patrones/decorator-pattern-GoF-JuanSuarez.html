@@ -1,0 +1,1317 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Patrón de Diseño: DECORATOR</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy:    #1A2744;
+    --navy2:   #0F1B35;
+    --teal:    #0D9488;
+    --teal-l:  #14B8A6;
+    --teal-xl: #5EEAD4;
+    --white:   #FFFFFF;
+    --off-w:   #F0F4F8;
+    --slate:   #334155;
+    --gray:    #64748B;
+    --light:   #E8F0F9;
+    --red:     #EF4444;
+    --amber:   #F59E0B;
+    --green:   #10B981;
+    --indigo:  #6366F1;
+    --code-bg: #1E293B;
+    --code-t:  #7DD3C8;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Lora', Georgia, serif;
+    background: var(--navy2);
+    color: var(--white);
+    overflow-x: hidden;
+  }
+
+  /* ── NAV ─────────────────────────────────────── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    background: rgba(15, 27, 53, 0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(13, 148, 136, 0.25);
+    display: flex;
+    align-items: center;
+    gap: 0;
+    padding: 0 2rem;
+    height: 54px;
+    overflow-x: auto;
+  }
+  nav a {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.68rem;
+    color: var(--gray);
+    text-decoration: none;
+    padding: 0 0.85rem;
+    height: 54px;
+    display: flex;
+    align-items: center;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+    border-bottom: 2px solid transparent;
+    transition: color .2s, border-color .2s;
+  }
+  nav a:hover, nav a.active {
+    color: var(--teal-l);
+    border-bottom-color: var(--teal-l);
+  }
+  nav .logo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1rem;
+    color: var(--white);
+    margin-right: 1.5rem;
+    border-bottom: none;
+    letter-spacing: 0.06em;
+    flex-shrink: 0;
+  }
+
+  /* ── SECTIONS ────────────────────────────────── */
+  section {
+    min-height: 100vh;
+    padding: 7rem 6vw 5rem;
+    position: relative;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+  section:nth-child(odd) { background: var(--navy2); }
+  section:nth-child(even) { background: #111e38; }
+
+  /* ── HERO ────────────────────────────────────── */
+  #hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    background: var(--navy2);
+    overflow: hidden;
+  }
+  .hero-grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(13,148,136,0.06) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(13,148,136,0.06) 1px, transparent 1px);
+    background-size: 60px 60px;
+    mask-image: radial-gradient(ellipse at 30% 50%, black 20%, transparent 70%);
+  }
+  .hero-accent {
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 6px;
+    background: linear-gradient(to bottom, var(--teal), var(--teal-xl));
+  }
+  .hero-content {
+    position: relative;
+    z-index: 1;
+    max-width: 900px;
+  }
+  .hero-eyebrow {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.75rem;
+    letter-spacing: 0.18em;
+    color: var(--teal-l);
+    margin-bottom: 1.5rem;
+    opacity: 0;
+    animation: fadeUp 0.7s ease 0.2s forwards;
+  }
+  .hero-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: clamp(5rem, 12vw, 9rem);
+    line-height: 0.9;
+    color: var(--white);
+    letter-spacing: -0.02em;
+    opacity: 0;
+    animation: fadeUp 0.7s ease 0.4s forwards;
+  }
+  .hero-title span { color: var(--teal-l); }
+  .hero-subtitle {
+    margin-top: 2rem;
+    font-size: 1.15rem;
+    color: #A0B4CC;
+    line-height: 1.6;
+    max-width: 560px;
+    opacity: 0;
+    animation: fadeUp 0.7s ease 0.6s forwards;
+  }
+  .hero-tags {
+    display: flex; flex-wrap: wrap; gap: 0.75rem;
+    margin-top: 2.5rem;
+    opacity: 0;
+    animation: fadeUp 0.7s ease 0.8s forwards;
+  }
+  .tag {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.72rem;
+    padding: 0.4rem 1rem;
+    border: 1px solid rgba(13,148,136,0.4);
+    color: var(--teal-l);
+    letter-spacing: 0.05em;
+  }
+
+  /* ── SECTION HEADERS ─────────────────────────── */
+  .sec-num {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    color: var(--teal);
+    margin-bottom: 0.6rem;
+  }
+  .sec-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: clamp(2rem, 4vw, 3rem);
+    color: var(--white);
+    margin-bottom: 2.5rem;
+    line-height: 1.1;
+  }
+  .sec-title em { color: var(--teal-l); font-style: normal; }
+
+  /* ── CARDS ───────────────────────────────────── */
+  .card {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    padding: 1.75rem;
+    transition: border-color .3s, transform .3s;
+  }
+  .card:hover {
+    border-color: rgba(13,148,136,0.4);
+    transform: translateY(-3px);
+  }
+  .card-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--white);
+    margin-bottom: 0.6rem;
+    display: flex; align-items: center; gap: 0.6rem;
+  }
+  .card-title .dot {
+    width: 8px; height: 8px;
+    background: var(--teal);
+    flex-shrink: 0;
+  }
+  .card p, .card li {
+    font-size: 0.95rem;
+    color: #94A3B8;
+    line-height: 1.7;
+  }
+  .card ul { padding-left: 1.1rem; }
+
+  /* ── BIG QUOTE ───────────────────────────────── */
+  .big-quote {
+    background: linear-gradient(135deg, var(--teal) 0%, #065a55 100%);
+    padding: 2.5rem 3rem;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 2.5rem;
+  }
+  .big-quote::before {
+    content: '"';
+    position: absolute;
+    top: -1.5rem; left: 1.5rem;
+    font-family: 'Syne', sans-serif;
+    font-size: 10rem;
+    color: rgba(255,255,255,0.08);
+    line-height: 1;
+    pointer-events: none;
+  }
+  .big-quote p {
+    font-family: 'Lora', serif;
+    font-size: clamp(1.05rem, 2vw, 1.35rem);
+    line-height: 1.7;
+    color: var(--white);
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ── GRID LAYOUTS ────────────────────────────── */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; }
+  @media (max-width: 900px) {
+    .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+  }
+
+  /* ── COMPARE ─────────────────────────────────── */
+  .compare {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    border: 1px solid rgba(255,255,255,0.1);
+    overflow: hidden;
+  }
+  @media (max-width: 900px) { .compare { grid-template-columns: 1fr; } }
+  .compare-col { padding: 2rem; }
+  .compare-col.bad { background: rgba(239,68,68,0.08); border-right: 1px solid rgba(255,255,255,0.1); }
+  .compare-col.good { background: rgba(13,148,136,0.08); }
+  .compare-header {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 0.85rem;
+    letter-spacing: 0.1em;
+    padding: 0.5rem 1rem;
+    margin: -2rem -2rem 1.5rem;
+    display: flex; align-items: center; gap: 0.6rem;
+  }
+  .compare-header.bad-h { background: var(--red); color: white; }
+  .compare-header.good-h { background: var(--teal); color: white; }
+  .compare-col pre {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.82rem;
+    color: var(--teal-xl);
+    white-space: pre-wrap;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+  }
+  .compare-col ul { padding-left: 1.1rem; }
+  .compare-col li { font-size: 0.9rem; color: #94A3B8; line-height: 1.7; margin-bottom: 0.3rem; }
+  .bad li { color: #FCA5A5; }
+  .good li { color: #6EE7B7; }
+
+  /* ── UML DIAGRAM ─────────────────────────────── */
+  .uml-wrap { overflow-x: auto; padding-bottom: 1rem; }
+  .uml {
+    display: grid;
+    grid-template-columns: 200px 200px 200px;
+    grid-template-rows: auto auto auto;
+    gap: 0;
+    min-width: 700px;
+    position: relative;
+    margin: 0 auto;
+    width: fit-content;
+  }
+  .uml-box {
+    border: 1.5px solid rgba(13,148,136,0.5);
+    background: rgba(255,255,255,0.04);
+    min-width: 170px;
+  }
+  .uml-box-head {
+    background: var(--navy);
+    border-bottom: 1.5px solid rgba(13,148,136,0.5);
+    padding: 0.5rem 0.8rem;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--teal-l);
+    text-align: center;
+  }
+  .uml-box-head small {
+    display: block;
+    color: var(--gray);
+    font-size: 0.62rem;
+    font-weight: 400;
+    font-style: italic;
+    margin-top: 0.1rem;
+  }
+  .uml-box-body {
+    padding: 0.5rem 0.8rem;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.68rem;
+    color: #94A3B8;
+    line-height: 1.7;
+  }
+  .uml-row {
+    display: flex;
+    justify-content: center;
+    gap: 3rem;
+    position: relative;
+  }
+  .uml-row + .uml-row { margin-top: 1rem; }
+  .uml-connector {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: var(--teal);
+    font-size: 1.2rem;
+    padding: 0.5rem 0;
+    min-height: 2rem;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+  }
+  .arrow-down { font-size: 1.5rem; }
+  .rel-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.62rem;
+    color: var(--teal-l);
+    letter-spacing: 0.04em;
+  }
+
+  /* ── PARTICIPANTS ────────────────────────────── */
+  .participant {
+    display: flex; gap: 1.5rem;
+    padding: 1.5rem;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-left: 4px solid var(--teal);
+    transition: border-color .3s;
+    margin-bottom: 1rem;
+  }
+  .participant:hover { border-color: var(--teal-l); }
+  .participant-num {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 2rem;
+    color: rgba(13,148,136,0.3);
+    line-height: 1;
+    flex-shrink: 0;
+    width: 2.5rem;
+  }
+  .participant-content {}
+  .participant-name {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 1.05rem;
+    color: var(--white);
+  }
+  .participant-ex {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--teal-l);
+    margin: 0.2rem 0 0.5rem;
+  }
+  .participant p { font-size: 0.92rem; color: #94A3B8; line-height: 1.65; }
+
+  /* ── CODE BLOCKS ─────────────────────────────── */
+  .code-block {
+    background: var(--code-bg);
+    border: 1px solid rgba(13,148,136,0.2);
+    border-radius: 0;
+    overflow: hidden;
+    margin: 1.5rem 0;
+  }
+  .code-header {
+    background: rgba(0,0,0,0.3);
+    padding: 0.6rem 1.2rem;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--gray);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    display: flex; align-items: center; gap: 0.5rem;
+  }
+  .code-header::before {
+    content: '';
+    width: 8px; height: 8px;
+    background: var(--teal);
+    display: inline-block;
+  }
+  .code-block pre {
+    padding: 1.5rem 1.5rem;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.8rem;
+    line-height: 1.75;
+    overflow-x: auto;
+    color: #CBD5E1;
+    tab-size: 2;
+  }
+  .kw { color: #C792EA; }
+  .cn { color: #FFCB6B; }
+  .str { color: #C3E88D; }
+  .num { color: #F78C6C; }
+  .cm { color: #546E7A; font-style: italic; }
+  .fn { color: #82AAFF; }
+  .op { color: var(--teal-xl); }
+
+  .code-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+  @media (max-width: 900px) { .code-grid { grid-template-columns: 1fr; } }
+
+  /* ── PRO/CON CARDS ───────────────────────────── */
+  .pro-con-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+  @media (max-width: 900px) { .pro-con-grid { grid-template-columns: 1fr; } }
+
+  .pro-card {
+    background: rgba(16,185,129,0.07);
+    border: 1px solid rgba(16,185,129,0.2);
+    padding: 1.5rem;
+    transition: border-color .3s, transform .3s;
+  }
+  .pro-card:hover { border-color: rgba(16,185,129,0.5); transform: translateY(-2px); }
+  .con-card {
+    background: rgba(239,68,68,0.07);
+    border: 1px solid rgba(239,68,68,0.2);
+    padding: 1.5rem;
+    transition: border-color .3s, transform .3s;
+  }
+  .con-card:hover { border-color: rgba(239,68,68,0.4); transform: translateY(-2px); }
+
+  .pro-icon { font-size: 1.8rem; margin-bottom: 0.75rem; }
+  .pro-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.95rem; color: #6EE7B7; margin-bottom: 0.5rem; }
+  .con-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.95rem; color: #FCA5A5; margin-bottom: 0.5rem; }
+  .pro-card p, .con-card p { font-size: 0.88rem; color: #94A3B8; line-height: 1.65; }
+
+  /* ── RELATED PATTERNS ────────────────────────── */
+  .rel-pattern {
+    display: grid;
+    grid-template-columns: 80px 1fr;
+    gap: 1.5rem;
+    align-items: start;
+    padding: 1.5rem;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    margin-bottom: 1rem;
+    transition: border-color .3s;
+  }
+  .rel-pattern:hover { border-color: rgba(13,148,136,0.3); }
+  .rel-badge {
+    width: 72px; height: 72px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 2rem;
+    flex-shrink: 0;
+  }
+  .rel-name { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1.1rem; color: var(--white); }
+  .rel-vs { font-family: 'Space Mono', monospace; font-size: 0.68rem; color: var(--teal); margin: 0.2rem 0 0.5rem; }
+  .rel-desc { font-size: 0.9rem; color: #94A3B8; line-height: 1.65; }
+
+  /* ── STREAMS DIAGRAM ─────────────────────────── */
+  .stream-chain {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    flex-wrap: wrap;
+    margin: 2rem 0;
+    overflow-x: auto;
+  }
+  .stream-box {
+    background: var(--navy);
+    border: 1.5px solid rgba(13,148,136,0.4);
+    padding: 0.9rem 1.3rem;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.78rem;
+    color: var(--teal-l);
+    text-align: center;
+    white-space: nowrap;
+  }
+  .stream-box small { display: block; color: var(--gray); font-size: 0.65rem; margin-top: 0.2rem; }
+  .stream-arrow {
+    font-size: 1.3rem;
+    color: var(--teal);
+    padding: 0 0.5rem;
+    flex-shrink: 0;
+  }
+
+  /* ── CONCLUSION ──────────────────────────────── */
+  #conclusion {
+    background: var(--navy2);
+    position: relative;
+    overflow: hidden;
+  }
+  .conclusion-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: start; }
+  @media (max-width: 900px) { .conclusion-grid { grid-template-columns: 1fr; } }
+  .concl-phrase {
+    font-family: 'Lora', serif;
+    font-style: italic;
+    font-size: clamp(1.4rem, 2.5vw, 1.9rem);
+    color: var(--teal-l);
+    line-height: 1.5;
+    border-left: 4px solid var(--teal);
+    padding-left: 1.5rem;
+    margin-bottom: 2rem;
+  }
+  .concl-list { list-style: none; }
+  .concl-list li {
+    display: flex; align-items: flex-start; gap: 0.8rem;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+    font-size: 0.95rem;
+    color: #94A3B8;
+    line-height: 1.5;
+  }
+  .concl-list li:last-child { border-bottom: none; }
+  .check { color: var(--teal-l); font-size: 1rem; flex-shrink: 0; margin-top: 0.1rem; }
+  .warn { color: var(--amber); font-size: 1rem; flex-shrink: 0; margin-top: 0.1rem; }
+
+  .concl-big {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: clamp(4rem, 8vw, 6rem);
+    line-height: 0.9;
+    color: rgba(13,148,136,0.15);
+    letter-spacing: -0.03em;
+    word-break: break-all;
+  }
+
+  /* ── ANIMATIONS ──────────────────────────────── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .reveal {
+    opacity: 0;
+    transform: translateY(28px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ── DIVIDER ─────────────────────────────────── */
+  .divider {
+    width: 60px; height: 3px;
+    background: var(--teal);
+    margin-bottom: 2rem;
+  }
+
+  /* ── SCROLLBAR ───────────────────────────────── */
+  ::-webkit-scrollbar { width: 5px; height: 5px; }
+  ::-webkit-scrollbar-track { background: var(--navy2); }
+  ::-webkit-scrollbar-thumb { background: var(--teal); }
+
+  /* ── BACK TO TOP ─────────────────────────────── */
+  .back-top {
+    position: fixed;
+    bottom: 1.5rem; right: 1.5rem;
+    background: var(--teal);
+    color: white;
+    width: 42px; height: 42px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.2rem;
+    cursor: pointer;
+    border: none;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .3s;
+    z-index: 99;
+  }
+  .back-top.visible { opacity: 1; pointer-events: auto; }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="logo" href="#hero">DECORATOR</a>
+  <a href="#intencion">01 Intención</a>
+  <a href="#motivacion">02 Motivación</a>
+  <a href="#estructura">03 Estructura</a>
+  <a href="#participantes">04 Participantes</a>
+  <a href="#java">05 Java</a>
+  <a href="#ejemplo">06 Ejemplo</a>
+  <a href="#ventajas">07 Ventajas</a>
+  <a href="#desventajas">08 Desventajas</a>
+  <a href="#caso-real">09 Caso Real</a>
+  <a href="#relacionados">10 Relacionados</a>
+  <a href="#conclusion">11 Conclusión</a>
+</nav>
+
+<!-- BACK TO TOP -->
+<button class="back-top" id="backTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- HERO                                           -->
+<!-- ═══════════════════════════════════════════════ -->
+<section id="hero">
+  <div class="hero-grid"></div>
+  <div class="hero-accent"></div>
+  <div class="hero-content">
+    <p class="hero-eyebrow">PATRONES DE DISEÑO · GOF · ESTRUCTURAL DE OBJETO</p>
+    <h1 class="hero-title">DECO<span>RATOR</span></h1>
+    <p class="hero-subtitle">
+      Adjunta responsabilidades adicionales a un objeto de forma dinámica.
+      Alternativa flexible a la herencia para extender funcionalidad.
+    </p>
+    <div class="hero-tags">
+      <span class="tag">También: Wrapper</span>
+      <span class="tag">Tipo: Estructural</span>
+      <span class="tag">Scope: Object</span>
+      <span class="tag">GoF — Gamma et al.</span>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- 01 INTENCIÓN                                   -->
+<!-- ═══════════════════════════════════════════════ -->
+<section id="intencion">
+  <div class="sec-num">01 — INTENCIÓN</div>
+  <h2 class="sec-title">¿Qué es el <em>Decorator</em>?</h2>
+  <div class="divider"></div>
+
+  <div class="big-quote reveal">
+    <p>
+      Attach additional responsibilities to an object dynamically. Decorators provide
+      a flexible alternative to subclassing for extending functionality.
+    </p>
+  </div>
+
+  <div class="grid-2 reveal">
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>¿Qué hace?</div>
+      <ul>
+        <li>Envuelve un objeto en otro que extiende su comportamiento</li>
+        <li>El decorador conforma la misma interfaz del componente que decora</li>
+        <li>Su presencia es transparente para los clientes</li>
+        <li>Se pueden anidar múltiples decoradores recursivamente</li>
+        <li>El decorador reenvía las solicitudes al componente original</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>¿Cuándo usarlo?</div>
+      <ul>
+        <li>Para añadir responsabilidades a objetos individuales de forma dinámica y transparente</li>
+        <li>Cuando las responsabilidades deben poder retirarse</li>
+        <li>Cuando la extensión por subclases es impráctica</li>
+        <li>Cuando un gran número de extensiones independientes produciría una explosión de subclases</li>
+        <li>Cuando la definición de una clase está oculta o no disponible para subclasificar</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- 02 MOTIVACIÓN                                  -->
+<!-- ═══════════════════════════════════════════════ -->
+<section id="motivacion">
+  <div class="sec-num">02 — MOTIVACIÓN</div>
+  <h2 class="sec-title">El <em>Problema</em> a resolver</h2>
+  <div class="divider"></div>
+
+  <div class="compare reveal">
+    <div class="compare-col bad">
+      <div class="compare-header bad-h">❌ &nbsp;Con Herencia</div>
+      <ul>
+        <li>TextView</li>
+        <li>&nbsp;&nbsp;ScrollableTextView</li>
+        <li>&nbsp;&nbsp;BorderedTextView</li>
+        <li>&nbsp;&nbsp;BorderedScrollableTextView</li>
+        <li>&nbsp;&nbsp;DropShadowTextView</li>
+        <li>&nbsp;&nbsp;BorderedDropShadowScrollableTextView</li>
+        <li>&nbsp;&nbsp;... ∞</li>
+      </ul>
+      <br>
+      <ul>
+        <li>Explosión de subclases para cada combinación</li>
+        <li>Elección <strong>estática</strong> en tiempo de compilación</li>
+        <li>Inflexible: no se puede cambiar en tiempo de ejecución</li>
+        <li>El cliente no controla cómo ni cuándo decorar</li>
+        <li>Herencia múltiple de la misma clase es propensa a errores</li>
+      </ul>
+    </div>
+    <div class="compare-col good">
+      <div class="compare-header good-h">✓ &nbsp;Con Decorator</div>
+      <pre>new BorderDecorator(
+  new ScrollDecorator(
+    new TextView()
+  )
+)</pre>
+      <ul>
+        <li>Composición <strong>dinámica</strong> en tiempo de ejecución</li>
+        <li>Una sola clase base limpia (<code>TextView</code>)</li>
+        <li>Combinaciones ilimitadas sin nuevas clases</li>
+        <li>Se puede añadir una propiedad dos veces fácilmente</li>
+        <li>Transparente para el cliente: misma interfaz</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- 03 ESTRUCTURA                                  -->
+<!-- ═══════════════════════════════════════════════ -->
+<section id="estructura">
+  <div class="sec-num">03 — ESTRUCTURA</div>
+  <h2 class="sec-title">Diagrama <em>UML</em> del Patrón</h2>
+  <div class="divider"></div>
+
+  <div class="uml-wrap reveal">
+    <!-- Row 1: Component -->
+    <div class="uml-row" style="justify-content:center; margin-bottom:0.5rem;">
+      <div class="uml-box" style="width:180px;">
+        <div class="uml-box-head" style="color:#FFCB6B;">
+          «abstract»<br>Component
+          <small>VisualComponent</small>
+        </div>
+        <div class="uml-box-body">
+          <em>+ Operation()</em>
+        </div>
+      </div>
+    </div>
+
+    <!-- Connectors row -->
+    <div class="uml-row" style="gap:8rem;">
+      <div class="uml-connector">
+        <span style="font-size:1.5rem;">△</span>
+        <span class="arrow-down">|</span>
+      </div>
+      <div class="uml-connector" style="flex-direction:column; align-items:center; gap:0.2rem;">
+        <span style="font-size:0.9rem;">△</span>
+        <span>|</span>
+        <span class="rel-label" style="margin-left:4.5rem; font-size:0.62rem; color:var(--teal-l);">◆ component</span>
+      </div>
+    </div>
+
+    <!-- Row 2: ConcreteComponent + Decorator -->
+    <div class="uml-row" style="gap:3rem;">
+      <div class="uml-box" style="width:195px;">
+        <div class="uml-box-head">
+          ConcreteComponent
+          <small>TextView</small>
+        </div>
+        <div class="uml-box-body">
+          + Operation()
+        </div>
+      </div>
+
+      <div class="uml-box" style="width:195px; border-color:var(--teal-l);">
+        <div class="uml-box-head" style="color:var(--teal-l);">
+          «abstract» Decorator
+        </div>
+        <div class="uml-box-body">
+          - component: Component<br>
+          + Operation()
+        </div>
+      </div>
+    </div>
+
+    <!-- Connectors row 2 -->
+    <div class="uml-row" style="margin-left:14rem;">
+      <div class="uml-connector">
+        <div style="display:flex; gap:5.5rem;">
+          <span>△<br>|</span>
+          <span>△<br>|</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Row 3: Concrete Decorators -->
+    <div class="uml-row" style="gap:1.5rem; margin-left:8rem;">
+      <div class="uml-box" style="width:185px;">
+        <div class="uml-box-head">
+          ConcreteDecoratorA
+          <small>ScrollDecorator</small>
+        </div>
+        <div class="uml-box-body">
+          - scrollPosition<br>
+          + Operation()<br>
+          + ScrollTo()
+        </div>
+      </div>
+
+      <div class="uml-box" style="width:185px;">
+        <div class="uml-box-head">
+          ConcreteDecoratorB
+          <small>BorderDecorator</small>
+        </div>
+        <div class="uml-box-body">
+          - borderWidth<br>
+          + Operation()<br>
+          + DrawBorder()
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-2 reveal" style="margin-top:2rem;">
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>Herencia (triángulo △)</div>
+      <p>ConcreteComponent y Decorator heredan de Component. Esto garantiza que los decoradores puedan usarse en cualquier lugar donde se espere un Component.</p>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>Composición (◆ component)</div>
+      <p>Decorator mantiene una referencia al Component que decora. El método Operation() reenvía la llamada al componente y puede añadir comportamiento antes o después.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- 04 PARTICIPANTES                               -->
+<!-- ═══════════════════════════════════════════════ -->
+<section id="participantes">
+  <div class="sec-num">04 — PARTICIPANTES</div>
+  <h2 class="sec-title">Roles del <em>Patrón</em></h2>
+  <div class="divider"></div>
+
+  <div class="reveal">
+    <div class="participant">
+      <div class="participant-num">01</div>
+      <div class="participant-content">
+        <div class="participant-name">Component</div>
+        <div class="participant-ex">Ej: VisualComponent</div>
+        <p>Define la interfaz para objetos que pueden tener responsabilidades añadidas dinámicamente. Es la interfaz común que deben implementar tanto el componente concreto como el decorador, garantizando la transparencia.</p>
+      </div>
+    </div>
+
+    <div class="participant">
+      <div class="participant-num">02</div>
+      <div class="participant-content">
+        <div class="participant-name">ConcreteComponent</div>
+        <div class="participant-ex">Ej: TextView</div>
+        <p>Define un objeto al que se le pueden adjuntar responsabilidades adicionales. Es el objeto "núcleo" que será decorado. Implementa la interfaz Component sin adornos extra.</p>
+      </div>
+    </div>
+
+    <div class="participant">
+      <div class="participant-num">03</div>
+      <div class="participant-content">
+        <div class="participant-name">Decorator</div>
+        <div class="participant-ex">Ej: Decorator (clase abstracta)</div>
+        <p>Mantiene una referencia a un objeto Component y define una interfaz que conforma la interfaz de Component. Delega las operaciones al componente envuelto. Puede ser concreto si solo se necesita un decorador.</p>
+      </div>
+    </div>
+
+    <div class="participant">
+      <div class="participant-num">04</div>
+      <div class="participant-content">
+        <div class="participant-name">ConcreteDecorator</div>
+        <div class="participant-ex">Ej: ScrollDecorator, BorderDecorator</div>
+        <p>Añade responsabilidades concretas al componente. Extiende el comportamiento de Decorator sobreescribiendo Operation() para ejecutar acciones adicionales antes y/o después de delegar al componente.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- 05 IMPLEMENTACIÓN JAVA                         -->
+<!-- ═══════════════════════════════════════════════ -->
+<section id="java">
+  <div class="sec-num">05 — IMPLEMENTACIÓN EN JAVA</div>
+  <h2 class="sec-title">Código <em>Java</em> paso a paso</h2>
+  <div class="divider"></div>
+
+  <div class="code-grid reveal">
+    <div>
+      <div class="code-block">
+        <div class="code-header">Beverage.java — Interfaz Component</div>
+        <pre><span class="cm">// 1. La interfaz base (Component)</span>
+<span class="kw">public interface</span> <span class="cn">Beverage</span> {
+    <span class="cn">String</span> <span class="fn">getDescription</span>();
+    <span class="kw">double</span> <span class="fn">cost</span>();
+}</pre>
+      </div>
+
+      <div class="code-block">
+        <div class="code-header">DarkRoast.java — ConcreteComponent</div>
+        <pre><span class="cm">// 2. El componente concreto</span>
+<span class="kw">public class</span> <span class="cn">DarkRoast</span>
+    <span class="kw">implements</span> <span class="cn">Beverage</span> {
+
+    <span class="kw">public</span> <span class="cn">String</span> <span class="fn">getDescription</span>() {
+        <span class="kw">return</span> <span class="str">"Dark Roast Coffee"</span>;
+    }
+
+    <span class="kw">public double</span> <span class="fn">cost</span>() {
+        <span class="kw">return</span> <span class="num">0.99</span>;
+    }
+}</pre>
+      </div>
+    </div>
+
+    <div>
+      <div class="code-block">
+        <div class="code-header">CondimentDecorator.java — Decorator abstracto</div>
+        <pre><span class="cm">// 3. La clase Decorator abstracta</span>
+<span class="kw">public abstract class</span> <span class="cn">CondimentDecorator</span>
+    <span class="kw">implements</span> <span class="cn">Beverage</span> {
+
+    <span class="kw">protected</span> <span class="cn">Beverage</span> beverage;
+    <span class="cm">// Delegación explícita</span>
+}</pre>
+      </div>
+
+      <div class="code-block">
+        <div class="code-header">Mocha.java — ConcreteDecorator</div>
+        <pre><span class="cm">// 4. Un decorador concreto</span>
+<span class="kw">public class</span> <span class="cn">Mocha</span>
+    <span class="kw">extends</span> <span class="cn">CondimentDecorator</span> {
+
+    <span class="kw">public</span> <span class="fn">Mocha</span>(<span class="cn">Beverage</span> b) {
+        <span class="kw">this</span>.beverage = b;
+    }
+
+    <span class="kw">public</span> <span class="cn">String</span> <span class="fn">getDescription</span>() {
+        <span class="kw">return</span> beverage.<span class="fn">getDescription</span>()
+            + <span class="str">", Mocha"</span>;
+    }
+
+    <span class="kw">public double</span> <span class="fn">cost</span>() {
+        <span class="kw">return</span> <span class="num">0.20</span> + beverage.<span class="fn">cost</span>();
+    }
+}</pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- 06 EJEMPLO DE USO                              -->
+<!-- ═══════════════════════════════════════════════ -->
+<section id="ejemplo">
+  <div class="sec-num">06 — EJEMPLO DE USO</div>
+  <h2 class="sec-title">Decoradores en <em>acción</em></h2>
+  <div class="divider"></div>
+
+  <div class="code-grid reveal">
+    <div class="code-block" style="height:fit-content;">
+      <div class="code-header">Main.java — Composición dinámica</div>
+      <pre><span class="cm">// Café base sin adornos</span>
+<span class="cn">Beverage</span> bev = <span class="kw">new</span> <span class="cn">DarkRoast</span>();
+<span class="cm">// → "Dark Roast Coffee"  $0.99</span>
+
+<span class="cm">// Envolver con un Mocha</span>
+bev = <span class="kw">new</span> <span class="cn">Mocha</span>(bev);
+<span class="cm">// → "Dark Roast Coffee, Mocha"  $1.19</span>
+
+<span class="cm">// Añadir un segundo Mocha</span>
+bev = <span class="kw">new</span> <span class="cn">Mocha</span>(bev);
+<span class="cm">// → "Dark Roast Coffee, Mocha, Mocha"  $1.39</span>
+
+<span class="cm">// Añadir crema batida</span>
+bev = <span class="kw">new</span> <span class="cn">Whip</span>(bev);
+<span class="cm">// → "Dark Roast Coffee, Mocha, Mocha, Whip"</span>
+
+System.out.<span class="fn">println</span>(bev.<span class="fn">getDescription</span>());
+<span class="cm">// "Dark Roast Coffee, Mocha, Mocha, Whip"</span>
+
+System.out.<span class="fn">println</span>(bev.<span class="fn">cost</span>());
+<span class="cm">// 1.49</span></pre>
+    </div>
+
+    <div>
+      <div class="card" style="margin-bottom:1rem;">
+        <div class="card-title"><span class="dot"></span>☕ Composición dinámica</div>
+        <p>Cada <code>new Mocha(bev)</code> envuelve al objeto anterior, añadiendo su propio costo y descripción. El objeto resultante se comporta como un todo unificado.</p>
+      </div>
+      <div class="card" style="margin-bottom:1rem;">
+        <div class="card-title"><span class="dot"></span>🔗 Interfaz uniforme</div>
+        <p>El cliente siempre llama <code>.getDescription()</code> y <code>.cost()</code> sobre el mismo tipo <code>Beverage</code>, sin importar cuántos decoradores estén apilados.</p>
+      </div>
+      <div class="card" style="margin-bottom:1rem;">
+        <div class="card-title"><span class="dot"></span>🔄 Repetición sin errores</div>
+        <p>Aplicar Mocha dos veces es trivial y correcto. Con herencia, heredar de <code>Border</code> dos veces es propenso a errores en C++ y directamente ilegal en Java.</p>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="dot"></span>🧮 Cadena de responsabilidad</div>
+        <p>La llamada a <code>cost()</code> se propaga recursivamente: <code>Whip → Mocha → Mocha → DarkRoast</code>, acumulando el valor en cada nivel: <strong>0.10 + 0.20 + 0.20 + 0.99 = 1.49</strong></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- 07 VENTAJAS                                    -->
+<!-- ═══════════════════════════════════════════════ -->
+<section id="ventajas">
+  <div class="sec-num">07 — CONSECUENCIAS POSITIVAS</div>
+  <h2 class="sec-title"><em>Ventajas</em> del Patrón</h2>
+  <div class="divider"></div>
+
+  <div class="pro-con-grid reveal">
+    <div class="pro-card">
+      <div class="pro-icon">⚡</div>
+      <div class="pro-title">Más flexibilidad que la herencia estática</div>
+      <p>Las responsabilidades se añaden y eliminan en tiempo de ejecución simplemente adjuntando y desvinculando decoradores. La herencia, en contraste, exige crear una nueva clase para cada responsabilidad adicional (ej: <em>BorderedScrollableTextView</em>), lo que aumenta exponencialmente la complejidad.</p>
+    </div>
+    <div class="pro-card">
+      <div class="pro-icon">🧩</div>
+      <div class="pro-title">Principio Abierto/Cerrado (OCP)</div>
+      <p>Las clases están abiertas para extensión pero cerradas para modificación. No es necesario modificar el código existente para añadir nueva funcionalidad. Cada decorador es independiente y puede desarrollarse por separado.</p>
+    </div>
+    <div class="pro-card">
+      <div class="pro-icon">💡</div>
+      <div class="pro-title">Evita clases sobrecargadas (pay-as-you-go)</div>
+      <p>En lugar de intentar soportar todas las funciones posibles en una clase compleja, se define una clase simple y se añade funcionalidad incrementalmente con decoradores. La aplicación no paga por características que no usa. Extender una clase compleja tiende a exponer detalles no relacionados.</p>
+    </div>
+    <div class="pro-card">
+      <div class="pro-icon">🔁</div>
+      <div class="pro-title">Repetición limpia de responsabilidades</div>
+      <p>Es trivial añadir una propiedad dos veces: para doble borde, simplemente se aplican dos <em>BorderDecorator</em>. Con herencia, heredar de Border dos veces es propenso a errores (en C++) o directamente inválido (en Java).</p>
+    </div>
+    <div class="pro-card">
+      <div class="pro-icon">🔀</div>
+      <div class="pro-title">Mezcla y combinación de responsabilidades</div>
+      <p>Proveer diferentes clases Decorator para un Component específico permite combinar responsabilidades de formas que serían imposibles o muy costosas con herencia múltiple.</p>
+    </div>
+    <div class="pro-card">
+      <div class="pro-icon">🔒</div>
+      <div class="pro-title">Transparencia para el cliente</div>
+      <p>Los decoradores implementan la misma interfaz que el componente. Los clientes no pueden (ni necesitan) distinguir entre un componente decorado y uno sin decorar, lo que elimina la dependencia en la decoración.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- 08 DESVENTAJAS                                 -->
+<!-- ═══════════════════════════════════════════════ -->
+<section id="desventajas">
+  <div class="sec-num">08 — CONSECUENCIAS NEGATIVAS</div>
+  <h2 class="sec-title"><em>Desventajas</em> y Limitaciones</h2>
+  <div class="divider"></div>
+
+  <div class="pro-con-grid reveal">
+    <div class="con-card">
+      <div class="pro-icon">⚠️</div>
+      <div class="con-title">No son idénticos al componente</div>
+      <p>Un decorador actúa como enclosure transparente, pero desde el punto de vista de identidad de objeto (<code>==</code> o <code>instanceof</code>), un componente decorado no es idéntico al componente en sí. No se debe confiar en la identidad del objeto cuando se usan decoradores.</p>
+    </div>
+    <div class="con-card">
+      <div class="pro-icon">🔩</div>
+      <div class="con-title">Muchos objetos pequeños</div>
+      <p>Un diseño con Decorator suele resultar en sistemas compuestos por muchos objetos pequeños que se parecen entre sí. Aunque son fáciles de personalizar para quienes los entienden, pueden ser difíciles de aprender y depurar para quienes no.</p>
+    </div>
+    <div class="con-card">
+      <div class="pro-icon">🔍</div>
+      <div class="con-title">El orden de composición importa</div>
+      <p>El orden en que se anidan los decoradores puede cambiar el resultado final. Un error en el orden de composición puede producir comportamientos sutiles y difíciles de detectar. Requiere documentación cuidadosa del orden esperado.</p>
+    </div>
+    <div class="con-card">
+      <div class="pro-icon">📐</div>
+      <div class="con-title">Problemas con verificación de tipo</div>
+      <p>Si el código cliente necesita verificar el tipo concreto del componente (<code>instanceof</code>), el decorador rompe ese chequeo ya que el objeto externo es el decorador, no el componente. Requiere diseño cuidadoso de la API.</p>
+    </div>
+    <div class="con-card">
+      <div class="pro-icon">🐛</div>
+      <div class="con-title">Difícil de depurar</div>
+      <p>Al tener múltiples capas de objetos anidados, los stack traces en depuración pueden volverse profundos y difíciles de seguir. Los errores en un nivel intermedio de la cadena pueden ser complicados de localizar.</p>
+    </div>
+    <div class="con-card">
+      <div class="pro-icon">⚖️</div>
+      <div class="con-title">No apto para componentes pesados</div>
+      <p>Si la clase Component es intrínsecamente pesada, el Decorator puede ser demasiado costoso de aplicar en cantidad. En ese caso, el patrón <strong>Strategy</strong> es una mejor alternativa, permitiendo cambiar el comportamiento sin la sobrecarga del anidamiento.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- 09 CASO REAL                                   -->
+<!-- ═══════════════════════════════════════════════ -->
+<section id="caso-real">
+  <div class="sec-num">09 — CASO REAL</div>
+  <h2 class="sec-title">Decorator en <em>Java I/O</em></h2>
+  <div class="divider"></div>
+
+  <p class="reveal" style="color:#94A3B8; font-size:1rem; margin-bottom:2rem; max-width:700px;">
+    Java usa el patrón Decorator internamente en su librería <code>java.io</code>. Las clases de streams están diseñadas exactamente según este patrón, permitiendo combinar distintas capacidades de forma flexible.
+  </p>
+
+  <div class="stream-chain reveal">
+    <div class="stream-box">
+      FileInputStream
+      <small>Componente concreto</small>
+    </div>
+    <div class="stream-arrow">→</div>
+    <div class="stream-box" style="border-color:var(--teal-l);">
+      BufferedInputStream
+      <small>Añade buffer de lectura</small>
+    </div>
+    <div class="stream-arrow">→</div>
+    <div class="stream-box" style="border-color:#FFCB6B; color:#FFCB6B;">
+      DataInputStream
+      <small>Lee tipos primitivos</small>
+    </div>
+    <div class="stream-arrow">→</div>
+    <div class="stream-box" style="border-color:#82AAFF; color:#82AAFF;">
+      Cliente
+      <small>Usa la interfaz</small>
+    </div>
+  </div>
+
+  <div class="code-block reveal">
+    <div class="code-header">Java I/O — Decorator en la práctica</div>
+    <pre><span class="cm">// Java usa Decorator internamente en java.io</span>
+<span class="cm">// Equivalente al ejemplo del libro GoF con Streams</span>
+<span class="cn">InputStream</span> is = <span class="kw">new</span> <span class="cn">DataInputStream</span>(
+    <span class="kw">new</span> <span class="cn">BufferedInputStream</span>(
+        <span class="kw">new</span> <span class="cn">FileInputStream</span>(<span class="str">"archivo.dat"</span>)
+    )
+);
+
+<span class="cm">// Se puede componer aún más:</span>
+<span class="cn">InputStream</span> secure = <span class="kw">new</span> <span class="cn">CipherInputStream</span>(
+    <span class="kw">new</span> <span class="cn">BufferedInputStream</span>(
+        <span class="kw">new</span> <span class="cn">FileInputStream</span>(<span class="str">"secreto.enc"</span>)
+    ), cipher
+);</pre>
+  </div>
+
+  <div class="code-block reveal" style="margin-top:0;">
+    <div class="code-header">Equivalente en el libro GoF (C++)</div>
+    <pre><span class="cm">// Del libro: CompressingStream y ASCII7Stream son decoradores de Stream</span>
+<span class="cn">Stream</span>* aStream = <span class="kw">new</span> <span class="cn">CompressingStream</span>(
+    <span class="kw">new</span> <span class="cn">ASCII7Stream</span>(
+        <span class="kw">new</span> <span class="cn">FileStream</span>(<span class="str">"aFileName"</span>)
+    )
+);
+aStream-><span class="fn">PutInt</span>(<span class="num">12</span>);
+aStream-><span class="fn">PutString</span>(<span class="str">"aString"</span>);</pre>
+  </div>
+
+  <div class="grid-3 reveal" style="margin-top:1.5rem;">
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>InputStream (abstracto)</div>
+      <p>Clase base — el <strong>Component</strong> del patrón. Define la interfaz <code>read()</code>.</p>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>FilterInputStream</div>
+      <p>El <strong>Decorator</strong> abstracto. Todos los decoradores de I/O heredan de aquí.</p>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>Buffered / Data / Cipher</div>
+      <p>Los <strong>ConcreteDecorators</strong>. Cada uno añade una capa de funcionalidad: buffer, tipos, cifrado.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- 10 RELACIONADOS                                -->
+<!-- ═══════════════════════════════════════════════ -->
+<section id="relacionados">
+  <div class="sec-num">10 — PATRONES RELACIONADOS</div>
+  <h2 class="sec-title">Comparativa con <em>otros Patrones</em></h2>
+  <div class="divider"></div>
+
+  <div class="reveal">
+    <div class="rel-pattern">
+      <div class="rel-badge" style="background:rgba(99,102,241,0.15); border:1px solid rgba(99,102,241,0.3);">🔌</div>
+      <div>
+        <div class="rel-name">Adapter (p.139)</div>
+        <div class="rel-vs">Decorator vs Adapter</div>
+        <div class="rel-desc">
+          Un Adapter cambia la interfaz de un objeto por completo, dándole una interfaz totalmente nueva.
+          Un Decorator solo añade responsabilidades <strong>manteniendo exactamente la misma interfaz</strong> del componente original.
+          La presencia del Decorator es completamente transparente para los clientes.
+        </div>
+      </div>
+    </div>
+
+    <div class="rel-pattern">
+      <div class="rel-badge" style="background:rgba(245,158,11,0.15); border:1px solid rgba(245,158,11,0.3);">🌳</div>
+      <div>
+        <div class="rel-name">Composite (p.163)</div>
+        <div class="rel-vs">Decorator vs Composite</div>
+        <div class="rel-desc">
+          Un Decorator puede verse como un Composite <em>degenerado</em> con un solo componente (en lugar de varios hijos).
+          Sin embargo, un Decorator añade responsabilidades adicionales — no está pensado para la agregación de objetos.
+          Composite enfoca en la estructura jerárquica; Decorator en el enriquecimiento de comportamiento.
+        </div>
+      </div>
+    </div>
+
+    <div class="rel-pattern">
+      <div class="rel-badge" style="background:rgba(16,185,129,0.15); border:1px solid rgba(16,185,129,0.3);">🧠</div>
+      <div>
+        <div class="rel-name">Strategy (p.315)</div>
+        <div class="rel-vs">Decorator vs Strategy</div>
+        <div class="rel-desc">
+          <strong>Decorator</strong> cambia la "piel" del objeto desde afuera — el componente no sabe nada de sus decoradores.
+          <strong>Strategy</strong> cambia las "tripas" — el componente delega parte de su comportamiento a un objeto estrategia que conoce.
+          Strategy es preferible cuando el Component es intrínsecamente pesado (costoso de decorar).
+          Estas son dos alternativas para cambiar dinámicamente el comportamiento de un objeto.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- 11 CONCLUSIÓN                                  -->
+<!-- ═══════════════════════════════════════════════ -->
+<section id="conclusion">
+  <div class="sec-num">11 — CONCLUSIÓN</div>
+  <h2 class="sec-title">Lo que hay que <em>recordar</em></h2>
+  <div class="divider"></div>
+
+  <div class="conclusion-grid">
+    <div class="reveal">
+      <div class="concl-phrase">
+        "Envuelve objetos para extender su comportamiento en tiempo de ejecución, sin tocar el código original."
+      </div>
+      <ul class="concl-list">
+        <li>
+          <span class="check">✓</span>
+          Alternativa flexible a la herencia — evita la explosión de subclases para cada combinación de funciones
+        </li>
+        <li>
+          <span class="check">✓</span>
+          Composición dinámica en tiempo de ejecución, no estática en tiempo de compilación
+        </li>
+        <li>
+          <span class="check">✓</span>
+          Aplica el Principio Abierto/Cerrado con elegancia y sin modificar código existente
+        </li>
+        <li>
+          <span class="check">✓</span>
+          Omnipresente en Java I/O (<code>InputStream</code>), frameworks y librerías modernas
+        </li>
+        <li>
+          <span class="check">✓</span>
+          El decorador es transparente — misma interfaz, mismos métodos, mismos contratos
+        </li>
+        <li>
+          <span class="warn">⚠</span>
+          Cuidado: el orden de composición importa y muchos objetos pequeños dificultan el debug
+        </li>
+        <li>
+          <span class="warn">⚠</span>
+          No usar cuando se requiera verificación de identidad (<code>instanceof</code>) del componente interno
+        </li>
+      </ul>
+    </div>
+
+    <div class="reveal" style="display:flex; flex-direction:column; justify-content:space-between; gap:2rem;">
+      <div class="concl-big">DECO<br>RATOR</div>
+      <div class="card">
+        <div class="card-title" style="font-size:0.9rem;"><span class="dot"></span>Referencia bibliográfica</div>
+        <p style="font-size:0.85rem;">
+          Gamma, E., Helm, R., Johnson, R., &amp; Vlissides, J. (1994).<br>
+          <em>Design Patterns: Elements of Reusable Object-Oriented Software</em>.<br>
+          Addison-Wesley. Páginas 175–184.<br><br>
+          <span style="color:var(--teal-l);">También conocido como: Wrapper</span>
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  // ── Scroll reveal ──────────────────────────────
+  const reveals = document.querySelectorAll('.reveal');
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach((e, i) => {
+      if (e.isIntersecting) {
+        e.target.style.transitionDelay = (i * 0.05) + 's';
+        e.target.classList.add('visible');
+        io.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.1 });
+  reveals.forEach(el => io.observe(el));
+
+  // ── Active nav ─────────────────────────────────
+  const sections = document.querySelectorAll('section[id]');
+  const navLinks = document.querySelectorAll('nav a[href^="#"]');
+  const navObs = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        navLinks.forEach(a => a.classList.remove('active'));
+        const link = document.querySelector(`nav a[href="#${e.target.id}"]`);
+        if (link) link.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-40% 0px -55% 0px' });
+  sections.forEach(s => navObs.observe(s));
+
+  // ── Back to top ────────────────────────────────
+  const btn = document.getElementById('backTop');
+  window.addEventListener('scroll', () => {
+    btn.classList.toggle('visible', window.scrollY > 400);
+  });
+</script>
+</body>
+</html>

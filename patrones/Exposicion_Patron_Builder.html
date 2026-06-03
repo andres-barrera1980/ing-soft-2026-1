@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exposición: Patrón de Diseño Builder</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #34495e;
+            --accent: #3498db;
+            --light: #ecf0f1;
+            --text: #333;
+            --white: #ffffff;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text);
+            background-color: #f4f7f6;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 20px auto;
+            background: var(--white);
+            padding: 40px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+
+        header {
+            text-align: center;
+            border-bottom: 3px solid var(--accent);
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            color: var(--primary);
+            margin: 0;
+            font-size: 2.5em;
+        }
+
+        h2 {
+            color: var(--secondary);
+            border-left: 5px solid var(--accent);
+            padding-left: 15px;
+            margin-top: 40px;
+        }
+
+        h3 {
+            color: var(--accent);
+        }
+
+        .badge {
+            display: inline-block;
+            background: var(--accent);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            margin-top: 10px;
+        }
+
+        .concept-card {
+            background: var(--light);
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        pre {
+            background: #282c34;
+            color: #abb2bf;
+            padding: 20px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-family: 'Consolas', monospace;
+        }
+
+        .highlight {
+            color: #e67e22;
+            font-weight: bold;
+        }
+
+        footer {
+            text-align: center;
+            font-size: 0.8em;
+            color: #7f8c8d;
+            margin-top: 50px;
+        }
+
+        ul {
+            padding-left: 20px;
+        }
+
+        li {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <header>
+            <h1>Patrón de Diseño: Builder</h1>
+            <div class="badge">Categoría: Gamma (GoF)</div>
+            <div class="badge">Tipo: Creacional</div>
+        </header>
+
+        <section>
+            <h2>1. Contexto: Categoría Gamma (GoF)</h2>
+            <p>Este patrón pertenece a la clasificación establecida por Erich Gamma y sus coautores en
+                el libro fundamental "Design Patterns" (1994). Son conocidos como la "Gang of Four" (Erich Gamma, Richard Helm, Ralph Johnson y John Vilssides).</p>
+            
+        </section>
+
+        <section>
+            <h2>2. Tipo: Creacional</h2>
+            <p>Los patrones Creacionales se enfocan en los mecanismos de creación de objetos. Su
+                objetivo es aumentar la flexibilidad y la reutilización del código existente.</p>
+            <ul>
+                <li>Evitan el uso excesivo de <code>new</code> disperso por todo el código.</li>
+                <li>Aislar cómo se crean los objetos de cómo se usan.</li>
+                <li>Son fundamentales para sistemas que deben ser independientes de cómo se crean sus componentes.</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>3. El Patrón Builder </h2>
+            <h3>Definición</h3>
+            <p>Es un patrón que permite construir objetos complejos paso a paso. A diferencia de otros
+                patrones creacionales, el Builder no requiere que el producto final tenga una interfaz común, lo que
+                permite crear productos muy diferentes siguiendo el mismo proceso.</p>
+
+
+
+            <h3>Estructura (Participantes)</h3>
+            <ul>
+                <li><strong>Director:</strong> Gestiona el orden de los pasos de construcción.</li>
+                <li><strong>Builder (Interfaz):</strong> Define los pasos necesarios para construir el producto.</li>
+                <li><strong>Builder Concreto:</strong> Implementa los pasos específicos y retiene el producto
+                    resultante.</li>
+                <li><strong>Producto:</strong> El objeto complejo que estamos construyendo.</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>4. Ejemplo de Código (C++)</h2>
+            <p>Un ejemplo claro aplicando la construcción de una computadora personalizada:</p>
+            <pre>
+// Producto Final
+class PC {
+public:
+    string cpu, ram;
+    void mostrar() { cout << "PC con " << cpu << " y " << ram << endl; }
+};
+
+// Interfaz Builder
+class PCBuilder {
+public:
+    virtual void setCPU() = 0;
+    virtual void setRAM() = 0;
+    virtual PC* getResult() = 0;
+};
+
+// Builder Concreto
+class GamerPCBuilder : public PCBuilder {
+    PC* pc = new PC();
+public:
+    void setCPU() override { pc->cpu = "Intel i9"; }
+    void setRAM() override { pc->ram = "32GB"; }
+    PC* getResult() override { return pc; }
+};
+
+// Director
+class Fabricante {
+public:
+    void construir(PCBuilder* b) {
+        b->setCPU();
+        b->setRAM();
+    }
+};
+        </pre>
+        </section>
+
+        <section>
+            <h2>5. ¿Cuándo usarlo?</h2>
+            <ul>
+                <li>Cuando el constructor de una clase tiene demasiados parámetros</li>
+                <li>Cuando queremos que el código sea capaz de crear distintas representaciones de un objeto (ej. JSON,
+                    XML, HTML) usando el mismo proceso de construcción.</li>
+                <li>Cuando la construcción de un objeto implica pasos complejos que deben ejecutarse en un orden
+                    específico.</li>
+            </ul>
+        </section>
+
+        <footer>
+            Fundamentos de Desarrollo de Software | Patrones de Diseño | Nicolas Silva Garcia
+        </footer>
+    </div>
+
+</body>
+
+</html>

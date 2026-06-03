@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patrón Adapter — Diseño de Software</title>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:ital,wght@0,400;0,500;1,400&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg:        #0d0f14;
+            --surface:   #13161e;
+            --surface2:  #1a1e2a;
+            --border:    #272c3d;
+            --accent:    #5b8cff;
+            --accent2:   #a78bfa;
+            --accent3:   #34d399;
+            --danger:    #f87171;
+            --text:      #e8eaf0;
+            --muted:     #7c8494;
+            --code-bg:   #0a0c12;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'Lora', Georgia, serif;
+            font-size: 17px;
+            line-height: 1.75;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 70% 50% at 10% 20%, rgba(91,140,255,.13) 0%, transparent 60%),
+                radial-gradient(ellipse 50% 40% at 90% 80%, rgba(167,139,250,.10) 0%, transparent 60%),
+                radial-gradient(ellipse 40% 35% at 55% 50%, rgba(52,211,153,.06) 0%, transparent 60%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
+            background-size: 40px 40px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .wrapper {
+            position: relative;
+            z-index: 1;
+            max-width: 920px;
+            margin: 0 auto;
+            padding: 3rem 2rem 6rem;
+        }
+
+        header { text-align: center; padding: 4rem 0 3.5rem; }
+
+        .badge {
+            display: inline-block;
+            background: linear-gradient(135deg, rgba(91,140,255,.18), rgba(167,139,250,.18));
+            border: 1px solid rgba(91,140,255,.35);
+            color: var(--accent);
+            font-family: 'DM Mono', monospace;
+            font-size: .72rem;
+            letter-spacing: .12em;
+            text-transform: uppercase;
+            padding: .35em 1em;
+            border-radius: 999px;
+            margin-bottom: 1.4rem;
+        }
+
+        h1 {
+            font-family: 'Syne', sans-serif;
+            font-size: clamp(2.4rem, 6vw, 4rem);
+            font-weight: 800;
+            line-height: 1.1;
+            background: linear-gradient(135deg, #fff 30%, var(--accent2) 70%, var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: .5rem;
+        }
+
+        .subtitle {
+            font-family: 'DM Mono', monospace;
+            color: var(--muted);
+            font-size: .85rem;
+            letter-spacing: .06em;
+        }
+
+        h2 {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.45rem;
+            font-weight: 700;
+            color: #fff;
+            margin: 3.5rem 0 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: .7rem;
+        }
+
+        h2::before {
+            content: '';
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            border-radius: 4px;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            flex-shrink: 0;
+        }
+
+        .intro-card {
+            background: linear-gradient(135deg, rgba(91,140,255,.08), rgba(167,139,250,.06));
+            border: 1px solid var(--border);
+            border-left: 3px solid var(--accent);
+            border-radius: 12px;
+            padding: 1.6rem 1.8rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .intro-card p { color: #c8ccd8; }
+        b { color: #fff; font-weight: 600; }
+        i { color: var(--accent2); }
+
+        .steps { list-style: none; counter-reset: steps; display: flex; flex-direction: column; gap: 1rem; }
+
+        .steps li {
+            counter-increment: steps;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 1rem 1.2rem 1rem 4.5rem;
+            position: relative;
+            transition: border-color .2s;
+        }
+
+        .steps li:hover { border-color: var(--accent); }
+
+        .steps li::before {
+            content: counter(steps);
+            position: absolute;
+            left: 1.2rem;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 2rem;
+            height: 2rem;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            color: #fff;
+            font-family: 'Syne', sans-serif;
+            font-weight: 700;
+            font-size: .9rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* ── DIAGRAM ── */
+        .diagram-wrap {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            overflow: hidden;
+            margin: 1.5rem 0;
+        }
+
+        .diagram-header {
+            background: var(--surface2);
+            border-bottom: 1px solid var(--border);
+            padding: .85rem 1.4rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .diagram-title {
+            font-family: 'Syne', sans-serif;
+            font-size: .88rem;
+            font-weight: 700;
+            color: #fff;
+            letter-spacing: .04em;
+        }
+
+        .diagram-sub {
+            font-family: 'DM Mono', monospace;
+            font-size: .72rem;
+            color: var(--muted);
+            letter-spacing: .06em;
+        }
+
+        .diagram-body { padding: 2rem 1.5rem; overflow-x: auto; }
+        .seq-svg { display: block; width: 100%; min-width: 620px; }
+
+        /* ── CODE BLOCK ── */
+        .code-wrap {
+            background: var(--code-bg);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            overflow: hidden;
+            margin: 1.5rem 0;
+        }
+
+        .code-header {
+            background: var(--surface2);
+            border-bottom: 1px solid var(--border);
+            padding: .65rem 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: .6rem;
+        }
+
+        .dot { width: 12px; height: 12px; border-radius: 50%; }
+        .dot-r { background: #f87171; }
+        .dot-y { background: #fbbf24; }
+        .dot-g { background: var(--accent3); }
+
+        .code-lang {
+            margin-left: auto;
+            font-family: 'DM Mono', monospace;
+            font-size: .72rem;
+            color: var(--muted);
+            letter-spacing: .08em;
+        }
+
+        /* ── ANNOTATED CODE ── */
+        .code-annotated {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
+        }
+
+        .code-annotated .code-col {
+            padding: 1.4rem 1.2rem;
+            overflow-x: auto;
+            border-right: 1px solid var(--border);
+        }
+
+        .code-annotated .notes-col {
+            padding: 1.4rem 1.2rem;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .code-line-group {
+            font-family: 'DM Mono', monospace;
+            font-size: .8rem;
+            line-height: 1.8;
+            white-space: pre;
+            color: #c0c8e0;
+        }
+
+        .kw  { color: var(--accent2); }
+        .cl  { color: #67e8f9; }
+        .fn  { color: #6ee7b7; }
+        .cm  { color: #4a5370; font-style: italic; }
+        .str { color: #fbbf24; }
+        .nb  { color: #fb923c; }
+
+        /* note cards aligned with code sections */
+        .note-block {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-left: 3px solid var(--accent);
+            border-radius: 8px;
+            padding: .75rem 1rem;
+            margin-bottom: .75rem;
+            font-family: 'Lora', serif;
+            font-size: .82rem;
+            color: #b0b8cc;
+            line-height: 1.6;
+            flex-shrink: 0;
+        }
+
+        .note-block.purple { border-left-color: var(--accent2); }
+        .note-block.green  { border-left-color: var(--accent3); }
+        .note-block.orange { border-left-color: #fb923c; }
+
+        .note-block strong {
+            display: block;
+            font-family: 'Syne', sans-serif;
+            font-size: .78rem;
+            font-weight: 700;
+            letter-spacing: .05em;
+            margin-bottom: .25rem;
+        }
+
+        .note-block.purple strong { color: var(--accent2); }
+        .note-block.green  strong { color: var(--accent3); }
+        .note-block.orange strong { color: #fb923c; }
+        .note-block strong { color: var(--accent); }
+
+        /* section label inside code area */
+        .section-label {
+            font-family: 'Syne', sans-serif;
+            font-size: .7rem;
+            font-weight: 700;
+            letter-spacing: .1em;
+            text-transform: uppercase;
+            padding: .3em .7em;
+            border-radius: 4px;
+            display: inline-block;
+            margin-bottom: .5rem;
+        }
+
+        .sl-blue   { background: rgba(91,140,255,.15);  color: var(--accent);  border: 1px solid rgba(91,140,255,.3); }
+        .sl-purple { background: rgba(167,139,250,.15); color: var(--accent2); border: 1px solid rgba(167,139,250,.3); }
+        .sl-green  { background: rgba(52,211,153,.15);  color: var(--accent3); border: 1px solid rgba(52,211,153,.3); }
+        .sl-orange { background: rgba(251,146,60,.15);  color: #fb923c;        border: 1px solid rgba(251,146,60,.3); }
+
+        .code-section { margin-bottom: 1.4rem; }
+
+        @media (max-width: 700px) {
+            .code-annotated { grid-template-columns: 1fr; }
+            .code-annotated .code-col { border-right: none; border-bottom: 1px solid var(--border); }
+        }
+
+        /* ── CARDS ── */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        @media (max-width: 600px) { .cards-grid { grid-template-columns: 1fr; } }
+
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.15rem 1.25rem;
+            transition: transform .2s, border-color .2s, box-shadow .2s;
+        }
+
+        .card:hover { transform: translateY(-3px); box-shadow: 0 8px 30px rgba(0,0,0,.4); }
+        .card.good { border-top: 2px solid var(--accent3); }
+        .card.bad  { border-top: 2px solid var(--danger); }
+        .card-icon { font-size: 1.3rem; margin-bottom: .5rem; }
+
+        .card h3 {
+            font-family: 'Syne', sans-serif;
+            font-size: .95rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: .35rem;
+        }
+
+        .card p { font-size: .88rem; color: #9aa0b4; line-height: 1.6; }
+
+        .conclusion {
+            background: linear-gradient(135deg, rgba(52,211,153,.07), rgba(91,140,255,.07));
+            border: 1px solid rgba(52,211,153,.2);
+            border-radius: 14px;
+            padding: 1.8rem 2rem;
+            margin-top: 3rem;
+        }
+
+        .conclusion p + p { margin-top: 1rem; }
+
+        .footer-tag {
+            text-align: center;
+            font-family: 'DM Mono', monospace;
+            font-size: .75rem;
+            color: var(--muted);
+            margin-top: 4rem;
+            letter-spacing: .08em;
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(22px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        header        { animation: fadeUp .6s ease .05s both; }
+        .intro-card   { animation: fadeUp .6s ease .15s both; }
+        .steps        { animation: fadeUp .6s ease .25s both; }
+        .diagram-wrap { animation: fadeUp .6s ease .32s both; }
+        .code-wrap    { animation: fadeUp .6s ease .38s both; }
+        .cards-grid   { animation: fadeUp .6s ease .45s both; }
+        .conclusion   { animation: fadeUp .6s ease .52s both; }
+    </style>
+</head>
+<body>
+<div class="wrapper">
+
+    <!-- ══ HEADER ══ -->
+    <header>
+        <span class="badge">Patrones de Diseño · GoF</span>
+        <h1>Patrón Adapter</h1>
+        <p class="subtitle">también conocido como &lt;Wrapper&gt;</p>
+    </header>
+
+    <!-- ══ INTRO ══ -->
+    <div class="intro-card">
+        <p>
+            Este patrón tiene como objetivo <b>convertir la interfaz de una clase en otra interfaz que los clientes esperan</b>.
+            Su función principal es permitir que clases con interfaces incompatibles trabajen juntas,
+            actuando como un puente entre una funcionalidad existente y una necesidad específica del sistema.
+        </p>
+    </div>
+
+    <!-- ══ CÓMO FUNCIONA ══ -->
+    <h2>¿Cómo funciona?</h2>
+    <ol class="steps">
+        <li><b>Solicitud del Cliente:</b> El cliente realiza una llamada a una operación sobre la instancia del Adaptador utilizando la interfaz conocida (Target).</li>
+        <li><b>Traducción y Redirección:</b> El Adaptador recibe la petición y la traduce internamente para llamar a los métodos específicos de la clase preexistente (Adaptee).</li>
+        <li><b>Ejecución en el Adaptado:</b> La clase preexistente realiza el trabajo real utilizando su propia interfaz original sin saber que está siendo adaptada.</li>
+        <li><b>Entrega de Resultados:</b> Si es necesario, el Adaptador procesa la respuesta de la clase adaptada para que coincida con el formato que el cliente espera recibir.</li>
+    </ol>
+
+    <!-- ══ DIAGRAMA DE SECUENCIA ══ -->
+    <h2>Diagrama de Secuencia</h2>
+    <p style="color:var(--muted); font-size:.9rem; margin-bottom:1rem;">
+        Ejemplo: Editor gráfico adaptando un componente de texto externo como una forma geométrica.
+    </p>
+
+    <div class="diagram-wrap">
+        <div class="diagram-header">
+            <span class="diagram-title">DIAGRAMA DE SECUENCIA — PATRÓN ADAPTER</span>
+            <span class="diagram-sub">Ejemplo: Editor Gráfico + TextView</span>
+        </div>
+        <div class="diagram-body">
+            <svg class="seq-svg" viewBox="0 0 780 620" xmlns="http://www.w3.org/2000/svg" role="img">
+                <title>Diagrama de Secuencia del Patrón Adapter</title>
+                <defs>
+                    <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                        <path d="M1 1L9 5L1 9" fill="none" stroke="#5b8cff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </marker>
+                    <marker id="arr-return" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                        <path d="M1 1L9 5L1 9" fill="none" stroke="#a78bfa" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </marker>
+                </defs>
+
+                <!-- step numbers -->
+                <g font-family="'DM Mono', monospace" font-size="11" fill="#4a5370">
+                    <text x="8" y="198">1</text>
+                    <text x="8" y="258">2</text>
+                    <text x="8" y="318">3</text>
+                    <text x="8" y="358">3.1</text>
+                    <text x="8" y="418">4</text>
+                    <text x="8" y="468">4.1</text>
+                    <text x="8" y="528">5</text>
+                    <text x="8" y="568">5.1</text>
+                </g>
+
+                <!-- step descriptions -->
+                <g font-family="'Lora', serif" font-size="11" fill="#7c8494">
+                    <text x="28" y="192">El editor solicita</text>
+                    <text x="28" y="204">dibujar forma</text>
+                    <text x="28" y="252">Adapter valida</text>
+                    <text x="28" y="264">la solicitud</text>
+                    <text x="28" y="312">Adapter llama</text>
+                    <text x="28" y="324">a getBoundingBox</text>
+                    <text x="28" y="352">Retorna las</text>
+                    <text x="28" y="364">dimensiones</text>
+                    <text x="28" y="412">Adapter computa</text>
+                    <text x="28" y="424">el área</text>
+                    <text x="28" y="462">Retorna</text>
+                    <text x="28" y="474">área calculada</text>
+                    <text x="28" y="522">Respuesta final</text>
+                    <text x="28" y="534">al editor</text>
+                    <text x="28" y="562">Confirma</text>
+                    <text x="28" y="574">dibujado OK</text>
+                </g>
+
+                <!-- actor boxes -->
+                <rect x="160" y="20" width="140" height="54" rx="6" fill="#13161e" stroke="#5b8cff" stroke-width="1.5"/>
+                <text x="230" y="43" text-anchor="middle" font-family="'Syne', sans-serif" font-size="12" font-weight="700" fill="#5b8cff">Editor Gráfico</text>
+                <text x="230" y="60" text-anchor="middle" font-family="'DM Mono', monospace" font-size="10" fill="#7c8494">(Client)</text>
+
+                <rect x="340" y="20" width="150" height="54" rx="6" fill="#13161e" stroke="#a78bfa" stroke-width="1.5"/>
+                <text x="415" y="43" text-anchor="middle" font-family="'Syne', sans-serif" font-size="12" font-weight="700" fill="#a78bfa">AdaptadorTexto</text>
+                <text x="415" y="60" text-anchor="middle" font-family="'DM Mono', monospace" font-size="10" fill="#7c8494">(Adapter)</text>
+
+                <rect x="540" y="20" width="150" height="54" rx="6" fill="#13161e" stroke="#34d399" stroke-width="1.5"/>
+                <text x="615" y="43" text-anchor="middle" font-family="'Syne', sans-serif" font-size="12" font-weight="700" fill="#34d399">ComponenteTexto</text>
+                <text x="615" y="60" text-anchor="middle" font-family="'DM Mono', monospace" font-size="10" fill="#7c8494">(Adaptee)</text>
+
+                <!-- lifelines -->
+                <line x1="230" y1="74" x2="230" y2="600" stroke="#272c3d" stroke-width="1.5" stroke-dasharray="6 4"/>
+                <line x1="415" y1="74" x2="415" y2="600" stroke="#272c3d" stroke-width="1.5" stroke-dasharray="6 4"/>
+                <line x1="615" y1="74" x2="615" y2="600" stroke="#272c3d" stroke-width="1.5" stroke-dasharray="6 4"/>
+
+                <!-- activation boxes -->
+                <rect x="224" y="190" width="12" height="380" rx="2" fill="#1a2140" stroke="#5b8cff" stroke-width="1"/>
+                <rect x="409" y="230" width="12" height="310" rx="2" fill="#1e1a2e" stroke="#a78bfa" stroke-width="1"/>
+                <rect x="609" y="310" width="12" height="100" rx="2" fill="#0d2218" stroke="#34d399" stroke-width="1"/>
+
+                <!-- arrows -->
+                <line x1="236" y1="195" x2="408" y2="195" stroke="#5b8cff" stroke-width="1.5" marker-end="url(#arr)"/>
+                <text x="322" y="188" text-anchor="middle" font-family="'DM Mono', monospace" font-size="10.5" fill="#5b8cff">1. draw(shape)</text>
+
+                <path d="M421 235 Q460 235 460 252 Q460 270 421 270" fill="none" stroke="#a78bfa" stroke-width="1.2" marker-end="url(#arr-return)"/>
+                <text x="465" y="248" text-anchor="start" font-family="'DM Mono', monospace" font-size="10" fill="#a78bfa">2. validar()</text>
+
+                <line x1="421" y1="315" x2="608" y2="315" stroke="#5b8cff" stroke-width="1.5" marker-end="url(#arr)"/>
+                <text x="514" y="308" text-anchor="middle" font-family="'DM Mono', monospace" font-size="10.5" fill="#5b8cff">3. getBoundingBox()</text>
+
+                <line x1="609" y1="355" x2="422" y2="355" stroke="#a78bfa" stroke-width="1.2" stroke-dasharray="5 3" marker-end="url(#arr-return)"/>
+                <text x="514" y="348" text-anchor="middle" font-family="'DM Mono', monospace" font-size="10.5" fill="#a78bfa">3.1 return {w, h}</text>
+
+                <path d="M421 415 Q462 415 462 432 Q462 450 421 450" fill="none" stroke="#a78bfa" stroke-width="1.2" marker-end="url(#arr-return)"/>
+                <text x="467" y="428" text-anchor="start" font-family="'DM Mono', monospace" font-size="10" fill="#a78bfa">4. area = w*h</text>
+
+                <line x1="408" y1="525" x2="237" y2="525" stroke="#a78bfa" stroke-width="1.2" stroke-dasharray="5 3" marker-end="url(#arr-return)"/>
+                <text x="322" y="518" text-anchor="middle" font-family="'DM Mono', monospace" font-size="10.5" fill="#a78bfa">5. return area</text>
+
+                <path d="M236 565 Q272 565 272 578 Q272 590 236 590" fill="none" stroke="#34d399" stroke-width="1.2" marker-end="url(#arr-return)"/>
+                <text x="276" y="578" text-anchor="start" font-family="'DM Mono', monospace" font-size="10" fill="#34d399">5.1 dibujado OK</text>
+
+                <!-- legend -->
+                <rect x="160" y="600" width="460" height="1" fill="#272c3d"/>
+                <g font-family="'DM Mono', monospace" font-size="10" fill="#4a5370">
+                    <line x1="170" y1="612" x2="210" y2="612" stroke="#5b8cff" stroke-width="1.5" marker-end="url(#arr)"/>
+                    <text x="215" y="616">Llamada</text>
+                    <line x1="280" y1="612" x2="320" y2="612" stroke="#a78bfa" stroke-width="1.2" stroke-dasharray="5 3" marker-end="url(#arr-return)"/>
+                    <text x="325" y="616">Retorno</text>
+                    <path d="M395 608 Q415 608 415 614 Q415 620 395 620" fill="none" stroke="#a78bfa" stroke-width="1.2"/>
+                    <text x="420" y="616">Auto-llamada</text>
+                </g>
+            </svg>
+        </div>
+    </div>
+
+    <!-- ══ CÓDIGO COMENTADO ══ -->
+    <h2>Código comentado línea a línea</h2>
+    <p style="color:var(--muted); font-size:.9rem; margin-bottom:1rem;">
+        Cada sección del código explicada junto a lo que hace.
+    </p>
+
+    <!-- SECCIÓN 1: interfaz -->
+    <div class="code-wrap" style="margin-bottom:1rem;">
+        <div class="code-header">
+            <span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span>
+            <span class="code-lang">Parte 1 — Interfaz Target</span>
+        </div>
+        <div class="code-annotated">
+            <div class="code-col">
+                <div class="code-section">
+                    <span class="section-label sl-blue">Target / Contrato</span>
+                    <div class="code-line-group"><span class="cm">// Define qué métodos debe tener cualquier "Forma"</span>
+<span class="kw">interface</span> <span class="cl">Forma</span> {
+
+    <span class="cm">// Método para dibujar la forma en pantalla</span>
+    <span class="kw">void</span> <span class="fn">draw</span>();
+
+    <span class="cm">// Método para obtener el área de la forma</span>
+    <span class="kw">double</span> <span class="fn">getArea</span>();
+
+}</div>
+                </div>
+            </div>
+            <div class="notes-col">
+                <div class="note-block">
+                    <strong>¿Qué es una interface?</strong>
+                    Es un contrato. Cualquier clase que lo firme está obligada a implementar todos sus métodos.
+                </div>
+                <div class="note-block">
+                    <strong>draw()</strong>
+                    Declara que toda Forma debe saber dibujarse. No define cómo, solo dice que debe poder hacerlo.
+                </div>
+                <div class="note-block">
+                    <strong>getArea()</strong>
+                    Declara que toda Forma debe poder calcular su área y devolver un número decimal (double).
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SECCIÓN 2: Adaptee -->
+    <div class="code-wrap" style="margin-bottom:1rem;">
+        <div class="code-header">
+            <span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span>
+            <span class="code-lang">Parte 2 — Clase Adaptee</span>
+        </div>
+        <div class="code-annotated">
+            <div class="code-col">
+                <div class="code-section">
+                    <span class="section-label sl-green">Adaptee / Clase externa</span>
+                    <div class="code-line-group"><span class="cm">// Clase existente con su propia interfaz</span>
+<span class="kw">class</span> <span class="cl">ComponenteTextoExterno</span> {
+
+    <span class="cm">// Devuelve {ancho, alto} del texto como arreglo</span>
+    <span class="kw">public int</span>[] <span class="fn">getBoundingBox</span>() {
+        System.out.println(<span class="str">"Calculando bounding box..."</span>);
+        <span class="kw">return new int</span>[] {<span class="nb">200</span>, <span class="nb">50</span>};
+    }
+
+    <span class="cm">// Renderiza el texto usando su propio sistema</span>
+    <span class="kw">public void</span> <span class="fn">renderText</span>() {
+        System.out.println(<span class="str">"Renderizando texto externo..."</span>);
+    }
+
+}</div>
+                </div>
+            </div>
+            <div class="notes-col">
+                <div class="note-block green">
+                    <strong>¿Por qué es incompatible?</strong>
+                    Esta clase no implementa <code>Forma</code>. Sus métodos se llaman diferente: <code>renderText()</code> en vez de <code>draw()</code>, y <code>getBoundingBox()</code> en vez de <code>getArea()</code>.
+                </div>
+                <div class="note-block green">
+                    <strong>getBoundingBox()</strong>
+                    Devuelve un arreglo de 2 números: la posición 0 es el ancho y la posición 1 es el alto del texto. El Adapter usará esto para calcular el área.
+                </div>
+                <div class="note-block green">
+                    <strong>renderText()</strong>
+                    Es el equivalente del <code>draw()</code>, pero con otro nombre. El Adapter se encargará de conectarlos.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SECCIÓN 3: Adapter -->
+    <div class="code-wrap" style="margin-bottom:1rem;">
+        <div class="code-header">
+            <span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span>
+            <span class="code-lang">Parte 3 — Clase Adapter</span>
+        </div>
+        <div class="code-annotated">
+            <div class="code-col">
+                <div class="code-section">
+                    <span class="section-label sl-purple">Adapter / El puente</span>
+                    <div class="code-line-group"><span class="cm">// Implementa Forma (cumple el contrato del cliente)</span>
+<span class="kw">class</span> <span class="cl">AdaptadorTexto</span> <span class="kw">implements</span> <span class="cl">Forma</span> {
+
+    <span class="cm">// Guarda una referencia al objeto externo</span>
+    <span class="kw">private</span> <span class="cl">ComponenteTextoExterno</span> texto;
+
+    <span class="cm">// Constructor: recibe el objeto a adaptar</span>
+    <span class="kw">public</span> <span class="fn">AdaptadorTexto</span>(<span class="cl">ComponenteTextoExterno</span> t) {
+        <span class="kw">this</span>.texto = t;
+    }
+
+    <span class="cm">// draw() del contrato → llama a renderText() del externo</span>
+    <span class="kw">@Override</span>
+    <span class="kw">public void</span> <span class="fn">draw</span>() {
+        texto.<span class="fn">renderText</span>();
+    }
+
+    <span class="cm">// getArea() del contrato → usa getBoundingBox() y calcula</span>
+    <span class="kw">@Override</span>
+    <span class="kw">public double</span> <span class="fn">getArea</span>() {
+        <span class="kw">int</span>[] dims = texto.<span class="fn">getBoundingBox</span>();
+        <span class="kw">return</span> dims[<span class="nb">0</span>] * dims[<span class="nb">1</span>]; <span class="cm">// ancho × alto</span>
+    }
+
+}</div>
+                </div>
+            </div>
+            <div class="notes-col">
+                <div class="note-block purple">
+                    <strong>implements Forma</strong>
+                    Al implementar la interfaz, esta clase se compromete a tener <code>draw()</code> y <code>getArea()</code>. Así el Cliente puede usarla como si fuera cualquier otra Forma.
+                </div>
+                <div class="note-block purple">
+                    <strong>private ComponenteTextoExterno texto</strong>
+                    Guarda el objeto externo adentro. Es el "envuelto". El Adapter lo usa internamente pero el Cliente nunca lo ve.
+                </div>
+                <div class="note-block purple">
+                    <strong>Constructor</strong>
+                    Al crear el Adapter, se le pasa el objeto externo que se quiere adaptar. Esto es la inyección del Adaptee.
+                </div>
+                <div class="note-block purple">
+                    <strong>draw() → renderText()</strong>
+                    Cuando el Cliente llama <code>draw()</code>, el Adapter lo redirige a <code>renderText()</code>. Traducción directa de un método al otro.
+                </div>
+                <div class="note-block purple">
+                    <strong>getArea() → getBoundingBox()</strong>
+                    El Adapter pide las dimensiones al objeto externo, y él mismo hace la multiplicación. El Cliente recibe el área sin saber cómo se obtuvo.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SECCIÓN 4: Cliente -->
+    <div class="code-wrap" style="margin-bottom:1rem;">
+        <div class="code-header">
+            <span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span>
+            <span class="code-lang">Parte 4 — Cliente</span>
+        </div>
+        <div class="code-annotated">
+            <div class="code-col">
+                <div class="code-section">
+                    <span class="section-label sl-orange">Client / Uso final</span>
+                    <div class="code-line-group"><span class="kw">public class</span> <span class="cl">EditorGrafico</span> {
+
+    <span class="kw">public static void</span> <span class="fn">main</span>(String[] args) {
+
+        <span class="cm">// Crea el objeto externo (la librería incompatible)</span>
+        <span class="cl">ComponenteTextoExterno</span> lib = <span class="kw">new</span> <span class="cl">ComponenteTextoExterno</span>();
+
+        <span class="cm">// Lo envuelve en el Adapter → ahora es una Forma válida</span>
+        <span class="cl">Forma</span> miTexto = <span class="kw">new</span> <span class="cl">AdaptadorTexto</span>(lib);
+
+        <span class="cm">// El editor usa la interfaz Forma sin saber qué hay detrás</span>
+        miTexto.<span class="fn">draw</span>();
+
+        <span class="cm">// Imprime el área sin conocer getBoundingBox()</span>
+        System.out.println(<span class="str">"Área: "</span> + miTexto.<span class="fn">getArea</span>());
+
+    }
+}</div>
+                </div>
+            </div>
+            <div class="notes-col">
+                <div class="note-block orange">
+                    <strong>new ComponenteTextoExterno()</strong>
+                    Se instancia la librería externa. En la práctica, esto podría venir de una dependencia o módulo ya existente.
+                </div>
+                <div class="note-block orange">
+                    <strong>Forma miTexto = new AdaptadorTexto(lib)</strong>
+                    Aquí ocurre la clave: la variable es de tipo <code>Forma</code>, pero lo que hay adentro es un <code>AdaptadorTexto</code> que envuelve la librería. El tipo de la variable oculta la complejidad.
+                </div>
+                <div class="note-block orange">
+                    <strong>miTexto.draw() y miTexto.getArea()</strong>
+                    El editor solo llama métodos de <code>Forma</code>. No sabe nada de <code>renderText()</code> ni de <code>getBoundingBox()</code>. La incompatibilidad quedó completamente oculta.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══ VENTAJAS ══ -->
+    <h2>Ventajas</h2>
+    <div class="cards-grid">
+        <div class="card good">
+            <div class="card-icon">♻️</div>
+            <h3>Reutilización de clases</h3>
+            <p>Permite usar clases existentes cuya interfaz no coincide, sin modificar código ajeno o legado.</p>
+        </div>
+        <div class="card good">
+            <div class="card-icon">🔧</div>
+            <h3>Módulos reutilizables</h3>
+            <p>Facilita crear módulos que cooperan con clases no previstas o interfaces aún no definidas.</p>
+        </div>
+        <div class="card good">
+            <div class="card-icon">🌿</div>
+            <h3>Flexibilidad (Object Adapter)</h3>
+            <p>Un solo adaptador puede trabajar con una clase y todas sus subclases simultáneamente.</p>
+        </div>
+        <div class="card good">
+            <div class="card-icon">👁️</div>
+            <h3>Transparencia al cliente</h3>
+            <p>El cliente ignora completamente las diferencias de interfaz de los objetos que usa.</p>
+        </div>
+    </div>
+
+    <!-- ══ DESVENTAJAS ══ -->
+    <h2>Desventajas</h2>
+    <div class="cards-grid">
+        <div class="card bad">
+            <div class="card-icon">📡</div>
+            <h3>Indirección adicional</h3>
+            <p>Introduce un nivel extra de llamadas; en sistemas críticos puede tener impacto en rendimiento.</p>
+        </div>
+        <div class="card bad">
+            <div class="card-icon">🔒</div>
+            <h3>Rigidez en herencia (Class Adapter)</h3>
+            <p>El adaptador de clases se compromete con una clase específica y no adapta a subclases.</p>
+        </div>
+        <div class="card bad">
+            <div class="card-icon">🧩</div>
+            <h3>Dificultad para sobrescribir</h3>
+            <p>En el adaptador de objetos, sobrescribir comportamientos requiere subclases adicionales.</p>
+        </div>
+    </div>
+
+    <!-- ══ CONCLUSIÓN ══ -->
+    <h2>Conclusión</h2>
+    <div class="conclusion">
+        <p>
+            <b>Úsalo para resolver incompatibilidades:</b> El Adapter es la herramienta ideal cuando descubres
+            que dos clases que deberían trabajar juntas no pueden hacerlo por discrepancias en sus métodos.
+            Es un patrón que suele aplicarse <b>después</b> de que el código ha sido diseñado,
+            como una solución a problemas de integración imprevistos.
+        </p>
+        <p>
+            <b>No lo confundas:</b> A diferencia del <i>Bridge</i>, que se diseña <i>antes</i> para que las cosas varíen
+            independientemente, el Adapter se aplica para que cosas que <i>ya existen</i> funcionen juntas
+            a pesar de sus diferencias.
+        </p>
+    </div>
+
+    <p class="footer-tag">Patrón Adapter · Gang of Four · Diseño Orientado a Objetos</p>
+
+</div>
+</body>
+</html>

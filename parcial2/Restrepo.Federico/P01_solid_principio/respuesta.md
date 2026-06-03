@@ -4,10 +4,10 @@
 
 ---
 
-## Pregunta [XX]: [Título resumido]
+## Pregunta 01: SOLID - Principio en GestorLibro
 
 ### Estudiante
-- **Nombre completo**: [Tu nombre y apellido]
+- **Nombre completo**: Federico Restrepo
 
 ---
 
@@ -15,9 +15,9 @@
 
 | Campo | Valor |
 |---|---|
-| **Nombre del LLM** | [Claude / ChatGPT / Gemini / Copilot / DeepSeek / Qwen / Mistral / Otro / **Sin IA — respuesta propia**] |
-| **Modelo específico** | [Ej: Claude Opus 4.5, GPT-4o, Gemini 2.5 Pro, etc. Si respondes sin IA, escribe "N/A"] |
-| **¿Por qué elegiste este LLM?** | [Justifica en 1-3 oraciones. Si respondes sin IA, explica por qué decidiste no usar LLM para esta pregunta.] |
+| **Nombre del LLM** | Gemini |
+| **Modelo específico** | Gemini 3.1 Pro (High) |
+| **¿Por qué elegiste este LLM?** | Gemini 3.1 Pro es excelente analizando arquitectura de software y detectando violaciones a los principios SOLID en código Java. |
 
 ---
 
@@ -25,16 +25,20 @@
 
 > **Si respondiste sin IA, omite esta sección y ve directamente a Análisis crítico.**
 
-```
-[Pega aquí el prompt exacto que enviaste al LLM. 
-Incluye TODO el texto, sin editar ni resumir.
+```text
+Actúa como un Arquitecto de Software Senior. 
+Contexto: Estoy trabajando en el módulo de administración de un proyecto llamado OpenLib Market (escrito en Java). Tenemos una clase `GestorLibro` con un método `publicarLibro(Libro libro, Usuario vendedor)` que realiza múltiples tareas a la vez: validación, guardado en BD, generación de slug, envío de correo, logging e indexación.
 
-Un buen prompt incluye:
-- Contexto del proyecto OpenLib Market
-- El código o situación específica
-- Lo que esperas que el LLM haga
-- Restricciones (ej: "usa Java 21", "aplica SOLID")
-- Formato de salida esperado (ej: "respuesta en markdown con código Java")]
+Código a analizar:
+(Se incluye el código de la clase GestorLibro del enunciado)
+
+Tarea:
+1. Identifica qué principio SOLID principal se está violando en esta clase y explica brevemente por qué.
+2. Propón un refactoring completo del código para corregir esta violación, separando las responsabilidades correctamente.
+
+Restricciones: Usa Java 21, aplica inyección de dependencias mediante constructores, no asumas el uso de frameworks como Spring (hazlo con Java puro), y mantén un acoplamiento bajo mediante el uso de interfaces.
+
+Formato de salida: Estructura tu respuesta en Markdown, entregando primero tu diagnóstico teórico y luego los fragmentos de código refactorizados.
 ```
 
 ---
@@ -42,12 +46,55 @@ Un buen prompt incluye:
 ### Respuesta del LLM
 
 > **Si respondiste sin IA, omite esta sección y ve directamente a Análisis crítico.**
-[Pega aquí la respuesta COMPLETA del LLM, sin editar, sin resumir.
-Incluye TODO el texto, código, explicaciones que generó el LLM.
+**Diagnóstico**
+El principio principal que se está violando de forma evidente es el **Single Responsibility Principle (SRP - Principio de Responsabilidad Única)**. Este principio dicta que una clase debe tener una sola razón para cambiar. 
+Actualmente, `GestorLibro` cambiará si cambian las reglas de validación, el motor de base de datos, el algoritmo del slug, el servidor de correo, la estrategia de logs o el motor de búsqueda.
 
-Si el LLM generó código, asegúrate de que esté correctamente formateado.
-Si tuviste que hacer varias iteraciones, pega la MEJOR respuesta obtenida,
-pero menciona cuántas iteraciones hiciste.]
+**Refactoring propuesto**
+Para solucionarlo, debemos delegar estas responsabilidades en abstracciones separadas (interfaces) e inyectarlas en un caso de uso orquestador (`PublicadorDeLibros`), respetando también la **Inversión de Dependencias (DIP)**.
+
+```java
+// Abstracciones (Interfaces)
+public interface LibroRepository { void guardar(Libro libro); }
+public interface GeneradorSlug { String generarPara(String texto); }
+public interface Notificador { void notificarPublicacion(Usuario usuario, Libro libro); }
+public interface BuscadorIndex { void indexar(Libro libro); }
+public interface LoggerService { void info(String mensaje); }
+
+// Orquestador (El nuevo GestorLibro)
+public class PublicadorDeLibros {
+    private final LibroRepository repository;
+    private final GeneradorSlug generadorSlug;
+    private final Notificador notificador;
+    private final BuscadorIndex buscadorIndex;
+    private final LoggerService logger;
+
+    public PublicadorDeLibros(LibroRepository repository, GeneradorSlug generadorSlug,
+                              Notificador notificador, BuscadorIndex buscadorIndex, 
+                              LoggerService logger) {
+        this.repository = repository;
+        this.generadorSlug = generadorSlug;
+        this.notificador = notificador;
+        this.buscadorIndex = buscadorIndex;
+        this.logger = logger;
+    }
+
+    public void publicarLibro(Libro libro, Usuario vendedor) {
+        validarLibro(libro);
+        String slug = generadorSlug.generarPara(libro.getTitulo());
+        libro.setSlug(slug);
+        repository.guardar(libro);
+        buscadorIndex.indexar(libro);
+        notificador.notificarPublicacion(vendedor, libro);
+        logger.info("Libro publicado: " + libro.getIsbn() + " por " + vendedor.getNombre());
+    }
+
+    private void validarLibro(Libro libro) {
+        if (libro.getIsbn() == null || libro.getTitulo() == null || libro.getAutor() == null) {
+            throw new IllegalArgumentException("Datos del libro incompletos");
+        }
+    }
+}
 ```
 
 ---

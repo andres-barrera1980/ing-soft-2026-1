@@ -4,16 +4,16 @@
 
 | Campo | Valor |
 |---|---|
-| **Nombre completo** | [Tu nombre y apellido] |
-| **Fecha de entrega** | [FECHA] |
+| **Nombre completo** | Federico Restrepo |
+| **Fecha de entrega** | 2026-06-03 |
 
 ## LLM principal utilizado
 
 | Campo | Valor |
 |---|---|
-| **Nombre del LLM** | [Claude / ChatGPT / Gemini / Copilot / DeepSeek / Qwen / Mistral / Otro / Sin IA] |
-| **Modelo específico** | [Ej: Claude Opus 4.5, GPT-4o. Si respondes sin IA, escribe "N/A"] |
-| **¿Por qué elegiste este LLM?** | [Justifica en 2-4 oraciones. Si respondes sin IA, explica tu decisión.] |
+| **Nombre del LLM** | Gemini |
+| **Modelo específico** | Gemini 3.1 Pro (High) |
+| **¿Por qué elegiste este LLM?** | Gemini 3.1 Pro ofrece un excelente nivel de razonamiento para arquitectura de software, patrones de diseño y refactorización, lo que lo hace ideal para resolver este tipo de exámenes complejos paso a paso. |
 
 ## Estructura de la entrega
 

@@ -250,24 +250,11 @@ Se le pudo haber exigido al prompt que especificara un escenario de transición 
 
 #### 3. Respuesta final
 
-En conclusión, la respuesta del LLM es excelente y explica de manera muy didáctica las tres fases del ciclo. 
+En conclusión, la respuesta del LLM es excelente y explica de manera muy didáctica las tres fases del ciclo.
 
-Un acierto conceptual clave del LLM en la fase **REFACTOR** fue mover la lógica de transición de estado desde el servicio de inventario (`ControlInventarioService`) hacia la entidad de dominio (`Libro`). Esto previene el antipatrón del "Modelo de Dominio Anémico" y hace que la entidad sea rica en comportamiento y proteja sus propias invariantes.
+Uno de sus mayores aciertos fue trasladar la lógica de cambio de estado a la clase Libro, evitando que toda la responsabilidad recaiga en el servicio y logrando un modelo de dominio más sólido.
 
-**Vulnerabilidad/Engaño de la IA en TDD:**
-Los LLM suelen "hacer trampa" en la fase RED escribiendo código de pruebas que utiliza clases y métodos que asumen existentes sin más. En esta respuesta, el modelo resolvió correctamente esta limitación escribiendo primero un "esqueleto" mínimo (stubs) de las interfaces y la clase `ControlInventarioService` vacía. Si el modelo hubiese tirado el test RED directamente sin los stubs, el compilador de Java habría fallado y en TDD la fase RED debe ser un test que **compile pero falle por aserción**.
+Además, manejó correctamente una limitación común de los LLM en TDD: en lugar de escribir pruebas sobre clases inexistentes, creó primero estructuras mínimas para que el código pudiera compilar y la fase RED fallara por las pruebas, no por errores de compilación.
 
-Para garantizar la cobertura completa frente al punto que el prompt omitió (cambios de stock que no alteran el estado `DISPONIBLE` $\rightarrow$ `DISPONIBLE`), propongo incluir la siguiente prueba en la suite final:
+Como mejora, sería conveniente agregar una prueba que valide que, cuando el stock cambia pero el estado permanece en DISPONIBLE, no se generen notificaciones ni llamadas innecesarias a otros servicios. Esto ayudaría a evitar operaciones redundantes y asegurar un comportamiento más eficiente.
 
-```java
-@Test
-void actualizarStock_PermaneceDisponible_NoDisparaEventos() {
-    // Si cambia de 5 a 3, el estado no transiciona
-    service.actualizarStock(libro, 3, "vendedor@openlib.com");
-
-    assertEquals(EstadoLibro.DISPONIBLE, libro.getEstado());
-    verifyNoInteractions(notificador);
-    verifyNoInteractions(catalogo);
-}
-```
-Esto asegura que el diseño refactorizado solo notifique cuando realmente haya una transición de estado, evitando llamadas redundantes a servicios de red externos.

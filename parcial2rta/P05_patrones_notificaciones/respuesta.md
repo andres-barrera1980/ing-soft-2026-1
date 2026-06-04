@@ -271,8 +271,6 @@ El prompt no especificó el manejo de fallos (qué pasa si falla el envío de co
 
 #### 3. Respuesta final
 
-En conclusión, la combinación de los patrones **Observer** y **Command** es la solución más robusta y escalable para este escenario:
-- **Observer**: Permite que el sistema se suscriba y desuscriba dinámicamente a eventos de stock. `GestorStock` mantiene la lista de observadores y los notifica de manera uniforme.
-- **Command**: Encapsula cada tarea independiente de reacción. Esto permite que cada observador pueda ejecutar su tarea encapsulada de manera asíncrona (como se demuestra usando `Virtual Threads` de Java 21), aislando los fallos de red o base de datos. De esta forma, si falla la conexión con el servidor SMTP para mandar los correos, esto no detiene la actualización de la caché de Redis ni el log de auditoría.
+En conclusión, la combinación de los patrones **Observer** y **Command** es la solución más robusta y escalable para este escenario. El patrón Observer permite gestionar y notificar fácilmente los cambios de stock a los distintos componentes interesados, mientras que Command encapsula cada acción de forma independiente, facilitando su ejecución asíncrona y evitando que un fallo afecte a las demás tareas.
 
-El código propuesto por el LLM es totalmente funcional y demuestra un excelente entendimiento del desacoplamiento, integrando características modernas de Java 21. Una mejora menor en producción sería inyectar un gestor centralizado de comandos (como un bus de eventos o cola de mensajes en memoria) en lugar de instanciar los executors en cada observador, pero para los fines del modelado de patrones la solución es óptima.
+La propuesta del LLM demuestra un buen nivel de desacoplamiento y aprovecha características modernas de Java 21. Como mejora para un entorno de producción, podría utilizarse un gestor centralizado de eventos o comandos en lugar de crear ejecutores dentro de cada observador, aunque para el objetivo del ejercicio la solución es adecuada.

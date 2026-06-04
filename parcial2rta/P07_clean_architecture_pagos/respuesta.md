@@ -228,10 +228,8 @@ Faltó especificar si queríamos que el modelo considerara el patrón Factory o 
 
 #### 3. Respuesta final
 
-En conclusión, el rediseño planteado por el LLM aplica correctamente los principios de Clean Architecture y la inversión de dependencias (DIP):
-- La clase monolítica `PaymentService` desaparece y sus responsabilidades se distribuyen de forma limpia. El controlador HTTP recibe la llamada REST en la capa de adaptadores y pasa un DTO al caso de uso `ProcesarPagoUseCase` que vive en la capa de lógica de negocio.
-- El caso de uso no conoce ni a Hibernate, ni a Spring, ni a librerías de correo SMTP concretas. Solo depende de los puertos definidos en su propia capa (`TransaccionRepositoryPort`, `NotificadorEmailPort`, `PasarelaPagoPort`).
-- La persistencia y el envío de correo se implementan en la capa de adaptadores (`PostgresTransaccionRepositoryAdapter` y `SmtpNotificadorAdapter`), cumpliendo con la regla de dependencia de que la infraestructura depende de la lógica de negocio, no al revés.
-- El uso de la inyección de dependencias de Spring Boot en una clase `@Configuration` externa mantiene la capa de casos de uso 100% aislada de anotaciones del framework.
+En conclusión, el rediseño planteado por el LLM aplica correctamente los principios de Clean Architecture y la inversión de dependencias (DIP). La lógica de pago queda separada de la infraestructura, distribuyendo las responsabilidades en capas bien definidas y evitando dependencias directas con frameworks o tecnologías específicas.
 
-Este diseño no tiene dependencias que crucen las capas de forma incorrecta, y permite que la lógica del proceso de pago sea testeada de forma aislada mediante pruebas unitarias rápidas e inyectando mocks de los puertos (interfaces), eliminando la necesidad de levantar un servidor SMTP o levantar la base de datos PostgreSQL real durante las pruebas.
+El caso de uso trabaja únicamente con interfaces, mientras que la base de datos, el correo y otros servicios se implementan mediante adaptadores externos. Además, la configuración de dependencias se mantiene fuera de la lógica de negocio, lo que facilita el mantenimiento y la escalabilidad.
+
+Gracias a esta separación, el proceso de pago puede probarse de forma aislada utilizando mocks, sin necesidad de conectarse a una base de datos real ni a servicios externos durante las pruebas.

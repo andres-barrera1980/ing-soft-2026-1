@@ -171,12 +171,8 @@ El prompt pudo haber preguntado acerca de cómo manejar las estructuras de datos
 
 #### 3. Respuesta final
 
-En conclusión, la respuesta del LLM describe correctamente las capas y el funcionamiento de Clean Architecture. Es crucial entender que la diferencia fundamental con la arquitectura tradicional de tres capas radica en la dirección del acoplamiento: **en Clean Architecture la base de datos es un detalle externo**.
+En conclusión, la respuesta del LLM describe correctamente las capas y el funcionamiento de Clean Architecture. La idea principal es que la lógica de negocio no depende de la base de datos ni de los frameworks, sino que estos quedan como componentes externos.
 
-En el contexto de OpenLib Market, esto se traduce en:
-- **Entidades**: Clases puras de Java (POJOs) sin anotaciones de JPA (`@Entity`, `@Table`) para evitar que el motor de persistencia (Hibernate/Spring Data) dicte las reglas del negocio.
-- **Casos de Uso**: Contienen la orquestación (ej. `PublicarLibroUseCase`) y definen los puertos (interfaces como `LibroRepository`).
-- **Adaptadores**: Implementan los puertos (`PostgresLibroRepositoryAdapter`) mapeando las entidades del dominio puro a entidades JPA (`LibroEntity`) mediante Mappers.
-- **Frameworks**: Spring Boot, Hibernate y PostgreSQL quedan completamente aislados en la periferia.
+En OpenLib Market, las entidades deberían mantenerse independientes de tecnologías como JPA, los casos de uso contener la lógica del negocio, los adaptadores conectar el dominio con la persistencia y los frameworks permanecer aislados en la capa externa. Además, el LLM muestra adecuadamente el uso de la Inversión de Dependencias (DIP) mediante interfaces y sus implementaciones concretas.
 
-El LLM estructuró muy bien los ejemplos de código mostrando cómo se aplica la Inversión de Dependencias (DIP) mediante la separación de la interfaz `LibroRepository` (definida en Casos de Uso) de su adaptador concreto en persistencia. No obstante, para un sistema en producción, vale la pena resaltar que es necesario definir DTOs específicos para evitar que los cambios en la API web expongan las entidades directamente a los clientes, algo que el LLM omitió en su explicación.
+Como punto a mejorar, faltó mencionar el uso de DTOs para evitar exponer directamente las entidades del dominio a través de la API, algo importante en aplicaciones reales.

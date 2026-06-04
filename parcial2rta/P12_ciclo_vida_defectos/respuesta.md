@@ -107,9 +107,11 @@ El prompt pudo haber indagado sobre el manejo de excepciones y la severidad vs p
 
 #### 3. Respuesta final
 
-En conclusión, el LLM mapea de forma correcta el ciclo de vida de un defecto. Las responsabilidades están bien asignadas y los estados del flujo de Jira son lógicos.
+En general, el LLM explica bien el ciclo de vida del defecto y asigna correctamente las responsabilidades y estados del proceso.
 
-**Aspectos clave de la causa raíz y omisiones del LLM:**
-1.  **Error en el Frontend (Silencio de Fallo)**: La razón por la que "el botón no responde y no da retroalimentación" es un fallo de diseño en la comunicación entre capas. El controlador de la UI de JavaFX del frontend llama al servicio de backend, pero **no captura la excepción lanzada** (o el servicio REST devuelve un HTTP 500 que el frontend ignora). El código del botón debería tener un bloque `try-catch` que muestre una ventana de alerta o texto informativo tipo "Has alcanzado el límite máximo de libros en el carrito", en lugar de fallar silenciosamente.
-2.  **Severidad vs Prioridad en Jira**: Durante la fase de Reporte y Asignación, es crítico entender la diferencia. La **Severidad** es **Alta** porque la funcionalidad principal (comprar) está rota para ciertos casos. Sin embargo, la **Prioridad** en Jira la decide el Product Owner/Tech Lead basándose en el negocio. Si el release 1 se lanza mañana y solo el 1% de los usuarios tiene más de 5 ítems, se podría catalogar la prioridad como Media y resolverlo en un hotfix posterior para no retrasar el release.
-3.  **Omisión en la fase de Verificación**: El LLM describió la verificación solo como "repetir los pasos manuales". En ingeniería de software moderna, la verificación también debe incluir la **automatización de la prueba de regresión** en la pipeline de CI/CD para asegurar que el límite de ítems no se vuelva a romper en futuros releases.
+1. **Problema en el frontend:** El botón parece no hacer nada porque el frontend no está manejando correctamente el error que llega desde el backend. En lugar de fallar sin mostrar nada, debería informar al usuario con un mensaje indicando, por ejemplo, que se alcanzó el límite de libros permitidos.
+
+2. **Severidad y prioridad:** El error tiene una severidad alta porque afecta una función importante del sistema. Sin embargo, la prioridad depende del impacto en el negocio y de la urgencia con la que deba corregirse.
+
+3. **Verificación incompleta:** No basta con volver a probar manualmente que el error fue corregido. También sería recomendable agregar una prueba automática para evitar que el mismo problema reaparezca en futuras versiones.
+

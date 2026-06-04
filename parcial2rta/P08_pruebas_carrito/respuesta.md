@@ -224,35 +224,8 @@ El prompt omitió retar al modelo a encontrar vulnerabilidades lógicas en la im
 
 #### 3. Respuesta final
 
-En conclusión, la suite de pruebas del LLM es estructuralmente correcta, cubre todas las interfaces del servicio y mockea adecuadamente el repositorio de libros. Sin embargo, **omitió un escenario crítico debido a un bug oculto en la implementación del código de producción**.
+En conclusión, la suite de pruebas del LLM está bien planteada, cubre los casos principales y utiliza correctamente mocks para aislar las dependencias. Sin embargo, pasó por alto un escenario importante relacionado con la validación del stock acumulado en el carrito.
 
-##### El Bug del Stock Acumulado
-En el código de `CarritoService.agregarItem`:
-```java
-if (libro.getStock() < cantidad) throw new IllegalStateException("Stock insuficiente");
-```
-El sistema solo valida la cantidad *que se está agregando en la llamada actual* contra el stock disponible. No tiene en cuenta la cantidad *que el usuario ya tiene acumulada en el carrito*. 
+El problema es que el sistema solo verifica la cantidad agregada en cada operación, sin considerar los productos que ya están en el carrito. Esto permite que, mediante varias adiciones consecutivas, se supere el stock real disponible.
 
-Si el `libro1` tiene un stock total de **5** unidades:
-1. Primera llamada: `carritoService.agregarItem(1L, 3)` (Pasa la validación, pues 3 < 5).
-2. Segunda llamada: `carritoService.agregarItem(1L, 3)` (Pasa la validación de nuevo, pues 3 < 5).
-3. Resultado: El carrito termina con **6** unidades del libro, superando el stock real del almacén de **5**.
-
-El LLM **no generó una prueba que expusiera este fallo**. Para corregir esta omisión y hacer la suite verdaderamente robusta, se debe escribir la siguiente prueba unitaria adicional:
-
-```java
-@Test
-void agregarItem_AcumuladoSuperaStock_DeberiaLanzarIllegalStateException() {
-    // Escenario: Stock del libro es 5
-    Libro libroStockLimitado = new Libro(1L, "Libro Stock 5", new BigDecimal("10000"), 5);
-    when(repositorioLibro.buscarPorId(1L)).thenReturn(Optional.of(libroStockLimitado));
-
-    // Agregar 3 unidades (éxito)
-    carritoService.agregarItem(1L, 3);
-
-    // Intentar agregar 3 unidades más (debería lanzar excepción porque 3 + 3 = 6 > 5)
-    assertThrows(IllegalStateException.class, () -> carritoService.agregarItem(1L, 3));
-}
-```
-
-Esta prueba fallaría con la implementación actual del carrito, demostrando que hacía falta analizar el comportamiento acumulado de los ítems ya presentes en la sesión.
+Para hacer la suite más completa, sería necesario incluir una prueba que valide el comportamiento acumulado del carrito y confirme que se lance una excepción cuando la cantidad total de un producto exceda el stock disponible. De esta forma se podría detectar un error que actualmente no está cubierto por las pruebas.

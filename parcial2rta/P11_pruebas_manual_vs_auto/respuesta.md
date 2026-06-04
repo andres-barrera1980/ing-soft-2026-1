@@ -107,9 +107,7 @@ El prompt pudo indagar en los costos de infraestructura (servidores de CI/CD, li
 
 #### 3. Respuesta final
 
-En conclusión, la respuesta del LLM es correcta y proporciona una base sólida para la estrategia de QA de OpenLib Market:
-- **Pruebas Automatizadas:** Se deben enfocar en la lógica de negocio estable y de alto riesgo (cálculo de totales en carrito, procesamiento de pagos, pasarelas e integraciones de bases de datos) mediante Unit Tests e Integration Tests. Esto es vital para asegurar que futuros cambios no rompan flujos clave (Regresión).
-- **Pruebas Manuales:** Siguen siendo irremplazables para la experiencia de usuario (UX), el diseño visual (UI), y pruebas exploratorias rápidas de nuevas funcionalidades.
+En conclusión, la respuesta del LLM es correcta y proporciona una base sólida para la estrategia de QA de OpenLib Market. Las pruebas automatizadas son ideales para validar procesos críticos y repetitivos, como pagos, cálculos e integraciones, ayudando a prevenir errores en futuras actualizaciones. Por otro lado, las pruebas manuales siguen siendo fundamentales para evaluar la experiencia de usuario, la interfaz y realizar pruebas exploratorias.
 
-**Concepto omitido / Crucial a destacar (Costo de Mantenimiento y ROI):**
-El LLM no profundizó en la trampa del **Costo de Mantenimiento de la Automatización**. Automatizar no siempre ahorra dinero; si una funcionalidad está en constante cambio (como la UI de un startup), el costo de actualizar y reparar constantemente los scripts automatizados rotos ("test maintenance overhead") supera con creces el costo de realizar una prueba manual corta. La automatización se justifica cuando la funcionalidad es madura y el número de ejecuciones estimadas amortiza el costo de desarrollo del test.
+Sin embargo, faltó resaltar un aspecto importante: el costo de mantenimiento de la automatización. No siempre es conveniente automatizar, especialmente cuando una funcionalidad cambia con frecuencia. En esos casos, mantener y actualizar los tests puede requerir más esfuerzo que realizar pruebas manuales. Por eso, la automatización resulta más rentable cuando se aplica a funcionalidades estables que serán ejecutadas muchas veces.
+

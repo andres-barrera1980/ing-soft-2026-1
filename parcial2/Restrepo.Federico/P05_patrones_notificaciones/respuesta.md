@@ -274,8 +274,9 @@ El `try/catch` dentro del loop en `notificarDisponibilidad` aísla los fallos: s
 
 ### Análisis crítico de la respuesta
 
-El prompt funcionó bien porque le di contexto y el rol de Arquitecto Senior, eso hizo la respuesta más técnica de lo esperado.
+Lo que más me gustó fue que el código es funcional de verdad, no puro esqueleto con // TODO.Lo que más me gustó fue que el código es funcional de verdad, no puro esqueleto con // TODO. El try/catch dentro del loop también me pareció simple pero efectivo.
 
-Identificó bien el patrón y el código quedó limpio, pero el análisis de SOLID se quedó corto. También asumió cosas sin preguntar, como el orden de los descuentos combinados, que no es lo mismo aplicar primero fidelidad que volumen porque el precio final cambia.
+Lo que no me convenció fue el análisis de SOLID, muy por encima. Mencionó Observer y Strategy pero no explicó cómo se cumplen OCP o LSP en el diseño concreto.
+La combinación de patrones también me pareció forzada. Los observers de caché y auditoría no usan ninguna estrategia, entonces Strategy no aporta nada ahí y hubiera sido más honesto reconocerlo. Y el diagrama Mermaid quedó incompleto, le faltaron ActualizadorCache y RegistradorAuditoria en las relaciones.
 
-Lo más raro fue que cada decorador instancia la estrategia adentro. Si ya existe como clase separada, hubiera sido más limpio recibirla por constructor. Para la próxima le pediría que justifique mejor por qué Decorator agrega valor real sobre Strategy solo. 
+Para la próxima le pediría que justifique SOLID con ejemplos del código generado y que revise que el diagrama sea consistente con la implementación.

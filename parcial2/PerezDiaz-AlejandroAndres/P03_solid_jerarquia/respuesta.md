@@ -4,7 +4,7 @@
 
 ---
 
-## Pregunta [XX]: [Título resumido]
+## Pregunta [P03_solid_jerarquia]
 
 ### Estudiante
 - **Nombre completo**: [Tu nombre y apellido]
@@ -15,9 +15,9 @@
 
 | Campo | Valor |
 |---|---|
-| **Nombre del LLM** | [Claude / ChatGPT / Gemini / Copilot / DeepSeek / Qwen / Mistral / Otro / **Sin IA — respuesta propia**] |
-| **Modelo específico** | [Ej: Claude Opus 4.5, GPT-4o, Gemini 2.5 Pro, etc. Si respondes sin IA, escribe "N/A"] |
-| **¿Por qué elegiste este LLM?** | [Justifica en 1-3 oraciones. Si respondes sin IA, explica por qué decidiste no usar LLM para esta pregunta.] |
+| **Nombre del LLM** | [**Sin IA — respuesta propia**] |
+| **Modelo específico** | [ "N/A"] |
+| **¿Por qué elegiste este LLM?** | [NO use IA porque es Solo Analizar codigo(Jerarquia)] |
 
 ---
 
@@ -65,5 +65,5 @@ pero menciona cuántas iteraciones hiciste.]
 
 
 #### 3. Respuesta final
-
-[Escribe tu respuesta definitiva a la pregunta del parcial, integrando lo que aprendiste del LLM pero yendo más allá. Corrige errores, llena omisiones, conecta con conceptos vistos en clase. Esta es tu respuesta: demuestra que tú dominas el tema.]
+(Sin IA- solo aviso )
+[Esta Jeraquia esta diseñada basicamnete para reutilizar codigo porque segun lo que veo hace una extencion de que un Administrador tambien puede ser vendedor que segun el enunciado no estoy seguro si eso sea cierto  y esto pasa proque en este codigo se ve que se esta utilzando herencia para la reutilizacion de codigo. y tambien en la parte de comprador que tambien pude ser un vendedor esta bien pero tambien lo hace pormedio de un extends y este sobre escribe la parte de comprador y leugo de sobre escribirne l aparte de comprador lanza una excepcion que dice que hereda algo solo para desactivarlo or decirlo asi .]

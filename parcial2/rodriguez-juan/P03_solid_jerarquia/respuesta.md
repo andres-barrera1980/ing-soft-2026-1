@@ -53,6 +53,6 @@ pero menciona cuántas iteraciones hiciste.]
 ```
  
 ---
-
+Los 2 pricipios SOLID violados fueron : single responsibility y segregacion de interface. El primero es porque en la interfaz se estan mezclando varios roles en una misma interface. Siento que que un usuario pueda comprar y al mimso tiempo gestionar usuarios en una misma interface no esta bien organizado. Para casos asi, es mejor delegarlas a "administrador" y "Comprador" para asi distribuir mejor esas responsabilidades. Con respecto segregacion de interface, veo problemas en la interaccion de usuario y comprador por las misma razones. se estan implemetando en la interface de usuario metodos que despues no se usan en comprador, por ejemplo. lo que provoca UnsupportedOperationException.
 
 ```

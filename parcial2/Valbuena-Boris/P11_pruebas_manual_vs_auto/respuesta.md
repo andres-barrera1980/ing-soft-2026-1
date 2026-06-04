@@ -221,14 +221,25 @@ Para el primer release de OpenLib Market, **una estrategia 100% manual es un rie
 
 #### 1. ¿Qué hizo bien el prompt?
 
-[Evalúa tu propio prompt, no la respuesta del LLM. ¿El contexto fue suficiente? ¿Las restricciones fueron claras? ¿El formato de salida que pediste ayudó a obtener una buena respuesta? ¿Qué parte de tu prompt fue más efectiva? Sé específico: menciona fragmentos concretos de tu prompt que funcionaron bien.]
+El prompt esta bien porque define claramente el rol del LLM como QA Lead y da un contexto concreto con OpenLib Market. Eso ayuda a que las respuestas no sean genericas.
 
+Tambien es efectivo porque pide ventajas, desventajas, tipos de pruebas, criterios y una estrategia final. Eso obliga a cubrir todo el tema de forma completa.
 
 #### 2. ¿Qué se puede mejorar?
 
-[¿Qué le faltó a tu prompt? ¿Qué harías diferente si pudieras reformularlo? ¿El LLM entendió mal algo por falta de claridad en tu prompt? ¿La respuesta tiene errores u omisiones? ¿Qué no cubrió el LLM que tú sí sabes por lo visto en clase?]
+Aunque la respuesta es correcta, varias ideas se explican de forma muy general. Falto profundizar mas en el costo de mantenimiento de las pruebas automatizadas, que es clave en proyectos reales.
+
+Tambien los criterios para decidir manual vs automatizado son algo abstractos y podrian estar mas ligados al impacto en el negocio.
+
+En manuales, falto mencionar con mas fuerza la falta de repetibilidad exacta como desventaja importante.
 
 
 #### 3. Respuesta final
 
-[Escribe tu respuesta definitiva a la pregunta del parcial, integrando lo que aprendiste del LLM pero yendo más allá. Corrige errores, llena omisiones, conecta con conceptos vistos en clase. Esta es tu respuesta: demuestra que tú dominas el tema.]
+Las pruebas manuales las hacen personas y permiten flexibilidad y exploracion, pero son lentas, poco escalables y menos consistentes.
+
+Las pruebas automatizadas usan scripts, son rapidas y repetibles, pero tienen alto costo de mantenimiento y solo validan lo programado.
+
+En OpenLib Market, lo manual sirve para UX, panel admin y exploracion. Lo automatizado para login, checkout, carrito y APIs criticas.
+
+Lo mejor es un enfoque hibrido: automatizar lo critico del negocio y dejar lo exploratorio y visual a pruebas manuales.

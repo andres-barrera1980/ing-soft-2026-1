@@ -336,14 +336,29 @@ public class OpenLibMarketApplication {
 
 #### 1. ¿Qué hizo bien el prompt?
 
-[Evalúa tu propio prompt, no la respuesta del LLM. ¿El contexto fue suficiente? ¿Las restricciones fueron claras? ¿El formato de salida que pediste ayudó a obtener una buena respuesta? ¿Qué parte de tu prompt fue más efectiva? Sé específico: menciona fragmentos concretos de tu prompt que funcionaron bien.]
-
+El prompt describe claramente el problema y destaca algo muy importante: los descuentos se pueden combinar. Ademas, pide justificar el patron que elegimos y descartar otras opciones, lo que nos obliga a hacer un analisis mas profundo y no quedarnos con la primera solucion. Tambien pone restricciones muy utiles como no usar condicionales complejos y poder meter nuevos descuentos sin tocar el codigo que ya funciona.
 
 #### 2. ¿Qué se puede mejorar?
 
-[¿Qué le faltó a tu prompt? ¿Qué harías diferente si pudieras reformularlo? ¿El LLM entendió mal algo por falta de claridad en tu prompt? ¿La respuesta tiene errores u omisiones? ¿Qué no cubrió el LLM que tú sí sabes por lo visto en clase?]
+La respuesta ve bien que la combinacion de descuentos es lo mas critico. El patron Decorator sirve porque permite aplicar descuentos uno tras otro de forma acumulativa.
 
+Pero la explicacion sobre Strategy pudo ser mas exacta. De hecho, usar Strategy con una composicion de estrategias tambien resolveria todo muy bien. Ademas, la implementacion propuesta es algo compleja para un caso que se podria hacer con menos clases.
+
+Tambien falto dejar mas claro que la clave del problema no es solo meter descuentos, sino combinarlos dinamicamente dependiendo del contexto del usuario y de la compra.
 
 #### 3. Respuesta final
 
-[Escribe tu respuesta definitiva a la pregunta del parcial, integrando lo que aprendiste del LLM pero yendo más allá. Corrige errores, llena omisiones, conecta con conceptos vistos en clase. Esta es tu respuesta: demuestra que tú dominas el tema.]
+Creo que el LLM eligio un patron correcto. Usar Decorator tiene mucho sentido porque los descuentos se pueden acumular y aplicar uno encima del otro de forma dinamica.
+
+La respuesta tuvo en cuenta la composicion de descuentos, que era de lo mas importante que nos pedian. Con esto, el usuario puede tener descuento por fidelidad, temporada y volumen a la vez sin tener que crear una clase para cada combinacion de descuentos.
+
+Las opciones que se descartaron me parecen logicas:
+
+* **Strategy puro:** sirve para aislar cada descuento, pero por lo general solo se elige una estrategia a la vez.
+* **Chain of Responsibility:** puede encadenar pasos, pero su objetivo principal no es ir acumulando cambios sobre un mismo valor.
+
+La implementacion que propone funciona y cumple con OCP, porque si queremos meter un nuevo descuento solo tenemos que crear otra clase que implemente `DiscountPolicy` sin tocar el motor de descuentos.
+
+Como una mejora propia, yo simplificaria las cosas usando una interfaz de descuento y una lista de estrategias aplicables. Aunque Decorator esta bien, en este escenario usar una composicion de estrategias podria ser mas facil de programar y mantener.
+
+En resumen, la propuesta cumple con lo pedido porque combina los descuentos, baja el acoplamiento y nos deja agregar mas reglas de negocio a futuro sin problemas.

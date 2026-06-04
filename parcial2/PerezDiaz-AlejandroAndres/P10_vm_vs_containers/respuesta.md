@@ -3,11 +3,10 @@
 > **Instrucción**: Copia esta plantilla para cada pregunta del parcial. Reemplaza `[Pregunta XX]` por el identificador correcto (ej: `P01_solid_srp`) y completa todas las secciones. Haz al menos 2 commits por pregunta: uno con el prompt + respuesta del LLM, y otro con el análisis.
 
 ---
-
-## Pregunta [XX]: [Título resumido]
+### Pregunta [P10_vm_vs_containers]
 
 ### Estudiante
-- **Nombre completo**: [Tu nombre y apellido]
+- **Nombre completo**: [Alejandro Andres Perez Diaz]
 
 ---
 
@@ -15,9 +14,9 @@
 
 | Campo | Valor |
 |---|---|
-| **Nombre del LLM** | [Claude / ChatGPT / Gemini / Copilot / DeepSeek / Qwen / Mistral / Otro / **Sin IA — respuesta propia**] |
-| **Modelo específico** | [Ej: Claude Opus 4.5, GPT-4o, Gemini 2.5 Pro, etc. Si respondes sin IA, escribe "N/A"] |
-| **¿Por qué elegiste este LLM?** | [Justifica en 1-3 oraciones. Si respondes sin IA, explica por qué decidiste no usar LLM para esta pregunta.] |
+| **Nombre del LLM** | [ **Sin IA — respuesta propia**] |
+| **Modelo específico** | ["N/A"] |
+| **¿Por qué elegiste este LLM?** | [SIn IA] |
 
 ---
 
@@ -66,4 +65,21 @@ pero menciona cuántas iteraciones hiciste.]
 
 #### 3. Respuesta final
 
-[Escribe tu respuesta definitiva a la pregunta del parcial, integrando lo que aprendiste del LLM pero yendo más allá. Corrige errores, llena omisiones, conecta con conceptos vistos en clase. Esta es tu respuesta: demuestra que tú dominas el tema.]
+[Arquitectura:
+Las VMs virtualizan hardware completo, cada una tiene su propio sistema operativo y kernel, necesitan un hypervisor(que es un supervisor) como VMware entre el hardware y la VM. Los contenedores en cambio comparten el kernel del host y solo empaquetan la aplicación con sus dependencias, Docker es el más conocido.
+Ventajas de VMs:
+
+Aislamiento total, si una falla no afecta a las otras
+Más seguras porque cada una tiene su propio kernel
+Pueden correr sistemas operativos diferentes
+
+Ventajas de contenedores:
+
+Arrancan en segundos, una VM tarda minutos
+Consumen muchos menos recursos
+Portables, corren igual en cualquier ambiente
+
+Casos de uso:
+VMs para cuando necesitas seguridad estricta como ambientes bancarios. Contenedores para microservicios y despliegues frecuentes, por ejemplo OpenLib Market usaría contenedores para escalar pagos en temporada alta.
+Errores comunes:
+VMs — sobredimensionar recursos. Contenedores — correrlos como root o ignorar que comparten kernel, lo que es un riesgo de seguridad porque si un contenedor compromete el kernel afecta a todos los demás.]

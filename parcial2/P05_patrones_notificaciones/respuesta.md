@@ -223,14 +223,18 @@ Tu requerimiento está cumplido: tu clase `GestorInventario` no está acoplada a
 
 #### 1. ¿Que hizo bien el prompt?
 
-[Evalua tu propio prompt, no la respuesta del LLM. ¿El contexto fue suficiente? ¿Las restricciones fueron claras? ¿El formato de salida que pediste ayudo a obtener una buena respuesta? ¿Que parte de tu prompt fue mas efectiva? Se especifico: menciona fragmentos concretos de tu prompt que funcionaron bien.]
+El prompt funciono muy bien porque la estructura fue clarisima y logre que la IA no me combinara patrones a la fuerza. Lo mas util de mi prompt fue pedir explicitamente que el inventario no se modificara si agregabamos un nuevo paso, y sobre todo la validacion final donde le exigi manejar elegantemente la creacion de tareas *en caso de que alguna fallara*. Esto hizo que el LLM buscara no solo notificar, sino aislar los fallos usando un patron extra.
 
 
 #### 2. ¿Que se puede mejorar?
 
-[¿Que le falto a tu prompt? ¿Que harias diferente si pudieras reformularlo? ¿El LLM entendio mal algo por falta de claridad en tu prompt? ¿La respuesta tiene errores u omisiones? ¿Que no cubrio el LLM que tu si sabes por lo visto en clase?]
+A mi prompt le falto pedirle que incluyera inyeccion de dependencias explicita en los comandos, ya que en un framework como Spring Boot instanciar objetos con `new ActualizarRedisCommand()` *como hizo el LLM en el codigo* hace muy dificil inyectar el cliente de Redis o el servicio de correo dentro de ese comando. El LLM paso por alto que en Java moderno es mejor delegar la creacion de estos comandos a una Factory inyectada por Spring.
 
 
 #### 3. Respuesta final
 
-[Escribe tu respuesta definitiva a la pregunta del parcial, integrando lo que aprendiste del LLM pero yendo mas alla. Corrige errores, llena omisiones, conecta con conceptos vistos en clase. Esta es tu respuesta: demuestra que tu dominas el tema.]
+El LLM eligio una excelente combinacion: Observer + Command. Esta mezcla tiene muchisimo sentido y no se siente forzada para nada.
+Primero, el patron Observer es el adecuado porque permite registrar y desregistrar componentes dinamicamente (usando los metodos `registrar(obs)` y `remover(obs)`) logrando un acoplamiento bajisimo entre el GestorInventario y los servicios externos como Redis o Email.
+Segundo, y lo mas importante, *el uso del patron Command soluciona elegantemente el problema de los fallos de red que comentamos en clase*. Si el envio de notificaciones Push falla por timeout, el Comando correspondiente atrapa la excepcion y, al tener encapsulado el estado de la tarea (el `libroId`), puede ser guardado en una base de datos o en una cola (RabbitMQ/Kafka) para reintentarlo despues sin afectar el hilo principal ni tumbar el proceso vital de reposicion de inventario.
+
+Para mejorar la respuesta del LLM y acercarla mas a un entorno real de produccion, *yo cambiaria la instanciacion directa con `new` dentro de los observers por un Factory Method (Factory Pattern)*. De esa forma, Spring Boot podria inyectar las dependencias necesarias (como `Jedis` o `JavaMailSender`) directamente a los comandos cuando la Factory los crea, haciendo el sistema mucho mas limpio, testeable e integrando un tercer patron al diseño final.

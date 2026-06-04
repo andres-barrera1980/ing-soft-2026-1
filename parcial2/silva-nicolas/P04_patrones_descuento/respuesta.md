@@ -1,9 +1,7 @@
-# Plantilla de entrega — Parcial 2
-
-## Pregunta [XX]: [Título resumido]
+## Pregunta 4
 
 ### Estudiante
-- **Nombre completo**: [Tu nombre y apellido]
+- **Nombre completo**: Nicolas Silva
 
 ---
 

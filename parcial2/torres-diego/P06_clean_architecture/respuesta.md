@@ -7,7 +7,7 @@
 ## Pregunta [06]: [P06_clean_architecture]
 
 ### Estudiante
-- **Nombre completo**: [Tu nombre y apellido]
+- **Nombre completo**: [Diego Alejandro Torres Barragan]
 
 --- Sin uso de IA
 

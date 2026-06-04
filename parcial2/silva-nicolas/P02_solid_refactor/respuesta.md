@@ -11,7 +11,7 @@
 |---|---|
 | **Nombre del LLM** | [Gemini] |
 | **Modelo específico** | [Gemini 3.1 Pro] |
-| **¿Por qué elegiste este LLM?** | [Que dias me meti a mirar y me ofrecieron un mes de pro a 8 lukas, imposible no aprovechar ese gangaso] |
+| **¿Por qué elegiste este LLM?** | [Aparte de que es la unica cuenta en la que tengo un servicio de pago en este momento, Gemini 3.1 pro me ha demostrado que es muy efectivo a la hora de asimilar roles y contexto a lo largo de una conversación. Esto me permite guiar su respuesta al punto exacto que necesito sin tener que estarle recordando detalles basicos o limitaciones del problema] |
 
 ---
 
@@ -225,14 +225,87 @@ public class ProcesadorPago {
 
 #### 1. ¿Qué hizo bien el prompt?
 
-[Evalúa tu propio prompt, no la respuesta del LLM. ¿El contexto fue suficiente? ¿Las restricciones fueron claras? ¿El formato de salida que pediste ayudó a obtener una buena respuesta? ¿Qué parte de tu prompt fue más efectiva? Sé específico: menciona fragmentos concretos de tu prompt que funcionaron bien.]
+- Asimilo su rol a la perfeccion. Gracias al contexto de OpenLib Market guardado en la memoria y 
+  a las indicaciones de como debe comportarse (senior java 25, arquitecto de software, etc) 
+  logro entender la consigna y el contexto del problema pude determinar la profundidad y el nivel de la respuesta que esperaba, para que usara muchos tecnicismos y conceptos avanzados del desarrollo de software (inyección de dependencias, DTOs, polimorfismo).
+
+- Como le di una lista larga de restricciones arquitectonicas (Clean Architecture, DDD, TDD,    SOLID, GoF), el modelo pudo entender los parametros que debia tener en cuenta para analizar el codigo inicial y resolver el problema de refactorizacion de la manera esperada.
 
 
 #### 2. ¿Qué se puede mejorar?
 
-[¿Qué le faltó a tu prompt? ¿Qué harías diferente si pudieras reformularlo? ¿El LLM entendió mal algo por falta de claridad en tu prompt? ¿La respuesta tiene errores u omisiones? ¿Qué no cubrió el LLM que tú sí sabes por lo visto en clase?]
+Hay cosas para mejorar tanto en mi prompt como en la salida del LLM
+
+En el Prompt: 
+
+    - No le indique ningun formato de salida, y el LLM botó la respuesta como le dio la gana. Para la proxima pregunta le solicitare explicitamente un orden y un formato para su respuesta, algo como "Presenta tu respuesta en este orden: 1. Análisis de violaciones, 2. Código refactorizado, 3. Justificación de los paradigmas".
+
+    - Me falto ser mas exigente con la aplicacion de todas las restricciones, pues yo le pedi al agente que fuera experto en DDD, TDD y Clean Architecture, pero en la Tarea solo le pedí: "Identifica qué principios SOLID se están violando y refactoriza". El LLM cumplió la tarea exacta, dejando DDD y Clean Architecture en un segundo plano.
+
+
+En la Respuesta del LLM (Análisis Crítico de Software):
+
+    Por culpa de mi descuido en el promt, el LLM ignoró el DDD, pues solo utilizó tipos basicos de datos, y no creo un Value Object, como por ejemplo un "Money" que agrupe valor y moneda, para utilizar mejor el polimorfismo y el DDD en si.
+
 
 
 #### 3. Respuesta final
 
-[Escribe tu respuesta definitiva a la pregunta del parcial, integrando lo que aprendiste del LLM pero yendo más allá. Corrige errores, llena omisiones, conecta con conceptos vistos en clase. Esta es tu respuesta: demuestra que tú dominas el tema.]
+La clase propuesta por el equipo junior viola la O de Solid, el abierto-cerrado, pues se esta basando en un nido de if y else if para determinar el metodo de pago a utilizar, en vez de utilizar polimorfismo. Esto provoca que si se quiere agregar un nuevo metodo de pago, es necesario modificar la clase ProcesadorPago, lo cual viola la O de Solid.
+
+Para resolver esto, se puede utilizar el patron Strategy, que consiste en crear una interfaz para el metodo de pago, y luego crear una clase para cada metodo de pago, que implemente la interfaz. De esta manera, se puede agregar un nuevo metodo de pago sin modificar la clase ProcesadorPago.
+
+La interfaz seria la siguiente:
+
+public interface IEstrategiaPago {
+    ResultadoPago procesar(Pago pago);
+}
+
+Las clases serian las siguientes (propuestas por el LLM como se ve en la anterior respuesta):
+
+```java
+public class PagoTarjeta implements IEstrategiaPago {
+    @Override
+    public ResultadoPago procesar(Pago pago) {
+        // Validar CVV, fecha expiración, fondos
+        // Conectar con API de franquicia (Visa/Mastercard)
+        // Procesar cargo
+        return new ResultadoPago(true, "Pago con tarjeta procesado");
+    }
+}
+
+public class PagoPSE implements IEstrategiaPago {
+    @Override
+    public ResultadoPago procesar(Pago pago) {
+        // Redirigir a portal bancario
+        // Validar retorno de PSE
+        // Confirmar débito
+        return new ResultadoPago(true, "Pago PSE procesado");
+    }
+}
+
+public class PagoPayPal implements IEstrategiaPago {
+    @Override
+    public ResultadoPago procesar(Pago pago) {
+        // Autenticar con OAuth PayPal
+        // Ejecutar cargo
+        // Registrar webhook de confirmación
+        return new ResultadoPago(true, "Pago PayPal procesado");
+    }
+}
+```
+
+El ProcesadorPago seria el siguiente (propuesto por el LLM):
+
+```java
+public class ProcesadorPago {
+    private final IEstrategiaPago estrategiaPago;
+    
+    public ProcesadorPago(IEstrategiaPago estrategiaPago) {
+        this.estrategiaPago = estrategiaPago;
+    }
+    
+    public ResultadoPago procesar(Pago pago) {
+        return estrategiaPago.procesar(pago);
+    }
+} 

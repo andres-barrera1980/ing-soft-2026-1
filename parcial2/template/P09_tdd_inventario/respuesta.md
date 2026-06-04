@@ -1,13 +1,7 @@
-# Plantilla de entrega — Parcial 2
-
-> **Instrucción**: Copia esta plantilla para cada pregunta del parcial. Reemplaza `[Pregunta XX]` por el identificador correcto (ej: `P01_solid_srp`) y completa todas las secciones. Haz al menos 2 commits por pregunta: uno con el prompt + respuesta del LLM, y otro con el análisis.
-
----
-
-## Pregunta [XX]: [Título resumido]
+# Pregunta P09: TDD — ControlInventario
 
 ### Estudiante
-- **Nombre completo**: [Tu nombre y apellido]
+- **Nombre completo**: Mateo Traslaviña Moreno
 
 ---
 
@@ -15,55 +9,88 @@
 
 | Campo | Valor |
 |---|---|
-| **Nombre del LLM** | [Claude / ChatGPT / Gemini / Copilot / DeepSeek / Qwen / Mistral / Otro / **Sin IA — respuesta propia**] |
-| **Modelo específico** | [Ej: Claude Opus 4.5, GPT-4o, Gemini 2.5 Pro, etc. Si respondes sin IA, escribe "N/A"] |
-| **¿Por qué elegiste este LLM?** | [Justifica en 1-3 oraciones. Si respondes sin IA, explica por qué decidiste no usar LLM para esta pregunta.] |
+| **Nombre del LLM** | Claude |
+| **Modelo específico** | Claude Sonnet 4.6 |
+| **¿Por qué elegiste este LLM?** | Claude tiene excelente comprensión del ciclo Red-Green-Refactor y genera pruebas JUnit 5 correctas con Mockito. Para TDD, donde el orden importa tanto como el código en sí, Claude proporciona justificaciones técnicas precisas sobre por qué cada test debe existir antes que la implementación. |
 
 ---
 
 ### Prompt utilizado
 
-> **Si respondiste sin IA, omite esta sección y ve directamente a Análisis crítico.**
-
 ```
-[Pega aquí el prompt exacto que enviaste al LLM. 
-Incluye TODO el texto, sin editar ni resumir.
+Eres un ingeniero de software senior practicando TDD en el proyecto OpenLib Market, una plataforma de compra-venta de libros desarrollada en Java 21 con Spring Boot 3.x, JUnit 5 y Mockito.
 
-Un buen prompt incluye:
-- Contexto del proyecto OpenLib Market
-- El código o situación específica
-- Lo que esperas que el LLM haga
-- Restricciones (ej: "usa Java 21", "aplica SOLID")
-- Formato de salida esperado (ej: "respuesta en markdown con código Java")]
+Necesito implementar la clase `ControlInventario` del módulo de inventario usando TDD estricto. El requisito es:
+
+- `agregarStock(String isbn, int cantidad)`: agrega unidades al inventario. Si el isbn no existe, lo crea con esa cantidad. Si ya existe, suma. No acepta cantidades negativas ni cero.
+- `reducirStock(String isbn, int cantidad)`: reduce unidades. Falla si el stock resultante quedaría negativo. Falla si el isbn no existe.
+- `obtenerStock(String isbn)`: retorna el stock actual. Retorna 0 si el isbn no existe.
+- `hayDisponibilidad(String isbn, int cantidadRequerida)`: retorna true si hay suficiente stock.
+
+Necesito que:
+1. Apliques TDD estricto: primero los tests (fase RED), luego la implementación mínima (fase GREEN), luego el refactoring.
+2. Para cada test, expliques POR QUÉ ese test debe existir antes de la implementación.
+3. Generes todos los tests con JUnit 5 (`@Test`, `assertThrows`, `assertEquals`, etc.) — NO uses `@Test(expected=...)` que es JUnit 4.
+4. Generes la implementación final de `ControlInventario` en Java 21.
+5. Cubras casos borde: isbn null, cantidad cero, cantidad negativa, stock insuficiente.
+
+Restricciones:
+- Java 21, Spring Boot 3.x, JUnit 5, Mockito si aplica
+- La clase ControlInventario NO debe tener dependencias externas (es lógica pura de dominio)
+- No uses anotaciones de Spring en la clase de dominio
+
+Formato de salida: markdown con secciones "Fase RED (Tests primero)", "Fase GREEN (Implementación mínima)", "Fase REFACTOR (Código final limpio)", "Tests completos".
 ```
 
 ---
 
 ### Respuesta del LLM
 
-> **Si respondiste sin IA, omite esta sección y ve directamente a Análisis crítico.**
-[Pega aquí la respuesta COMPLETA del LLM, sin editar, sin resumir.
-Incluye TODO el texto, código, explicaciones que generó el LLM.
+## Fase RED (Tests primero)
 
-Si el LLM generó código, asegúrate de que esté correctamente formateado.
-Si tuviste que hacer varias iteraciones, pega la MEJOR respuesta obtenida,
-pero menciona cuántas iteraciones hiciste.]
-```
+Los tests se escriben ANTES que el código. En este punto, `ControlInventario` ni siquiera existe — y eso está bien. Cada test documenta un comportamiento requerido.
 
----
+### ¿Por qué escribir los tests primero?
 
-### Análisis crítico de la respuesta
+Escribir el test primero te fuerza a pensar en la API desde el punto de vista del consumidor, no del implementador. Si el test es difícil de escribir, es señal de que el diseño está mal.
 
-#### 1. ¿Qué hizo bien el prompt?
+```java
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
 
-[Evalúa tu propio prompt, no la respuesta del LLM. ¿El contexto fue suficiente? ¿Las restricciones fueron claras? ¿El formato de salida que pediste ayudó a obtener una buena respuesta? ¿Qué parte de tu prompt fue más efectiva? Sé específico: menciona fragmentos concretos de tu prompt que funcionaron bien.]
+class ControlInventarioTest {
 
+    private ControlInventario inventario;
 
-#### 2. ¿Qué se puede mejorar?
+    @BeforeEach
+    void setUp() {
+        inventario = new ControlInventario();
+    }
 
-[¿Qué le faltó a tu prompt? ¿Qué harías diferente si pudieras reformularlo? ¿El LLM entendió mal algo por falta de claridad en tu prompt? ¿La respuesta tiene errores u omisiones? ¿Qué no cubrió el LLM que tú sí sabes por lo visto en clase?]
+    // --- agregarStock ---
 
+    @Test
+    @DisplayName("Agregar stock en isbn nuevo debe crear entrada con esa cantidad")
+    void agregarStock_isbnNuevo_creaEntrada() {
+        inventario.agregarStock("978-0-13-468599-1", 10);
+        assertEquals(10, inventario.obtenerStock("978-0-13-468599-1"));
+    }
 
-#### 3. Respuesta final
+    @Test
+    @DisplayName("Agregar stock en isbn existente debe sumar al stock actual")
+    void agregarStock_isbnExistente_acumula() {
+        inventario.agregarStock("978-0-13-468599-1", 10);
+        inventario.agregarStock("978-0-13-468599-1", 5);
+        assertEquals(15, inventario.obtenerStock("978-0-13-468599-1"));
+    }
 
-[Escribe tu respuesta definitiva a la pregunta del parcial, integrando lo que aprendiste del LLM pero yendo más allá. Corrige errores, llena omisiones, conecta con conceptos vistos en clase. Esta es tu respuesta: demuestra que tú dominas el tema.]
+    @Test
+    @DisplayName("Agregar cantidad cero debe lanzar IllegalArgumentException")
+    void agregarStock_cantidadCero_lanzaExcepcion() {
+        assertThrows(IllegalArgumentException.class,
+            () -> inventario.agregarStock("978-0-13-468599-1", 0));
+    }
+
+   

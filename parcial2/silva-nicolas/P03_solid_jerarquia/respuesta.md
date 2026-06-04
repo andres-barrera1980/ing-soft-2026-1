@@ -1,13 +1,9 @@
 # Plantilla de entrega — Parcial 2
 
-> **Instrucción**: Copia esta plantilla para cada pregunta del parcial. Reemplaza `[Pregunta XX]` por el identificador correcto (ej: `P01_solid_srp`) y completa todas las secciones. Haz al menos 2 commits por pregunta: uno con el prompt + respuesta del LLM, y otro con el análisis.
-
----
-
 ## Pregunta [XX]: [Título resumido]
 
 ### Estudiante
-- **Nombre completo**: [Tu nombre y apellido]
+- **Nombre completo**: Nicolas Silva Garcia
 
 ---
 
@@ -15,9 +11,9 @@
 
 | Campo | Valor |
 |---|---|
-| **Nombre del LLM** | [Claude / ChatGPT / Gemini / Copilot / DeepSeek / Qwen / Mistral / Otro / **Sin IA — respuesta propia**] |
-| **Modelo específico** | [Ej: Claude Opus 4.5, GPT-4o, Gemini 2.5 Pro, etc. Si respondes sin IA, escribe "N/A"] |
-| **¿Por qué elegiste este LLM?** | [Justifica en 1-3 oraciones. Si respondes sin IA, explica por qué decidiste no usar LLM para esta pregunta.] |
+| **Nombre del LLM** | Sin IA — respuesta propia |
+| **Modelo específico** | N/A |
+| **¿Por qué elegiste este LLM?** | No use ningun LLM, esta respuesta es mia  |
 
 ---
 
@@ -52,18 +48,118 @@ pero menciona cuántas iteraciones hiciste.]
 
 ---
 
+### Pregunta 3
+### P.3 ⭐ (3 puntos)
+
+OpenLib Market tiene tres tipos de usuarios. El equipo modeló esta jerarquía:
+
+```java
+public interface Usuario {
+    void comprar(Libro libro);
+    void vender(Libro libro);
+    void moderarComentario(Comentario comentario);
+    void generarReporteVentas();
+    void gestionarUsuarios();
+}
+
+public class Comprador implements Usuario {
+    public void comprar(Libro libro) { /* implementación */ }
+    public void vender(Libro libro) { throw new UnsupportedOperationException("Un comprador no puede vender"); }
+    public void moderarComentario(Comentario c) { throw new UnsupportedOperationException("No autorizado"); }
+    public void generarReporteVentas() { throw new UnsupportedOperationException("No aplica"); }
+    public void gestionarUsuarios() { throw new UnsupportedOperationException("No autorizado"); }
+}
+
+public class Vendedor extends Comprador {
+    @Override
+    public void comprar(Libro libro) { throw new UnsupportedOperationException("Un vendedor no compra"); }
+    @Override
+    public void vender(Libro libro) { /* implementación */ }
+}
+
+public class Administrador extends Vendedor {
+    @Override
+    public void comprar(Libro libro) { /* un admin sí puede comprar */ }
+    // hereda vender() de Vendedor, implementa el resto
+}
+```
+
+**Tarea**: Analiza esta jerarquía de clases, señalando qué principios SOLID se violan y proponga un rediseño completo.
+
 ### Análisis crítico de la respuesta
 
 #### 1. ¿Qué hizo bien el prompt?
 
-[Evalúa tu propio prompt, no la respuesta del LLM. ¿El contexto fue suficiente? ¿Las restricciones fueron claras? ¿El formato de salida que pediste ayudó a obtener una buena respuesta? ¿Qué parte de tu prompt fue más efectiva? Sé específico: menciona fragmentos concretos de tu prompt que funcionaron bien.]
+No aplica, esta respuesta es mia propia.
+
 
 
 #### 2. ¿Qué se puede mejorar?
 
-[¿Qué le faltó a tu prompt? ¿Qué harías diferente si pudieras reformularlo? ¿El LLM entendió mal algo por falta de claridad en tu prompt? ¿La respuesta tiene errores u omisiones? ¿Qué no cubrió el LLM que tú sí sabes por lo visto en clase?]
+No aplica, esta respuesta es mia propia.
+
 
 
 #### 3. Respuesta final
 
-[Escribe tu respuesta definitiva a la pregunta del parcial, integrando lo que aprendiste del LLM pero yendo más allá. Corrige errores, llena omisiones, conecta con conceptos vistos en clase. Esta es tu respuesta: demuestra que tú dominas el tema.]
+Se estan violando la I y la L de Solid
+
+La I (interface segregation principle): la interfaz de Usuario tiene metodos que dependen de la clase de usuario que la implemente (comprar, vender, moderar, generar reportes, gestionar usuarios). Lo propio seria separar esta interfaz en varias interfaces mas pequenas y especificas para cada funcionalidad del usuario.
+
+La L (Liskov Substitution principle): Se esta haciendo Vendedor extends Comprador, pero un Vendedor no puede comprar. Por tanto no se puede usar un Vendedor en lugar de un Comprador. Tambien se esta haciendo Administrador extends Vendedor, pero un Administrador no puede vender. Por tanto no se puede usar un Administrador en lugar de un Vendedor. Hay que asignarle los modulos de interfaz apropiados a cada uno de los roles
+
+El rediseño que propongo divide la interfaz gorda del usuario en modulos pequeños para todas sus 
+tareas a la vez que corrige la violacion de Liskov, corrigiendo ambas violaciones a los principios SOLID.
+
+```java
+public interface IComprador {
+    void comprar(Libro libro);
+}
+
+public interface IVendedor {
+    void vender(Libro libro);
+}
+
+public interface IModerador {
+    void moderarComentario(Comentario comentario);
+}
+
+public interface IGestorAdministrativo {
+    void generarReporteVentas();
+    void gestionarUsuarios();
+}
+public class ClienteComprador implements IComprador {
+    @Override
+    public void comprar(Libro libro) {
+    }
+}
+
+public class ClienteVendedor implements IVendedor {
+    @Override
+    public void vender(Libro libro) {
+    }
+}
+
+//le mandamos al admin unicamente los comportamientos deseados en vez de todos los comportamientos disponibles del vendedor y comprador, ademas de los comportamientos exclusivos del administrador.
+public class AdministradorSistema implements IComprador, IVendedor, IModerador, IGestorAdministrativo {
+    
+    @Override
+    public void comprar(Libro libro) {
+    }
+
+    @Override
+    public void vender(Libro libro) {
+    }
+
+    @Override
+    public void moderarComentario(Comentario comentario) {
+    }
+
+    @Override
+    public void generarReporteVentas() {
+    }
+
+    @Override
+    public void gestionarUsuarios() {
+    }
+}

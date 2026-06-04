@@ -234,7 +234,6 @@ public class Main {
         libroConError.setStock(3);
     }
 }
-![alt text](image.png)
 
 
 ---

@@ -1,13 +1,9 @@
 # Plantilla de entrega — Parcial 2
 
-> **Instrucción**: Copia esta plantilla para cada pregunta del parcial. Reemplaza `[Pregunta XX]` por el identificador correcto (ej: `P01_solid_srp`) y completa todas las secciones. Haz al menos 2 commits por pregunta: uno con el prompt + respuesta del LLM, y otro con el análisis.
-
----
-
-## Pregunta [XX]: [Título resumido]
+## P01_solid_principio  
 
 ### Estudiante
-- **Nombre completo**: [Tu nombre y apellido]
+- **Nombre completo**: [Nicolás Silva García]
 
 ---
 
@@ -15,9 +11,9 @@
 
 | Campo | Valor |
 |---|---|
-| **Nombre del LLM** | [Claude / ChatGPT / Gemini / Copilot / DeepSeek / Qwen / Mistral / Otro / **Sin IA — respuesta propia**] |
-| **Modelo específico** | [Ej: Claude Opus 4.5, GPT-4o, Gemini 2.5 Pro, etc. Si respondes sin IA, escribe "N/A"] |
-| **¿Por qué elegiste este LLM?** | [Justifica en 1-3 oraciones. Si respondes sin IA, explica por qué decidiste no usar LLM para esta pregunta.] |
+| **Nombre del LLM** | [**Sin IA — respuesta propia**] |
+| **Modelo específico** | [N/A] |
+| **¿Por qué elegiste este LLM?** | [El enunciado la marca como recomendada sin IA y me siento confiado en lo que aprendi de los principios SOLID como para poder resolverla por mi cuenta] |
 
 ---
 
@@ -52,18 +48,110 @@ pero menciona cuántas iteraciones hiciste.]
 
 ---
 
+### Pregunta 1
+### P.1 ⭐ (3 puntos)
+
+El siguiente método pertenece a la clase `GestorLibro` del módulo de administración de OpenLib Market:
+
+```java
+public class GestorLibro {
+    public void publicarLibro(Libro libro, Usuario vendedor) {
+        // 1. Validar que el libro tenga ISBN, título y autor
+        if (libro.getIsbn() == null || libro.getTitulo() == null || libro.getAutor() == null) {
+            throw new IllegalArgumentException("Datos del libro incompletos");
+        }
+        
+        // 2. Guardar el libro en la base de datos
+        Connection conn = DriverManager.getConnection("jdbc:postgresql://localhost:5432/openlib", "admin", "pass");
+        PreparedStatement stmt = conn.prepareStatement("INSERT INTO libros (...) VALUES (...)");
+        stmt.executeUpdate();
+        
+        // 3. Generar slug para la URL
+        String slug = libro.getTitulo().toLowerCase().replace(" ", "-").replaceAll("[^a-z0-9-]", "");
+        libro.setSlug(slug);
+        
+        // 4. Enviar correo al vendedor
+        EmailService email = new EmailService("smtp.openlib.com", 587, "noreply@openlib.com", "pass123");
+        email.enviar(vendedor.getEmail(), "Libro publicado", "Tu libro '" + libro.getTitulo() + "' ha sido publicado exitosamente.");
+        
+        // 5. Registrar en log
+        Logger.getLogger("OpenLib").info("Libro publicado: " + libro.getIsbn() + " por " + vendedor.getNombre());
+        
+        // 6. Indexar para búsqueda
+        SearchIndex index = new SearchIndex("elasticsearch.openlib.com:9200");
+        index.indexar(libro);
+    }
+}
+```
+
+**Tarea**: Identifica qué principio SOLID se está violando (más de uno puede aplicar, pero enfócate en el principal).
+
 ### Análisis crítico de la respuesta
 
 #### 1. ¿Qué hizo bien el prompt?
 
-[Evalúa tu propio prompt, no la respuesta del LLM. ¿El contexto fue suficiente? ¿Las restricciones fueron claras? ¿El formato de salida que pediste ayudó a obtener una buena respuesta? ¿Qué parte de tu prompt fue más efectiva? Sé específico: menciona fragmentos concretos de tu prompt que funcionaron bien.]
+No aplica, esta respuesta es mia propia.
 
 
 #### 2. ¿Qué se puede mejorar?
 
-[¿Qué le faltó a tu prompt? ¿Qué harías diferente si pudieras reformularlo? ¿El LLM entendió mal algo por falta de claridad en tu prompt? ¿La respuesta tiene errores u omisiones? ¿Qué no cubrió el LLM que tú sí sabes por lo visto en clase?]
+No aplica, esta respuesta es mia propia.
 
 
 #### 3. Respuesta final
 
-[Escribe tu respuesta definitiva a la pregunta del parcial, integrando lo que aprendiste del LLM pero yendo más allá. Corrige errores, llena omisiones, conecta con conceptos vistos en clase. Esta es tu respuesta: demuestra que tú dominas el tema.]
+Se está violando la S del principio de responsabilidad única, ya que la clase esta haciendo 6 cosas diferentes que deberían estar en clases separadas:
+1) Validar que el libro tenga ISBN, título y autor
+2) Guardar el libro en la base de datos
+3) Generar slug para la URL
+4) Enviar correo al vendedor
+5) Registrar en log
+6) Indexar para búsqueda
+
+Esto es una mala practica, ya que si cambia la forma de validar los datos del libro, se deberia cambiar TODO el metodo publicarLibro, haciendo muy engorroso cualquier cambio futuro.
+
+Lo propio seria que cada responsabilidad tenga su propia clase, algo como esto (lo dejo en comentario y pseudocodigo porque no tengo ni idea de como funciona publicarLibro por dentro en este contexto)
+
+class LibroValidator {
+    public boolean validar(Libro libro) {
+        if (libro.getIsbn() == null || libro.getTitulo() == null || libro.getAutor() == null) {
+            throw new IllegalArgumentException("Datos del libro incompletos");
+        }
+    }
+}
+
+class LibroRepository {
+    public void guardar(Libro libro) {
+        // Guardar en la BD;
+        Connection conn = DriverManager.getConnection("jdbc:postgresql://localhost:5432/openlib", "admin", "pass");
+        PreparedStatement stmt = conn.prepareStatement("INSERT INTO libros (...) VALUES (...)");
+        stmt.executeUpdate();
+    }
+}
+
+class SlugGenerator {
+    public String generar(String titulo) {
+        //esto ya estaba en el problema entonces lo dejo igual
+        return titulo.toLowerCase().replace(" ", "-").replaceAll("[^a-z0-9-]", "");
+    }
+}
+
+class EmailService {
+    public void enviar() {
+       EmailService email = new EmailService("smtp.openlib.com", 587, "noreply@openlib.com", "pass123");
+        email.enviar(vendedor.getEmail(), "Libro publicado", "Tu libro '" + libro.getTitulo() + "' ha sido publicado exitosamente.");
+    }
+}
+
+class LoggerService {
+    public void log(String mensaje) {
+        Logger.getLogger("OpenLib").info("Libro publicado: " + libro.getIsbn() + " por " + vendedor.getNombre());
+    }
+}
+
+class SearchIndex {
+    public void indexar(Libro libro) {
+        SearchIndex index = new SearchIndex("elasticsearch.openlib.com:9200");
+        index.indexar(libro);
+    }
+}

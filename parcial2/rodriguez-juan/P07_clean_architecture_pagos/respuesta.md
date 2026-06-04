@@ -121,13 +121,22 @@ De esta forma, el flujo de control sale hacia la base de datos, pero la dependen
 
 #### 1. ¿Qué hizo bien el prompt?
 
-[Pendiente de análisis]
+El prompt fue muy sólido porque describió el problema concreto (el monolito `PaymentService`) y exigió tres entregables específicos: distribución por capas, diagrama Mermaid y explicación del DIP. Esto obligó al LLM a no quedarse en teoría abstracta sino a aplicar Clean Architecture directamente al contexto de OpenLib Market. La frase "aplicando estrictamente Clean Architecture" fue clave para que el LLM no mezclara con otras arquitecturas.
 
 #### 2. ¿Qué se puede mejorar?
 
-[Pendiente de análisis]
+El prompt debería haber pedido también **código Java de ejemplo del caso de uso** (el `ProcesarPagoUseCase` con sus dependencias inyectadas por constructor), ya que la rúbrica pregunta explícitamente: *"¿Qué tan testeable es el diseño resultante comparado con la versión acoplada original?"*. Sin ver el código del Use Case, es difícil evidenciar la ganancia en testeabilidad. Además, faltó preguntar si el controlador REST está bien aislado de la lógica de negocio con un ejemplo concreto.
 
 #### 3. Respuesta final
 
-[Pendiente de análisis]
-```
+El LLM hizo un trabajo excelente estructurando las cuatro capas de Clean Architecture para el módulo de pagos. La explicación del DIP fue particularmente correcta: definir las interfaces (`PagoRepository`, `EmailService`, `PaymentGateway`) **dentro** de la capa de Use Cases, para que los adaptadores externos las implementen, es la técnica correcta para cruzar la frontera sin violar la Regla de Dependencia.
+
+**Comparativa de testeabilidad (lo que el LLM no mostró explícitamente):**
+
+| | `PaymentService` original acoplado | `ProcesarPagoUseCase` con Clean Architecture |
+|---|---|---|
+| Test unitario | ❌ Imposible sin PostgreSQL, SMTP y Stripe reales | ✅ Basta con Mockito para simular `PagoRepository`, `EmailService`, `PaymentGateway` |
+| Cambiar BD | ❌ Modifica `PaymentService` | ✅ Solo crea una nueva implementación de `PagoRepository` |
+| Cambiar pasarela | ❌ Modifica `PaymentService` | ✅ Solo crea una nueva implementación de `PaymentGateway` |
+
+Esta comparativa demuestra que Clean Architecture no es solo un ejercicio teórico, sino que transforma un sistema inmantenible en uno donde los cambios de infraestructura tienen costo **cero** sobre las reglas de negocio.

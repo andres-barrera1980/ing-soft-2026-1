@@ -1,13 +1,7 @@
-# Plantilla de entrega — Parcial 2
-
-> **Instrucción**: Copia esta plantilla para cada pregunta del parcial. Reemplaza `[Pregunta XX]` por el identificador correcto (ej: `P01_solid_srp`) y completa todas las secciones. Haz al menos 2 commits por pregunta: uno con el prompt + respuesta del LLM, y otro con el análisis.
-
----
-
-## Pregunta [XX]: [Título resumido]
+# Pregunta P11: Pruebas manuales vs automatizadas
 
 ### Estudiante
-- **Nombre completo**: [Tu nombre y apellido]
+- **Nombre completo**: Mateo Traslaviña Moreno
 
 ---
 
@@ -15,55 +9,75 @@
 
 | Campo | Valor |
 |---|---|
-| **Nombre del LLM** | [Claude / ChatGPT / Gemini / Copilot / DeepSeek / Qwen / Mistral / Otro / **Sin IA — respuesta propia**] |
-| **Modelo específico** | [Ej: Claude Opus 4.5, GPT-4o, Gemini 2.5 Pro, etc. Si respondes sin IA, escribe "N/A"] |
-| **¿Por qué elegiste este LLM?** | [Justifica en 1-3 oraciones. Si respondes sin IA, explica por qué decidiste no usar LLM para esta pregunta.] |
+| **Nombre del LLM** | Claude |
+| **Modelo específico** | Claude Sonnet 4.6 |
+| **¿Por qué elegiste este LLM?** | Las preguntas sobre estrategia de pruebas requieren comprender trade-offs entre costo, velocidad y cobertura. Claude maneja bien el razonamiento sobre decisiones de ingeniería con múltiples variables, y conecta los conceptos teóricos con situaciones concretas del proyecto. |
 
 ---
 
 ### Prompt utilizado
 
-> **Si respondiste sin IA, omite esta sección y ve directamente a Análisis crítico.**
-
 ```
-[Pega aquí el prompt exacto que enviaste al LLM. 
-Incluye TODO el texto, sin editar ni resumir.
+Eres un QA Lead explicando estrategia de pruebas al equipo de OpenLib Market, plataforma de compra-venta de libros en Java 21 con Spring Boot 3.x.
 
-Un buen prompt incluye:
-- Contexto del proyecto OpenLib Market
-- El código o situación específica
-- Lo que esperas que el LLM haga
-- Restricciones (ej: "usa Java 21", "aplica SOLID")
-- Formato de salida esperado (ej: "respuesta en markdown con código Java")]
+El equipo necesita decidir qué pruebas automatizar y qué mantener manual. Actualmente tienen:
+- Módulo de búsqueda de libros (ElasticSearch)
+- Módulo de carrito de compras
+- Módulo de pagos (integración con pasarela externa)
+- Módulo de gestión de inventario
+- Módulo de reseñas de libros
+- Dashboard de administración (UI compleja)
+- API REST expuesta a terceros
+
+Necesito que compares pruebas manuales vs automatizadas cubriendo:
+1. Qué son y cómo funcionan cada una
+2. Cuándo usar cada tipo (criterios de decisión)
+3. Ventajas y desventajas de cada enfoque
+4. La pirámide de pruebas y cómo aplica a OpenLib Market
+5. Para cada módulo listado, recomienda qué automatizar y qué mantener manual
+6. Cómo calcular el ROI de automatizar una prueba (fórmula simple)
+
+Incluye ejemplos concretos del contexto de OpenLib Market. Formato markdown con tabla comparativa y sección de recomendaciones por módulo.
 ```
 
 ---
 
 ### Respuesta del LLM
 
-> **Si respondiste sin IA, omite esta sección y ve directamente a Análisis crítico.**
-[Pega aquí la respuesta COMPLETA del LLM, sin editar, sin resumir.
-Incluye TODO el texto, código, explicaciones que generó el LLM.
+## Qué son y cómo funcionan
 
-Si el LLM generó código, asegúrate de que esté correctamente formateado.
-Si tuviste que hacer varias iteraciones, pega la MEJOR respuesta obtenida,
-pero menciona cuántas iteraciones hiciste.]
+### Pruebas manuales
+
+Un tester humano ejecuta casos de prueba siguiendo un guión o explorando la aplicación. El tester verifica comportamiento, reporta defectos, y usa su criterio y experiencia para detectar problemas inesperados.
+
+**Tipos principales:**
+- **Exploratorias**: el tester navega libremente buscando problemas no anticipados
+- **De usabilidad**: ¿es la interfaz intuitiva? ¿fluye bien la experiencia?
+- **Ad-hoc**: pruebas sin planificación, basadas en intuición
+- **Regresión manual**: re-ejecutar casos de prueba después de un cambio
+
+### Pruebas automatizadas
+
+Scripts o programas que ejecutan casos de prueba y verifican resultados sin intervención humana. Pueden correr en CI/CD después de cada commit.
+
+**Tipos por nivel (pirámide):**
+- **Unitarias** (base): prueban una clase/método en aislamiento (JUnit 5 + Mockito)
+- **Integración**: prueban la interacción entre componentes (Spring Boot Test + TestContainers)
+- **End-to-End / UI**: prueban flujos completos de usuario (Selenium, Playwright)
+
+## La pirámide de pruebas para OpenLib Market
+
+```
+           /\
+          /  \
+         / E2E\   ← Pocas, lentas, caras — solo flujos críticos
+        /  (5%) \
+       /──────────\
+      / Integración \  ← Moderadas — APIs, DB, servicios externos
+     /    (25%)      \
+    /──────────────────\
+   /      Unitarias     \  ← Muchas, rápidas, baratas
+  /        (70%)         \
+ /──────────────────────── \
 ```
 
----
-
-### Análisis crítico de la respuesta
-
-#### 1. ¿Qué hizo bien el prompt?
-
-[Evalúa tu propio prompt, no la respuesta del LLM. ¿El contexto fue suficiente? ¿Las restricciones fueron claras? ¿El formato de salida que pediste ayudó a obtener una buena respuesta? ¿Qué parte de tu prompt fue más efectiva? Sé específico: menciona fragmentos concretos de tu prompt que funcionaron bien.]
-
-
-#### 2. ¿Qué se puede mejorar?
-
-[¿Qué le faltó a tu prompt? ¿Qué harías diferente si pudieras reformularlo? ¿El LLM entendió mal algo por falta de claridad en tu prompt? ¿La respuesta tiene errores u omisiones? ¿Qué no cubrió el LLM que tú sí sabes por lo visto en clase?]
-
-
-#### 3. Respuesta final
-
-[Escribe tu respuesta definitiva a la pregunta del parcial, integrando lo que aprendiste del LLM pero yendo más allá. Corrige errores, llena omisiones, conecta con conceptos vistos en clase. Esta es tu respuesta: demuestra que tú dominas el tema.]

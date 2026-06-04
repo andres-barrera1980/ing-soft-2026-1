@@ -367,14 +367,20 @@ Para una plataforma con alto potencial de crecimiento como **OpenLib Market**, a
 
 #### 1. ¿Qué hizo bien el prompt?
 
-[Evalúa tu propio prompt, no la respuesta del LLM. ¿El contexto fue suficiente? ¿Las restricciones fueron claras? ¿El formato de salida que pediste ayudó a obtener una buena respuesta? ¿Qué parte de tu prompt fue más efectiva? Sé específico: menciona fragmentos concretos de tu prompt que funcionaron bien.]
+El prompt fue bastante completo porque explicó el contexto de OpenLib Market y pidió específicamente explicar las capas, la regla de dependencia y el uso de DIP. También fue útil pedir ejemplos concretos para cada capa, ya que eso permitió relacionar la teoría con un caso real. La parte más efectiva fue solicitar la comparación con una arquitectura tradicional, porque ayudó a entender mejor las diferencias entre ambos enfoques.
 
 
 #### 2. ¿Qué se puede mejorar?
 
-[¿Qué le faltó a tu prompt? ¿Qué harías diferente si pudieras reformularlo? ¿El LLM entendió mal algo por falta de claridad en tu prompt? ¿La respuesta tiene errores u omisiones? ¿Qué no cubrió el LLM que tú sí sabes por lo visto en clase?]
 
+El prompt pudo pedir un ejemplo más detallado de cómo se implementa DIP entre capas. Además, el LLM mencionó que los repositorios pertenecen a Interface Adapters, cuando realmente las interfaces de los repositorios suelen definirse en la capa de Use Cases y sus implementaciones quedan en las capas externas. También habría sido útil pedir un diagrama más simple para visualizar las dependencias.
 
 #### 3. Respuesta final
 
-[Escribe tu respuesta definitiva a la pregunta del parcial, integrando lo que aprendiste del LLM pero yendo más allá. Corrige errores, llena omisiones, conecta con conceptos vistos en clase. Esta es tu respuesta: demuestra que tú dominas el tema.]
+Clean Architecture organiza el sistema en cuatro capas: Entities, Use Cases, Interface Adapters y Frameworks & Drivers. La regla principal es que las dependencias solo pueden apuntar hacia adentro, por lo que las capas internas no conocen detalles de frameworks, bases de datos o tecnologías externas.
+
+En OpenLib Market, las entidades serían clases como Book, User y Payment. Los casos de uso contienen procesos como publicar un libro o procesar un pago. Los adaptadores incluyen controladores REST y repositorios que traducen información entre el dominio y el exterior. Finalmente, en Frameworks & Drivers se encuentran Spring Boot, PostgreSQL y servicios externos.
+
+El principio DIP se aplica definiendo interfaces en las capas internas y haciendo que las capas externas las implementen. De esta forma, la lógica de negocio depende de abstracciones y no de tecnologías concretas.
+
+Comparada con una arquitectura tradicional de tres capas, Clean Architecture ofrece menor acoplamiento, mayor testabilidad y facilita cambiar tecnologías sin afectar la lógica de negocio. Por eso es una buena opción para sistemas que pueden crecer y evolucionar como OpenLib Market.

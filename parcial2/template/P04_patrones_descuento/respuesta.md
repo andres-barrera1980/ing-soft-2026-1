@@ -279,13 +279,15 @@ Las clases base (CarritoPrecioBase), la interfaz (CalculadorPrecio) y los decora
 #### 1. ¿Qué hizo bien el prompt?
 
 [Evalúa tu propio prompt, no la respuesta del LLM. ¿El contexto fue suficiente? ¿Las restricciones fueron claras? ¿El formato de salida que pediste ayudó a obtener una buena respuesta? ¿Qué parte de tu prompt fue más efectiva? Sé específico: menciona fragmentos concretos de tu prompt que funcionaron bien.]
-
+El prompt fue claro y dio suficiente contexto sobre OpenLib Market y las reglas de descuento. Lo mejor fue especificar que los descuentos podian combinarse, porque eso ayudo a identificar el patron adecuado. Tambien fue util pedir una justificacion y descartar otras alternativas.
 
 #### 2. ¿Qué se puede mejorar?
 
 [¿Qué le faltó a tu prompt? ¿Qué harías diferente si pudieras reformularlo? ¿El LLM entendió mal algo por falta de claridad en tu prompt? ¿La respuesta tiene errores u omisiones? ¿Qué no cubrió el LLM que tú sí sabes por lo visto en clase?]
+Se podria pedir una comparacion mas profunda con otros patrones vistos en clase y una explicacion mas detallada de los principios SOLID involucrados. Ademas, la solucion aun utiliza condicionales en el orquestador para activar los descuentos.
 
 
 #### 3. Respuesta final
 
 [Escribe tu respuesta definitiva a la pregunta del parcial, integrando lo que aprendiste del LLM pero yendo más allá. Corrige errores, llena omisiones, conecta con conceptos vistos en clase. Esta es tu respuesta: demuestra que tú dominas el tema.]
+El patron Decorator es la mejor opcion porque permite aplicar varios descuentos al mismo tiempo de forma flexible y sin crear muchas clases para cada combinacion posible. La respuesta identifica correctamente que Strategy y Chain of Responsibility no son tan adecuados para este caso. La implementacion es funcional, escalable y facilita agregar nuevos descuentos en el futuro manteniendo un bajo acoplamiento y respetando el principio Open/Closed.

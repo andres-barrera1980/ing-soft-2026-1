@@ -4,10 +4,10 @@
 
 ---
 
-## Pregunta [XX]: [Título resumido]
+## Pregunta [P011_prubeas_manual_vs_auto]
 
 ### Estudiante
-- **Nombre completo**: [Tu nombre y apellido]
+- **Nombre completo**: [Alejandro Andres Perez Diaz]
 
 ---
 
@@ -15,9 +15,9 @@
 
 | Campo | Valor |
 |---|---|
-| **Nombre del LLM** | [Claude / ChatGPT / Gemini / Copilot / DeepSeek / Qwen / Mistral / Otro / **Sin IA — respuesta propia**] |
-| **Modelo específico** | [Ej: Claude Opus 4.5, GPT-4o, Gemini 2.5 Pro, etc. Si respondes sin IA, escribe "N/A"] |
-| **¿Por qué elegiste este LLM?** | [Justifica en 1-3 oraciones. Si respondes sin IA, explica por qué decidiste no usar LLM para esta pregunta.] |
+| **Nombre del LLM** | [ **Sin IA — respuesta propia**] |
+| **Modelo específico** | ["N/A"] |
+| **¿Por qué elegiste este LLM?** | [porque es un tema del caul recuerdo y tengo apuntes del cuaderno de esa clase] |
 
 ---
 
@@ -65,5 +65,44 @@ pero menciona cuántas iteraciones hiciste.]
 
 
 #### 3. Respuesta final
+SIn IA 
+[Pruebas manuales:
+Ventajas:
 
-[Escribe tu respuesta definitiva a la pregunta del parcial, integrando lo que aprendiste del LLM pero yendo más allá. Corrige errores, llena omisiones, conecta con conceptos vistos en clase. Esta es tu respuesta: demuestra que tú dominas el tema.]
+Detectan problemas de usabilidad que una máquina no vería
+No necesitas gastar en infraestructura para empezar
+Puedes explorar cosas que no tenías planeadas
+
+Desventajas:
+
+Son lentas y no puedes escalarlas fácilmente
+Una persona puede cometer errores o saltarse pasos
+Cada vez que las corres pueden dar resultados diferentes
+
+Pruebas automatizadas:
+Ventajas:
+
+Se ejecutan rápido y las puedes correr cuando quieras
+Siempre hacen lo mismo, son consistentes
+Te avisan inmediatamente si algo se rompió
+
+Desventajas:
+
+Toma tiempo y esfuerzo crearlas al inicio
+Si el código cambia toca actualizar las pruebas también
+No detectan si algo se ve mal visualmente
+
+Cuándo automatizar:
+
+Pruebas que corres en cada entrega
+Lógica crítica como pagos o descuentos
+Pruebas de regresión
+
+Cuándo hacer manual:
+
+Cuando quieres explorar libremente
+Validar que la interfaz se vea bien
+Flujos que todavía están cambiando
+
+Recomendación para OpenLib Market:
+Automatizar las pruebas unitarias de CarritoService, ProcesadorPago y ControlInventarioService porque son lógica crítica que no puede fallar. Manual el flujo completo de compra desde el frontend JavaFX y la experiencia visual del carrito.]

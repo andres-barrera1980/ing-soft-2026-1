@@ -533,10 +533,18 @@ TOTAL                                ~6 h activas / ~18 h calendario
 
 #### 1. ¿Qué hizo bien el prompt?
 
-
+Proporcionar el reporte del bug estructurado de antemano (resumen, pasos a reproducir, resultado esperado vs. resultado obtenido) fue una buena decisión analítica. Impidió que el modelo inventara contexto y lo forzó a aplicar el ciclo de vida del defecto de forma procedimental. Darle el rol combinado de "QA Lead y Scrum Master" fue clave: obligó a la IA a incluir dinámicas de metodologías ágiles que aplicamos constantemente en los proyectos de la universidad, como la revisión del ticket en la Daily Standup, el impacto en el burndown chart del sprint y la etapa de Code Review.
 
 #### 2. ¿Qué se puede mejorar?
 
+Aunque la estructura narrativa es buena, al revisar el detalle operativo noté que el modelo cometió varias fallas técnicas y de gestión:
 
+Primero, aplicó mal las transiciones de Jira. En la fase de asignación, la IA pasa el ticket directamente a estado IN PROGRESS. En el flujo real de la industria, asignar un ticket solo lo mueve a la columna TO DO o SELECTED FOR DEVELOPMENT. El defecto solo debe pasar a IN PROGRESS cuando el desarrollador realmente inicia el trabajo de diagnóstico.
+Segundo, demostró una desconexión arquitectónica grave. El modelo diagnosticó y arregló el fallo asumiendo que toda la lógica de negocio vive estáticamente en el frontend (usando un DataStore.java local en JavaFX). Pero el proyecto tiene una arquitectura distribuida cliente-servidor con Spring Boot. El primer paso formal en el diagnóstico debió ser revisar los logs de red para confirmar el origen de la falla: o el backend (Spring) está rechazando la petición y el frontend simplemente no está capturando la excepción HTTP, o el frontend tiene el límite de 5 ítems "quemado" (hardcodeado) en la vista y ni siquiera manda la solicitud al servidor.
+
+Tercero, propuso un diseño de pruebas unitarias sucio. En la fase de validación, la IA propuso llenar un DataStore (que actúa como Singleton global) con objetos falsos. En la bibliografía técnica sobre testing, alterar el estado global en memoria para correr un test es un anti-patrón enorme. Debió reiniciar el contexto de ejecución o usar mocks formales (como Mockito) para garantizar que la prueba sea independiente y aislada.
 
 #### 3. Respuesta final
+A nivel teórico, la IA estructuró bien el flujo del bug. Separar las responsabilidades (el tester documenta, el Scrum Master prioriza, el desarrollador repara y QA valida) demuestra que comprende el estándar base de aseguramiento de calidad. La decisión de documentar "Deuda Técnica" paralela al arreglo del defecto fue un detalle de gestión muy maduro.
+
+Sin embargo, para presentar esta solución en una entrega formal de ingeniería, yo modificaría drásticamente la fase de diagnóstico. Le exigiría al desarrollador aislar la falla primero: auditar las trazas de red para determinar objetivamente si el problema recae en el controlador REST del backend o en la validación de vista de JavaFX. Adicionalmente, alinearía el tablero Kanban a las prácticas formales: el ticket se asigna en TO DO, se depura en IN PROGRESS, se bloquea en IN REVIEW durante el Pull Request, pasa a IN QA (o READY FOR TEST) para la verificación del equipo de pruebas, y únicamente entonces puede marcarse como DONE.

@@ -317,14 +317,32 @@ Al levantar la aplicación, Spring Boot detectará el componente `@Component`, l
 
 #### 1. ¿Qué hizo bien el prompt?
 
-[Evalúa tu propio prompt, no la respuesta del LLM. ¿El contexto fue suficiente? ¿Las restricciones fueron claras? ¿El formato de salida que pediste ayudó a obtener una buena respuesta? ¿Qué parte de tu prompt fue más efectiva? Sé específico: menciona fragmentos concretos de tu prompt que funcionaron bien.]
+El prompt da suficiente contexto sobre el problema y especifica claramente qué debe analizarse. También pide identificar varios principios SOLID, justificar el patrón elegido y verificar si el diseño permite agregar nuevos métodos de pago.
 
+Además, las restricciones ayudan a orientar la solución hacia un diseño extensible usando buenas prácticas y evitando condicionales basados en Strings.
 
 #### 2. ¿Qué se puede mejorar?
 
-[¿Qué le faltó a tu prompt? ¿Qué harías diferente si pudieras reformularlo? ¿El LLM entendió mal algo por falta de claridad en tu prompt? ¿La respuesta tiene errores u omisiones? ¿Qué no cubrió el LLM que tú sí sabes por lo visto en clase?]
+La respuesta identifica correctamente las violaciones de **SRP** y **OCP**, y la elección del patrón **Strategy** es adecuada para este caso.
 
+Sin embargo, también podría haberse mencionado **DIP**, ya que el procesador debería depender de abstracciones (`PaymentStrategy`) y no de implementaciones concretas. Además, aunque el diseño es bastante bueno, seguir usando Strings como `"TARJETA"` o `"PSE"` puede generar errores y podría reemplazarse por un `enum`.
 
 #### 3. Respuesta final
 
-[Escribe tu respuesta definitiva a la pregunta del parcial, integrando lo que aprendiste del LLM pero yendo más allá. Corrige errores, llena omisiones, conecta con conceptos vistos en clase. Esta es tu respuesta: demuestra que tú dominas el tema.]
+El LLM identificó correctamente que se están violando principalmente los principios **SRP** y **OCP**.
+
+Por un lado, `ProcesadorPago` conoce la lógica de todos los métodos de pago, por lo que cualquier cambio en tarjeta, PSE o PayPal obliga a modificar la misma clase. Por otro lado, para agregar un nuevo método de pago es necesario agregar otro `if`, incumpliendo el principio de abierto/cerrado.
+
+El patrón **Strategy** es una buena elección porque permite encapsular cada forma de pago en una clase independiente que implemente una misma interfaz, por ejemplo `PaymentStrategy`.
+
+La solución introduce una interfaz común y clases como:
+
+* `TarjetaPaymentStrategy`
+* `PsePaymentStrategy`
+* `PaypalPaymentStrategy`
+
+De esta forma, el procesador solo delega la operación a la estrategia correspondiente y ya no necesita conocer los detalles de cada método de pago.
+
+Si mañana se requiere agregar criptomonedas, bastaría con crear una nueva implementación como `CriptoPaymentStrategy` sin modificar el procesador principal. Esto cumple con OCP y hace el sistema más mantenible.
+
+Como mejora adicional, reemplazaría los Strings por un `enum TipoPago` para evitar errores de escritura y aumentar la seguridad del código. En general, el diseño propuesto reduce el acoplamiento, mejora la extensibilidad y facilita las pruebas unitarias.

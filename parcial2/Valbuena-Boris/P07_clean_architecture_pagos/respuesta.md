@@ -144,14 +144,35 @@ La solución debe respetar completamente la regla de dependencia de Clean Archit
 
 #### 1. ¿Qué hizo bien el prompt?
 
-[Evalúa tu propio prompt, no la respuesta del LLM. ¿El contexto fue suficiente? ¿Las restricciones fueron claras? ¿El formato de salida que pediste ayudó a obtener una buena respuesta? ¿Qué parte de tu prompt fue más efectiva? Sé específico: menciona fragmentos concretos de tu prompt que funcionaron bien.]
+El prompt da muy buen contexto sobre el problema, ya que explica de forma clara que funcionalidades debe tener el modulo de pagos y detalla las responsabilidades que hoy estan concentradas en `PaymentService`. Ademas, pide directo usar Clean Architecture y solicita describir cada capa (Entities, Use Cases, Interface Adapters y Frameworks & Drivers), lo que ayuda a organizar bien la respuesta.
 
+Tambien sirvieron bastante restricciones como que el dominio no dependa de Spring Boot, que no dependa de PostgreSQL y que la solucion respete del todo la regla de dependencia, porque obligan a que sea una arquitectura de verdad desacoplada.
+
+Otra cosa efectiva fue pedir el diagrama de arquitectura y la explicacion de como inyectar dependencias. Asi la respuesta no se quedo solo en teoria, sino que mostro como se haria en la practica en un proyecto real.
 
 #### 2. ¿Qué se puede mejorar?
 
-[¿Qué le faltó a tu prompt? ¿Qué harías diferente si pudieras reformularlo? ¿El LLM entendió mal algo por falta de claridad en tu prompt? ¿La respuesta tiene errores u omisiones? ¿Qué no cubrió el LLM que tú sí sabes por lo visto en clase?]
+Aunque el prompt esta completo, podria pedir de frente ejemplos de codigo para cada capa importante. La respuesta explica la arquitectura, pero algunos componentes se quedan muy por encima y no se ve con detalle como implementar los casos de uso o las entidades del dominio.
 
+Tambien habria sido util pedirle que maneje los multiples metodos de pago con algun patron de diseño especifico, como Strategy, porque el sistema debe soportar tarjeta, PSE y PayPal. El LLM lo menciona por encima con adaptadores y gateways, pero no entra en detalle en esa parte.
+
+Otra mejora seria pedirle ejemplos de pruebas unitarias para ver la ventaja real de esta arquitectura. El modelo habla de testabilidad, pero no muestra como hacer los tests.
 
 #### 3. Respuesta final
 
-[Escribe tu respuesta definitiva a la pregunta del parcial, integrando lo que aprendiste del LLM pero yendo más allá. Corrige errores, llena omisiones, conecta con conceptos vistos en clase. Esta es tu respuesta: demuestra que tú dominas el tema.]
+La implementacion original tiene mucho acoplamiento porque una sola clase `PaymentService` junta la logica de negocio, la persistencia, la integracion con pasarelas de pago, el envio de correos y la preparacion de las entregas. Esto rompe el principio de responsabilidad unica y hace que mantener y probar el codigo sea muy dificil.
+
+Si aplicamos Clean Architecture, dividimos el sistema en cuatro capas:
+
+* **Entities:** Tienen las reglas de negocio mas importantes y los objetos de dominio como `Payment`, `Transaction`, `Money` y `Order`.
+* **Use Cases:** Coordinan el flujo de pago con casos de uso como `ProcessPaymentUseCase` y definen interfaces como `PaymentRepository`, `PaymentGateway` y `NotificationService`.
+* **Interface Adapters:** Aca van los controladores REST, los adaptadores de los repositorios y los adaptadores para las pasarelas y servicios de mail.
+* **Frameworks & Drivers:** Contienen Spring Boot, PostgreSQL, los SDK de PayPal o PSE, JavaMail y cualquier tecnologia externa.
+
+La regla de dependencia se cumple porque las capas internas no saben nada de la infraestructura. Los casos de uso dependen solo de las interfaces, y las implementaciones reales estan en las capas mas externas.
+
+El controlador REST queda libre de logica de negocio, solo recibe peticiones y las pasa al caso de uso. De esta manera, si a futuro cambiamos Spring Boot por otro framework o PostgreSQL por otra base de datos, el codigo interno no se toca.
+
+Para soportar multiples metodos de pago de forma extensible, podemos meter el patron Strategy en el diseño, donde cada metodo de pago implemente una estrategia distinta (`TarjetaPaymentStrategy`, `PsePaymentStrategy`, `PayPalPaymentStrategy`). Asi, agregar nuevos metodos de pago no nos obliga a modificar los casos de uso que ya tenemos.
+
+Comparado con lo que habia antes, este diseño es mucho mas mantenible, facil de extender y probar, porque nos deja hacer pruebas unitarias usando mocks de las interfaces sin tener que conectarnos a bases de datos o servicios externos reales.

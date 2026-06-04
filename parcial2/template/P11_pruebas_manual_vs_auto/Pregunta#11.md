@@ -285,10 +285,19 @@ Documentar esta deuda explícitamente es parte de la responsabilidad del QA Lead
 
 #### 1. ¿Qué hizo bien el prompt?
 
-
+Contextualizar la situación como un "primer release con tiempo y presupuesto acotados" fue fundamental. Eso impidió que el modelo soltara la típica respuesta teórica e idealista de "hay que automatizar el 100% de las pruebas" (el clásico error que cometemos al empezar a diseñar sistemas). Obligarlo a listar exactamente tres ventajas y desventajas, aplicar la regla del ROI y aterrizar la recomendación a los flujos del proyecto, forzó a la IA a plantear una estrategia de aseguramiento de calidad (QA) realista, alineada con las restricciones de recursos que enfrentaríamos en un entorno laboral
 
 #### 2. ¿Qué se puede mejorar?
 
+Aunque la priorización táctica que propone el modelo tiene sentido práctico, al revisar la bibliografía técnica sobre Pruebas de Software noté que omitió varios principios formales del área:
 
+Primero, el Efecto Pesticida (Pesticide Paradox). La IA argumenta como gran ventaja que una regresión automatizada sirve intacta durante años. Omite la regla que advierte que si ejecutas exactamente los mismos scripts una y otra vez, el sistema se vuelve inmune y dejas de detectar fallos nuevos. La automatización sirve para proteger el código existente contra regresiones, no para descubrir bugs inéditos; para eso siempre será indispensable el testing exploratorio manual.
+
+Segundo, la falta de jerarquía (La Pirámide de Pruebas). El modelo nombra pruebas unitarias, de integración y E2E (End-to-End), pero no explica la relación de costos entre ellas. Faltó estructurar que las pruebas unitarias deben conformar la base ancha de la pirámide (por ser rápidas y baratas), mientras que las pruebas E2E automatizadas mediante UI deben conformar solo la punta (por ser lentas, costosas y frágiles).
+
+Tercero, la inestabilidad (Flakiness). En la sección de desventajas de automatizar, la IA olvidó mencionar el mayor dolor de cabeza a nivel operativo: los falsos positivos. Las pruebas E2E suelen fallar por un pico de latencia en la red o demoras en el renderizado del DOM, no por fallos reales en la lógica de negocio. Lidiar con estos flaky tests desgasta severamente al equipo de desarrollo.
 
 #### 3. Respuesta final
+La respuesta del modelo funciona bastante bien como guía de gestión. Su regla para medir el retorno de inversión (frecuencia de la tarea manual contra el tiempo que toma programar el test) es sólida. Tiene todo el sentido técnico clasificar las pruebas de usabilidad, integraciones complejas de terceros (como las pasarelas de pago 3DS) y las pruebas exploratorias como un esfuerzo estrictamente manual.
+
+No obstante, para armar un plan de pruebas completo para un proyecto real, yo ajustaría el alcance. Aplicaría la Pirámide de Pruebas de forma estricta: reduciría las pruebas de interfaz automatizadas (Playwright, por ejemplo) exclusivamente al camino feliz (Happy Path) más crítico, para evadir los altos costos de mantenimiento que genera el flakiness. Adicionalmente, para anular el Efecto Pesticida de la suite automatizada, organizaría sesiones de Bug Bash (pruebas exploratorias manuales con distintos miembros del equipo) antes de liberar cualquier versión mayor. Esto asegura que sometamos la aplicación a flujos de uso humano impredecibles que los algoritmos simplemente no están diseñados para evaluar.

@@ -83,12 +83,17 @@ Dado tu stack tecnológico en OpenLib Market, la arquitectura de testing deberí
 
 #### 1. ¿Qué hizo bien el prompt?
 
-[Pendiente de análisis]
+El prompt fue muy efectivo al acotar exactamente lo que se necesitaba: pedir un número específico de escenarios (2 manuales y 3 automatizados) obligó al LLM a priorizar. Además, al darle explícitamente el stack tecnológico del proyecto (Spring Boot, Web, JavaFX), el LLM pudo recomendar herramientas precisas y contextualizar los ejemplos (mencionando `CarritoService` o la app JavaFX) en lugar de dar definiciones abstractas de QA.
 
 #### 2. ¿Qué se puede mejorar?
 
-[Pendiente de análisis]
+Al prompt le faltó indagar sobre el **costo de mantenimiento** (ROI) de la automatización. Las pruebas automatizadas no son mágicas ni gratuitas; requieren tiempo para programarse y, sobre todo, sufren de "fragilidad" (flaky tests) cuando la interfaz gráfica cambia. Al no pedirle los contras de la automatización, la respuesta del LLM pinta la automatización como una solución perfecta, ignorando que automatizar el 100% es un anti-patrón de la industria.
 
 #### 3. Respuesta final
 
-[Pendiente de análisis]
+Estoy **totalmente de acuerdo** con los escenarios propuestos. La distinción refleja fielmente el principio fundamental del QA moderno: **las máquinas son para verificar (determinismo, volumen, repetición) y los humanos son para explorar (intuición, empatía, UX).** Poner a un humano a hacer pruebas de regresión o estrés es un desperdicio de talento y una receta para el *burnout*.
+
+En cuanto a las herramientas, son exactamente las indicadas para el stack de OpenLib Market:
+1. **Backend (Java):** JUnit 5 + Mockito son el estándar de oro. Añadir **REST Assured** es una decisión brillante para probar los contratos de la API sin levantar un frontend, y JMeter es clásico para pruebas de carga.
+2. **Frontend Web:** Cypress y Playwright han desplazado casi por completo a Selenium por su menor "flakiness" (inestabilidad) y su rapidez al ejecutarse directamente en el mismo hilo del navegador o por protocolo DevTools.
+3. **Escritorio (JavaFX):** **TestFX** es indiscutiblemente la única herramienta moderna y estable para automatizar GUIs en JavaFX, ya que se integra directamente con el SceneGraph y permite inyectar eventos de mouse/teclado como si fuera un test de JUnit.

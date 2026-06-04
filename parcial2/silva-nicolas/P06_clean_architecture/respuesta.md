@@ -1,13 +1,7 @@
-# Plantilla de entrega — Parcial 2
-
-> **Instrucción**: Copia esta plantilla para cada pregunta del parcial. Reemplaza `[Pregunta XX]` por el identificador correcto (ej: `P01_solid_srp`) y completa todas las secciones. Haz al menos 2 commits por pregunta: uno con el prompt + respuesta del LLM, y otro con el análisis.
-
----
-
-## Pregunta [XX]: [Título resumido]
+## Pregunta 6
 
 ### Estudiante
-- **Nombre completo**: [Tu nombre y apellido]
+- **Nombre completo**: Nicolas Silva García
 
 ---
 
@@ -15,11 +9,17 @@
 
 | Campo | Valor |
 |---|---|
-| **Nombre del LLM** | [Claude / ChatGPT / Gemini / Copilot / DeepSeek / Qwen / Mistral / Otro / **Sin IA — respuesta propia**] |
-| **Modelo específico** | [Ej: Claude Opus 4.5, GPT-4o, Gemini 2.5 Pro, etc. Si respondes sin IA, escribe "N/A"] |
-| **¿Por qué elegiste este LLM?** | [Justifica en 1-3 oraciones. Si respondes sin IA, explica por qué decidiste no usar LLM para esta pregunta.] |
+| **Nombre del LLM** | **Sin IA — respuesta propia** |
+| **Modelo específico** | [N/A] |
+| **¿Por qué elegiste este LLM?** | [No use LLM para esta pregunta porque siento confianza en lo que aprendi del tema] |
 
 ---
+
+### P.6 ⭐ (4 puntos)
+
+Clean Architecture (Robert C. Martin) propone una organización en capas concéntricas con una regla fundamental: **las dependencias solo pueden apuntar hacia adentro**. Las capas son: Entidades (Entities), Casos de Uso (Use Cases), Adaptadores de Interfaz (Interface Adapters), y Frameworks y Drivers.
+
+
 
 ### Prompt utilizado
 
@@ -48,7 +48,7 @@ Incluye TODO el texto, código, explicaciones que generó el LLM.
 Si el LLM generó código, asegúrate de que esté correctamente formateado.
 Si tuviste que hacer varias iteraciones, pega la MEJOR respuesta obtenida,
 pero menciona cuántas iteraciones hiciste.]
-```
+
 
 ---
 
@@ -56,14 +56,56 @@ pero menciona cuántas iteraciones hiciste.]
 
 #### 1. ¿Qué hizo bien el prompt?
 
-[Evalúa tu propio prompt, no la respuesta del LLM. ¿El contexto fue suficiente? ¿Las restricciones fueron claras? ¿El formato de salida que pediste ayudó a obtener una buena respuesta? ¿Qué parte de tu prompt fue más efectiva? Sé específico: menciona fragmentos concretos de tu prompt que funcionaron bien.]
+No aplica, esta respuesta es mia propia.
+
 
 
 #### 2. ¿Qué se puede mejorar?
 
-[¿Qué le faltó a tu prompt? ¿Qué harías diferente si pudieras reformularlo? ¿El LLM entendió mal algo por falta de claridad en tu prompt? ¿La respuesta tiene errores u omisiones? ¿Qué no cubrió el LLM que tú sí sabes por lo visto en clase?]
+No aplica, esta respuesta es mia propia.
+
 
 
 #### 3. Respuesta final
 
-[Escribe tu respuesta definitiva a la pregunta del parcial, integrando lo que aprendiste del LLM pero yendo más allá. Corrige errores, llena omisiones, conecta con conceptos vistos en clase. Esta es tu respuesta: demuestra que tú dominas el tema.]
+Clean Architecture se basa en el principio de que las dependencias deben ir hacia adentro del codigo, lo que implica que una capa de adentro no conoce nada de las clases de afuera. Por ejemplo, un objeto de dominio no sabe que existe una base de datos, ni un controlador REST, ni un framework Spring Boot. Esta regla garantiza que si se cambia algun factor grande del exterior del codigo, como por ejemplo, la base de datos de PostgreSQL a MongoDB, la logica de negocio no sufre ni una sola modificación.
+
+Dentro de OpenLib Market funciona de la siguiente manera
+
+Entidades y reglas de negocio
+
+Aca se define la logica interna del sistema, y las reglas de cada una de las clases, que siguen vigentes sin importar como se maneje el sistema desde afuera. Su responsabilidad es contener el estado y las reglas invariables del negocio.
+
+Ejemplo en OpenLib: La clase Libro valida que un ISBN sea unico, o la clase Usuario contiene la lógica matemática para saber si es un cliente "Fiel" según su historial. No tienen anotaciones de base de datos ni de JSON.
+
+Casos de Uso
+Aca se organizan los flujos de los datos hacia y desde las entidades, definiendo lo que hace el sistema. Su responsabilidad es ejecutar los pasos lógicos específicos de la aplicacion. 
+
+Ejemplo en OpenLib: La clase PublicarLibroUseCase valida los datos del libro, genera un slug (regla de negocio), pide que se guarde el libro y pide que se notifique al vendedor.
+
+Adaptadores de Interfaz
+Funcionan como traductores que agarran los datos en el formato de los casos de uso y los transforman al formato conveniente para los agentes externos y viceversa.
+
+Ejemplo en OpenLib: LibroController recibe un JSON (HTTP), lo convierte en un DTO y se lo pasa al Caso de Uso.
+
+Frameworks y Drivers (Detalles)
+Es la capa mas externa. Aca se implementan las herramienta de acceso al sistema. Su responsabilidad es proveer la infraestructura física o de librerías.
+
+Ejemplo en OpenLib: El motor de la BD o el framework Spring Boot,
+
+Tambien es importante mencionar el Principio de Inversion de Dependencias (DIP)
+
+El principio de Inversion de Dependencias es fundamental para que la arquitectura funcione correctamente. Este principio establece que los módulos de alto nivel no deben depender de los módulos de bajo nivel. Ambos deben depender de abstracciones. Las abstracciones no deben depender de los detalles. Los detalles deben depender de las abstracciones.
+
+
+Por poner un ejemplo, si las dependencias apuntan hacia adentro, como hace el Caso de Uso (PublicarLibroUseCase - capa interior) para guardar el libro en la BD sin depender de ella?
+
+El procedimiento mediante DIP:
+
+En el use case se define una interfaz (ej: ILibroRepository con un método guardar(Libro libro)).
+
+El Caso de Uso llama a ILibroRepository.guardar().
+
+En la capa de adaptadores se implementa la interfaz (ej: PostgresLibroRepository implements ILibroRepository).
+
+El Caso de Uso logra escribir en la base de datos sin saber que es PostgreSQL.

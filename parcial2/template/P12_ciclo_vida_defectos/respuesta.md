@@ -1,13 +1,7 @@
-# Plantilla de entrega — Parcial 2
-
-> **Instrucción**: Copia esta plantilla para cada pregunta del parcial. Reemplaza `[Pregunta XX]` por el identificador correcto (ej: `P01_solid_srp`) y completa todas las secciones. Haz al menos 2 commits por pregunta: uno con el prompt + respuesta del LLM, y otro con el análisis.
-
----
-
-## Pregunta [XX]: [Título resumido]
+# Pregunta P12: Ciclo de vida de defectos
 
 ### Estudiante
-- **Nombre completo**: [Tu nombre y apellido]
+- **Nombre completo**: Mateo Traslaviña Moreno
 
 ---
 
@@ -15,55 +9,30 @@
 
 | Campo | Valor |
 |---|---|
-| **Nombre del LLM** | [Claude / ChatGPT / Gemini / Copilot / DeepSeek / Qwen / Mistral / Otro / **Sin IA — respuesta propia**] |
-| **Modelo específico** | [Ej: Claude Opus 4.5, GPT-4o, Gemini 2.5 Pro, etc. Si respondes sin IA, escribe "N/A"] |
-| **¿Por qué elegiste este LLM?** | [Justifica en 1-3 oraciones. Si respondes sin IA, explica por qué decidiste no usar LLM para esta pregunta.] |
+| **Nombre del LLM** | Claude |
+| **Modelo específico** | Claude Sonnet 4.6 |
+| **¿Por qué elegiste este LLM?** | El ciclo de vida de defectos es un tema con flujos de estado bien definidos que Claude representa eficientemente. Su capacidad para generar diagramas ASCII y tablas bien estructuradas hace que los flujos sean fáciles de entender, y conecta bien los conceptos teóricos con herramientas concretas como Jira. |
 
 ---
 
 ### Prompt utilizado
 
-> **Si respondiste sin IA, omite esta sección y ve directamente a Análisis crítico.**
-
 ```
-[Pega aquí el prompt exacto que enviaste al LLM. 
-Incluye TODO el texto, sin editar ni resumir.
+Eres un QA Lead en el equipo de OpenLib Market, plataforma de compra-venta de libros en Java 21 con Spring Boot 3.x.
 
-Un buen prompt incluye:
-- Contexto del proyecto OpenLib Market
-- El código o situación específica
-- Lo que esperas que el LLM haga
-- Restricciones (ej: "usa Java 21", "aplica SOLID")
-- Formato de salida esperado (ej: "respuesta en markdown con código Java")]
-```
+Necesito una explicación completa del ciclo de vida de un defecto (bug lifecycle) aplicado a este proyecto.
 
----
+Cubre:
+1. Definición: qué es un defecto y cómo se diferencia de un "error" y un "fallo"
+2. Los estados del ciclo de vida (con diagrama de flujo ASCII)
+3. Quién tiene responsabilidad en cada estado (QA, Dev, Product Owner, etc.)
+4. Severidad vs Prioridad: diferencia y ejemplos concretos de OpenLib Market
+5. Un ejemplo completo de un defecto real en OpenLib Market pasando por todos los estados (desde que se reporta hasta que se cierra)
+6. Métricas para medir la salud del proceso de gestión de defectos
+7. Cómo se integra el bug lifecycle con un tablero Jira/GitHub Issues en un equipo ágil
 
-### Respuesta del LLM
-
-> **Si respondiste sin IA, omite esta sección y ve directamente a Análisis crítico.**
-[Pega aquí la respuesta COMPLETA del LLM, sin editar, sin resumir.
-Incluye TODO el texto, código, explicaciones que generó el LLM.
-
-Si el LLM generó código, asegúrate de que esté correctamente formateado.
-Si tuviste que hacer varias iteraciones, pega la MEJOR respuesta obtenida,
-pero menciona cuántas iteraciones hiciste.]
+Formato: markdown con diagrama de flujo, tabla de severidad/prioridad, y el ejemplo completo con el defecto pasando estado por estado.
 ```
 
 ---
 
-### Análisis crítico de la respuesta
-
-#### 1. ¿Qué hizo bien el prompt?
-
-[Evalúa tu propio prompt, no la respuesta del LLM. ¿El contexto fue suficiente? ¿Las restricciones fueron claras? ¿El formato de salida que pediste ayudó a obtener una buena respuesta? ¿Qué parte de tu prompt fue más efectiva? Sé específico: menciona fragmentos concretos de tu prompt que funcionaron bien.]
-
-
-#### 2. ¿Qué se puede mejorar?
-
-[¿Qué le faltó a tu prompt? ¿Qué harías diferente si pudieras reformularlo? ¿El LLM entendió mal algo por falta de claridad en tu prompt? ¿La respuesta tiene errores u omisiones? ¿Qué no cubrió el LLM que tú sí sabes por lo visto en clase?]
-
-
-#### 3. Respuesta final
-
-[Escribe tu respuesta definitiva a la pregunta del parcial, integrando lo que aprendiste del LLM pero yendo más allá. Corrige errores, llena omisiones, conecta con conceptos vistos en clase. Esta es tu respuesta: demuestra que tú dominas el tema.]

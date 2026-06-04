@@ -113,4 +113,8 @@ Parchear el OS dentro de la VM sin proceso. Aplicar patches directamente en VMs 
 
 #### 3. Respuesta final
 
-[Escribe tu respuesta definitiva a la pregunta del parcial, integrando lo que aprendiste del LLM pero yendo más allá. Corrige errores, llena omisiones, conecta con conceptos vistos en clase. Esta es tu respuesta: demuestra que tú dominas el tema.]
+[ ¿El LLM explicó correctamente la diferencia de arquitectura?Si, en la teoria fue correcto en lo que me arrojo
+ ¿Las ventajas que mencionó son precisas? Las generalizo un poco pero tienen sentido
+  ¿Los casos de uso son realistas? No todos son realistas.
+   ¿Mencionó el problema de seguridad en contenedores por compartir kernel?si, de una manera muy general pero si.
+    ¿Identificó los pitfalls comunes al adoptar cada tecnología?Si, no en su totalidad pero si.

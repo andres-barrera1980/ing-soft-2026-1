@@ -221,14 +221,15 @@ public class Administrador implements Moderador, AdministradorSistema {
 
 #### 1. ¿Qué hizo bien el prompt?
 
-[Evalúa tu propio prompt, no la respuesta del LLM. ¿El contexto fue suficiente? ¿Las restricciones fueron claras? ¿El formato de salida que pediste ayudó a obtener una buena respuesta? ¿Qué parte de tu prompt fue más efectiva? Sé específico: menciona fragmentos concretos de tu prompt que funcionaron bien.]
+El prompt establecio un rol claro y experto al solicitar la actuacion como un Arquitecto de Software Senior, lo que modulo el nivel tecnico esperado en la respuesta. Tambien proporciono el contexto completo del codigo fuente con la jerarquia de herencia fallida para que el modelo pudiera analizar la estructura real del problema de OpenLib Market.
 
+Ademas, las instrucciones fueron explicitas y estructuradas, solicitando categorias puntuales como principios violados, riesgos en ejecucion y una propuesta de rediseño justificada. El uso de un formato de entrega especifico facilito una respuesta organizada por secciones, asegurando que se abordaran de forma individual el analisis conceptual y la solucion de codigo en Java.
 
 #### 2. ¿Qué se puede mejorar?
 
-[¿Qué le faltó a tu prompt? ¿Qué harías diferente si pudieras reformularlo? ¿El LLM entendió mal algo por falta de claridad en tu prompt? ¿La respuesta tiene errores u omisiones? ¿Qué no cubrió el LLM que tú sí sabes por lo visto en clase?]
+Aunque el analisis del modelo identifico correctamente las violaciones graves a los principios de sustitucion de Liskov, segregacion de interfaces y abierto/cerrado, la respuesta paso por alto las consecuencias mas profundas en tiempo de ejecucion, como el uso inevitable de bloques condicionales con verificaciones manuales de tipo que ensucian el codigo de cliente. Ademas, el rediseño propuesto cometio el error de nombrar las interfaces utilizando sustantivos de rol en lugar de capacidades, y sugirio la creacion de clases hibridas que duplican logica de negocio y provocan una explosion combinatoria de componentes rigidos.
 
 
 #### 3. Respuesta final
 
-[Escribe tu respuesta definitiva a la pregunta del parcial, integrando lo que aprendiste del LLM pero yendo más allá. Corrige errores, llena omisiones, conecta con conceptos vistos en clase. Esta es tu respuesta: demuestra que tú dominas el tema.]
+Para resolver los problemas de OpenLib Market de forma limpia, debemos eliminar por completo la herencia rigida y estructurar el diseño mediante la composicion de capacidades, renombrando los contratos bajo nombres de comportamiento como Comprable, Vendible, Moderable y Administrable. En lugar de crear tipos especificos para cada usuario, la clase Usuario actua como un contenedor cohesivo que almacena referencias dinamicas hacia estas interfaces. Esto permite asignar o remover permisos en tiempo de ejecucion a traves de metodos de configuracion, delegando la ejecucion de cada operacion de forma segura mediante validaciones internas que evitan por completo el lanzamiento de excepciones inesperadas. Con este enfoque, el sistema gana flexibilidad estructural y el compilador vuelve a garantizar la seguridad del codigo sin comprometer el polimorfismo.

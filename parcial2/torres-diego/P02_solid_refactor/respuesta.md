@@ -4,66 +4,70 @@
 
 ---
 
-## Pregunta [XX]: [Título resumido]
+## Pregunta [02]: [P02_Solid_refactor]
 
 ### Estudiante
-- **Nombre completo**: [Tu nombre y apellido]
+- **Nombre completo**: [Diego Alejandro Torres Barragan]
 
 ---
 
-### LLM utilizado
+Pregunta Contestada sin IA 
 
-| Campo | Valor |
-|---|---|
-| **Nombre del LLM** | [Claude / ChatGPT / Gemini / Copilot / DeepSeek / Qwen / Mistral / Otro / **Sin IA — respuesta propia**] |
-| **Modelo específico** | [Ej: Claude Opus 4.5, GPT-4o, Gemini 2.5 Pro, etc. Si respondes sin IA, escribe "N/A"] |
-| **¿Por qué elegiste este LLM?** | [Justifica en 1-3 oraciones. Si respondes sin IA, explica por qué decidiste no usar LLM para esta pregunta.] |
+#### 1. Respuesta final
 
----
+[El principio que se viola en esta pregunta , principalmente es la O (open/close) ya que la clase procesar pago tiene una condicion if/else encadenado para cada metodo de pago , y si en un futuro sale un nuevo metodo de pago, tocac modificar directamente esata clase agregando otro condicional if/else y eso es exactamente lo que este principio dice que no se debe de hacer, pues el codigo debe estar abierto para extenderce pero no cerrado para modificarse. 
 
-### Prompt utilizado
+Otro patron que violando es la S de los SOLID ya que como en el punto anterior se esta manejando la logica de tres procesos (PSE, Tarjetas y paypal) en una misma clase y pues eso se puede separar aplicando este principio. 
 
-> **Si respondiste sin IA, omite esta sección y ve directamente a Análisis crítico.**
+Ahora el patron que yo propondira para refactorizar este punto es Strategy 
 
-```
-[Pega aquí el prompt exacto que enviaste al LLM. 
-Incluye TODO el texto, sin editar ni resumir.
+pues este praton no ayuda a que en ves de tener un if/else por tipo de pago , se crea una interfaz metodoPago, asi cada tipo de pago tendria su propia clase. asi ProcesarPAgo solo tendria que recibir metodo de pago y ejecutarlo sin importar cual sea , asi solucionando el proble aya que si llega un metodo de pago nuevo , solo es crea una clase nueva sin hacerle cambios a lo que ya existe  ]
 
-Un buen prompt incluye:
-- Contexto del proyecto OpenLib Market
-- El código o situación específica
-- Lo que esperas que el LLM haga
-- Restricciones (ej: "usa Java 21", "aplica SOLID")
-- Formato de salida esperado (ej: "respuesta en markdown con código Java")]
-```
+// Interfaz que deben implementar todos los métodos de pago
+public interface MetodoPago {
+    ResultadoPago procesar(Pago pago);
+}
 
----
+// Implementación para tarjeta
+public class PagoTarjeta implements MetodoPago {
+    @Override
+    public ResultadoPago procesar(Pago pago) {
+        // Validar CVV, fecha expiración, fondos
+        // Conectar con API de franquicia
+        return new ResultadoPago(true, "Pago con tarjeta procesado");
+    }
+}
 
-### Respuesta del LLM
+// Implementación para PSE
+public class PagoPSE implements MetodoPago {
+    @Override
+    public ResultadoPago procesar(Pago pago) {
+        // Redirigir a portal bancario
+        // Confirmar débito
+        return new ResultadoPago(true, "Pago PSE procesado");
+    }
+}
 
-> **Si respondiste sin IA, omite esta sección y ve directamente a Análisis crítico.**
-[Pega aquí la respuesta COMPLETA del LLM, sin editar, sin resumir.
-Incluye TODO el texto, código, explicaciones que generó el LLM.
+// Implementación para PayPal
+public class PagoPayPal implements MetodoPago {
+    @Override
+    public ResultadoPago procesar(Pago pago) {
+        // Autenticar con OAuth
+        // Ejecutar cargo
+        return new ResultadoPago(true, "Pago PayPal procesado");
+    }
+}
 
-Si el LLM generó código, asegúrate de que esté correctamente formateado.
-Si tuviste que hacer varias iteraciones, pega la MEJOR respuesta obtenida,
-pero menciona cuántas iteraciones hiciste.]
-```
+// ProcesadorPago ya no sabe qué método de pago es, solo lo ejecuta
+public class ProcesadorPago {
 
----
+    private final MetodoPago metodoPago;
 
-### Análisis crítico de la respuesta
+    public ProcesadorPago(MetodoPago metodoPago) {
+        this.metodoPago = metodoPago;
+    }
 
-#### 1. ¿Qué hizo bien el prompt?
-
-[Evalúa tu propio prompt, no la respuesta del LLM. ¿El contexto fue suficiente? ¿Las restricciones fueron claras? ¿El formato de salida que pediste ayudó a obtener una buena respuesta? ¿Qué parte de tu prompt fue más efectiva? Sé específico: menciona fragmentos concretos de tu prompt que funcionaron bien.]
-
-
-#### 2. ¿Qué se puede mejorar?
-
-[¿Qué le faltó a tu prompt? ¿Qué harías diferente si pudieras reformularlo? ¿El LLM entendió mal algo por falta de claridad en tu prompt? ¿La respuesta tiene errores u omisiones? ¿Qué no cubrió el LLM que tú sí sabes por lo visto en clase?]
-
-
-#### 3. Respuesta final
-
-[Escribe tu respuesta definitiva a la pregunta del parcial, integrando lo que aprendiste del LLM pero yendo más allá. Corrige errores, llena omisiones, conecta con conceptos vistos en clase. Esta es tu respuesta: demuestra que tú dominas el tema.]
+    public ResultadoPago procesar(Pago pago) {
+        return metodoPago.procesar(pago);
+    }
+}

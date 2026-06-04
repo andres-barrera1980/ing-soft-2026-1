@@ -4,10 +4,10 @@
 
 ---
 
-## Pregunta [XX]: [Título resumido]
+## Pregunta [P04_patrones_descuento]
 
 ### Estudiante
-- **Nombre completo**: [Tu nombre y apellido]
+- **Nombre completo**: [Alejadro Andres Perez Diaz]
 
 ---
 
@@ -15,9 +15,9 @@
 
 | Campo | Valor |
 |---|---|
-| **Nombre del LLM** | [Claude / ChatGPT / Gemini / Copilot / DeepSeek / Qwen / Mistral / Otro / **Sin IA — respuesta propia**] |
-| **Modelo específico** | [Ej: Claude Opus 4.5, GPT-4o, Gemini 2.5 Pro, etc. Si respondes sin IA, escribe "N/A"] |
-| **¿Por qué elegiste este LLM?** | [Justifica en 1-3 oraciones. Si respondes sin IA, explica por qué decidiste no usar LLM para esta pregunta.] |
+| **Nombre del LLM** | [Claude ] |
+| **Modelo específico** | [Sonet 4.6] |
+| **¿Por qué elegiste este LLM?** | [como dije antes segun yo es la mejor para analis o cosas de codigo.] |
 
 ---
 
@@ -42,8 +42,8 @@ Un buen prompt incluye:
 ### Respuesta del LLM
 
 > **Si respondiste sin IA, omite esta sección y ve directamente a Análisis crítico.**
-[Pega aquí la respuesta COMPLETA del LLM, sin editar, sin resumir.
-Incluye TODO el texto, código, explicaciones que generó el LLM.
+[Actúa como un Ingeniero de Software Senior y experto en arquitectura. 
+Considera que las estrategias de descuento pueden combinarse entre sí, por ejemplo fidelidad + temporada al mismo tiempo. Justifica si el patrón elegido soporta esa composición y descarta al menos dos patrones alternativos explicando por qué no son adecuados.
 
 Si el LLM generó código, asegúrate de que esté correctamente formateado.
 Si tuviste que hacer varias iteraciones, pega la MEJOR respuesta obtenida,
@@ -57,11 +57,13 @@ pero menciona cuántas iteraciones hiciste.]
 #### 1. ¿Qué hizo bien el prompt?
 
 [Evalúa tu propio prompt, no la respuesta del LLM. ¿El contexto fue suficiente? ¿Las restricciones fueron claras? ¿El formato de salida que pediste ayudó a obtener una buena respuesta? ¿Qué parte de tu prompt fue más efectiva? Sé específico: menciona fragmentos concretos de tu prompt que funcionaron bien.]
+-yo diria que el contexto fue suficeinte para realizar esta esta regunta y viedo la respeusta arrogaja por la ia la analise y si me parece correcta.
 
 
 #### 2. ¿Qué se puede mejorar?
 
-[¿Qué le faltó a tu prompt? ¿Qué harías diferente si pudieras reformularlo? ¿El LLM entendió mal algo por falta de claridad en tu prompt? ¿La respuesta tiene errores u omisiones? ¿Qué no cubrió el LLM que tú sí sabes por lo visto en clase?]
+[¿Qué le faltó a tu prompt? ¿Qué harías diferente si pudieras reformularlo? ¿El LLM entendió mal algo por falta de claridad en tu prompt? ¿La respuesta tiene errores u omisiones? ¿Qué no cubrió el LLM que tú sí sabes por lo visto en clase?
+-podria mejorar la parte de un mejor contexto porque le di contexto minimo.]
 
 
 #### 3. Respuesta final

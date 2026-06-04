@@ -4,10 +4,10 @@
 
 ---
 
-## Pregunta [XX]: [Título resumido]
+# Pregunta P01: Principio SOLID violado en GestorLibro
 
 ### Estudiante
-- **Nombre completo**: [Tu nombre y apellido]
+- **Nombre completo**: [Juan Camilo Gomez]
 
 ---
 
@@ -15,9 +15,9 @@
 
 | Campo | Valor |
 |---|---|
-| **Nombre del LLM** | [Claude / ChatGPT / Gemini / Copilot / DeepSeek / Qwen / Mistral / Otro / **Sin IA — respuesta propia**] |
-| **Modelo específico** | [Ej: Claude Opus 4.5, GPT-4o, Gemini 2.5 Pro, etc. Si respondes sin IA, escribe "N/A"] |
-| **¿Por qué elegiste este LLM?** | [Justifica en 1-3 oraciones. Si respondes sin IA, explica por qué decidiste no usar LLM para esta pregunta.] |
+| **Nombre del LLM** | Claude  |
+| **Modelo específico** 
+| **¿Por qué elegiste este LLM?** tenia certeza de la primera parte del principio violado, por lo cual lo hice yo, mas lo de refactoring si utilice LLM y use claude porqeu Claude tiene buen manejo de código Java y principios de ingeniería de software
 
 ---
 
@@ -26,15 +26,49 @@
 > **Si respondiste sin IA, omite esta sección y ve directamente a Análisis crítico.**
 
 ```
-[Pega aquí el prompt exacto que enviaste al LLM. 
-Incluye TODO el texto, sin editar ni resumir.
+Soy estudiante de Ingeniería de Software en la Pontificia Universidad Javeriana. 
+Estoy trabajando en el proyecto OpenLib Market, una plataforma de venta de libros digitales.
 
-Un buen prompt incluye:
-- Contexto del proyecto OpenLib Market
-- El código o situación específica
-- Lo que esperas que el LLM haga
-- Restricciones (ej: "usa Java 21", "aplica SOLID")
-- Formato de salida esperado (ej: "respuesta en markdown con código Java")]
+Analiza la siguiente clase Java del módulo de administración:
+
+public class GestorLibro {
+    public void publicarLibro(Libro libro, Usuario vendedor) {
+        // 1. Validar que el libro tenga ISBN, título y autor
+        if (libro.getIsbn() == null || libro.getTitulo() == null || libro.getAutor() == null) {
+            throw new IllegalArgumentException("Datos del libro incompletos");
+        }
+        
+        // 2. Guardar el libro en la base de datos
+        Connection conn = DriverManager.getConnection("jdbc:postgresql://localhost:5432/openlib", "admin", "pass");
+        PreparedStatement stmt = conn.prepareStatement("INSERT INTO libros (...) VALUES (...)");
+        stmt.executeUpdate();
+        
+        // 3. Generar slug para la URL
+        String slug = libro.getTitulo().toLowerCase().replace(" ", "-").replaceAll("[^a-z0-9-]", "");
+        libro.setSlug(slug);
+        
+        // 4. Enviar correo al vendedor
+        EmailService email = new EmailService("smtp.openlib.com", 587, "noreply@openlib.com", "pass123");
+        email.enviar(vendedor.getEmail(), "Libro publicado", "Tu libro '" + libro.getTitulo() + "' ha sido publicado exitosamente.");
+        
+        // 5. Registrar en log
+        Logger.getLogger("OpenLib").info("Libro publicado: " + libro.getIsbn() + " por " + vendedor.getNombre());
+        
+        // 6. Indexar para búsqueda
+        SearchIndex index = new SearchIndex("elasticsearch.openlib.com:9200");
+        index.indexar(libro);
+    }
+}
+
+Tareas:
+1. Propón un refactoring en Java 21 que corrija la violación. Usa interfaces y clases separadas donde sea necesario.
+2. Muestra cómo quedaría la clase GestorLibro después del refactoring.
+
+Restricciones:
+- Usa Java 21
+- Aplica principios SOLID correctamente
+- El código debe ser funcional y bien estructurado
+
 ```
 
 ---
@@ -42,13 +76,150 @@ Un buen prompt incluye:
 ### Respuesta del LLM
 
 > **Si respondiste sin IA, omite esta sección y ve directamente a Análisis crítico.**
-[Pega aquí la respuesta COMPLETA del LLM, sin editar, sin resumir.
-Incluye TODO el texto, código, explicaciones que generó el LLM.
+### Refactoring propuesto
 
-Si el LLM generó código, asegúrate de que esté correctamente formateado.
-Si tuviste que hacer varias iteraciones, pega la MEJOR respuesta obtenida,
-pero menciona cuántas iteraciones hiciste.]
+#### 1. Interfaz para el repositorio de libros
+
+```java
+public interface RepositorioLibro {
+    void guardar(Libro libro);
+}
 ```
+
+#### 2. Implementación con PostgreSQL
+
+```java
+public class RepositorioLibroPostgres implements RepositorioLibro {
+    @Override
+    public void guardar(Libro libro) {
+        try {
+            Connection conn = DriverManager.getConnection(
+                "jdbc:postgresql://localhost:5432/openlib", "admin", "pass");
+            PreparedStatement stmt = conn.prepareStatement("INSERT INTO libros (...) VALUES (...)");
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException("Error al guardar el libro", e);
+        }
+    }
+}
+```
+
+#### 3. Servicio de validación
+
+```java
+public class ValidadorLibro {
+    public void validar(Libro libro) {
+        if (libro.getIsbn() == null || libro.getTitulo() == null || libro.getAutor() == null) {
+            throw new IllegalArgumentException("Datos del libro incompletos");
+        }
+    }
+}
+```
+
+#### 4. Servicio de generación de slug
+
+```java
+public class GeneradorSlug {
+    public String generar(String titulo) {
+        return titulo.toLowerCase()
+                     .replace(" ", "-")
+                     .replaceAll("[^a-z0-9-]", "");
+    }
+}
+```
+
+#### 5. Interfaz para notificaciones
+
+```java
+public interface ServicioNotificacion {
+    void notificarPublicacion(Libro libro, Usuario vendedor);
+}
+```
+
+#### 6. Implementación de notificación por correo
+
+```java
+public class NotificacionEmail implements ServicioNotificacion {
+    private final String smtpHost;
+    private final int smtpPort;
+
+    public NotificacionEmail(String smtpHost, int smtpPort) {
+        this.smtpHost = smtpHost;
+        this.smtpPort = smtpPort;
+    }
+
+    @Override
+    public void notificarPublicacion(Libro libro, Usuario vendedor) {
+        EmailService email = new EmailService(smtpHost, smtpPort, "noreply@openlib.com", "pass123");
+        email.enviar(vendedor.getEmail(), "Libro publicado",
+            "Tu libro '" + libro.getTitulo() + "' ha sido publicado exitosamente.");
+    }
+}
+```
+
+#### 7. Interfaz para indexación
+
+```java
+public interface IndicesBusqueda {
+    void indexar(Libro libro);
+}
+```
+
+#### 8. Implementación con Elasticsearch
+
+```java
+public class IndiceElasticsearch implements IndicesBusqueda {
+    private final String url;
+
+    public IndiceElasticsearch(String url) {
+        this.url = url;
+    }
+
+    @Override
+    public void indexar(Libro libro) {
+        SearchIndex index = new SearchIndex(url);
+        index.indexar(libro);
+    }
+}
+```
+
+#### 9. GestorLibro refactorizado
+
+```java
+public class GestorLibro {
+    private final ValidadorLibro validador;
+    private final RepositorioLibro repositorio;
+    private final GeneradorSlug generadorSlug;
+    private final ServicioNotificacion notificacion;
+    private final IndicesBusqueda indice;
+    private final Logger logger = Logger.getLogger("OpenLib");
+
+    public GestorLibro(
+            ValidadorLibro validador,
+            RepositorioLibro repositorio,
+            GeneradorSlug generadorSlug,
+            ServicioNotificacion notificacion,
+            IndicesBusqueda indice) {
+        this.validador = validador;
+        this.repositorio = repositorio;
+        this.generadorSlug = generadorSlug;
+        this.notificacion = notificacion;
+        this.indice = indice;
+    }
+
+    public void publicarLibro(Libro libro, Usuario vendedor) {
+        validador.validar(libro);
+        repositorio.guardar(libro);
+        libro.setSlug(generadorSlug.generar(libro.getTitulo()));
+        notificacion.notificarPublicacion(libro, vendedor);
+        logger.info("Libro publicado: " + libro.getIsbn() + " por " + vendedor.getNombre());
+        indice.indexar(libro);
+    }
+}
+```
+
+Con este diseño, cada clase tiene **una sola responsabilidad** y el `GestorLibro` solo **coordina** el flujo, sin implementar ningún detalle. Cada colaborador puede cambiarse de forma independiente.
+
 
 ---
 
@@ -66,4 +237,4 @@ pero menciona cuántas iteraciones hiciste.]
 
 #### 3. Respuesta final
 
-[Escribe tu respuesta definitiva a la pregunta del parcial, integrando lo que aprendiste del LLM pero yendo más allá. Corrige errores, llena omisiones, conecta con conceptos vistos en clase. Esta es tu respuesta: demuestra que tú dominas el tema.]
+

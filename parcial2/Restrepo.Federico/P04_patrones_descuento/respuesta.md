@@ -15,9 +15,9 @@
 
 | Campo | Valor |
 |---|---|
-| **Nombre del LLM** | Claude |
-| **Modelo específico** | Claude Sonnet 4.5 |
-| **¿Por qué elegiste este LLM?** | Claude Sonnet 4.5 tiene buena capacidad de razonamiento sobre patrones de diseño y produce código Java limpio y bien estructurado. Además justifica sus decisiones de diseño con mayor profundidad que otros modelos, lo cual es clave para esta pregunta que exige descartar alternativas. |
+| **Nombre del LLM** | Gemini |
+| **Modelo específico** | Gemini 3.1 Pro |
+| **¿Por qué elegiste este LLM?** | Usé Gemini 3.1 Pro en antigravity, ya que ofrece relativamente una buena cantidad de tokens y ofrece un manejo visual de los archivos que me gusta. |
 
 ---
 

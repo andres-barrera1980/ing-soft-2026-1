@@ -403,22 +403,25 @@ REFACTOR ► Encapsulación en Libro (Tell, Don't Ask).
 
 El punto clave de TDD no es escribir tests después del código, sino dejar que **los tests dicten el diseño**: cada fallo en RED es una especificación ejecutable de lo que el sistema debe hacer.
 
-```
 
 ---
 
-### Análisis crítico de la respuesta
+#### Análisis crítico de la respuesta
 
-#### 1. ¿Qué hizo bien el prompt?
+#### 1. ¿Realmente hizo TDD o me esta tomando el pelo?
+No, no hizo TDD real. Un LLM genera todo de un solo viaje mental, asi que vio la implementacion antes de escribir los tests. Lo que hizo fue simular el proceso narrativamente, que tiene valor didactico, pero no es lo mismo que correr los tests, ver el rojo y ahi si escribir codigo.
 
-[Evalúa tu propio prompt, no la respuesta del LLM. ¿El contexto fue suficiente? ¿Las restricciones fueron claras? ¿El formato de salida que pediste ayudó a obtener una buena respuesta? ¿Qué parte de tu prompt fue más efectiva? Sé específico: menciona fragmentos concretos de tu prompt que funcionaron bien.]
+#### 2. ¿Los tests cubren todo lo que deberian?
+Mas o menos. Los casos felices estan bien pero faltan edge cases obvios como stock negativo reducir en un libro ya agotado, esos huecos son exactamente los que TDD real descubre solo.
 
+#### 3. ¿El refactor sirvio de algo o fue puro cosmetico?
+Sirvio. Mover la logica al propio Libro, los setters publicos desaparecieron y el servicio quedo delgado. Lo clave es que los 5 tests originales no se tocaron, que es exactamente la promesa del refactor.
 
-#### 2. ¿Qué se puede mejorar?
+#### 4. ¿Como cacharia que el LLM esta simulando y no aplicando TDD?
+Solo tocaria pegar los tests en un proyecto vacio y confirma que no compila. Luego agrega la Fase GREEN y verifica verde. Si en algun paso los tests referencian clases que "magicamente" ya existen, hay esta. Otra senal es que los tests esten escritos a la medida exacta de la implementacion, sin ningun caso que esta no maneje.
 
-[¿Qué le faltó a tu prompt? ¿Qué harías diferente si pudieras reformularlo? ¿El LLM entendió mal algo por falta de claridad en tu prompt? ¿La respuesta tiene errores u omisiones? ¿Qué no cubrió el LLM que tú sí sabes por lo visto en clase?]
+#### 5. ¿Que estuvo bien en el prompt?
+Definio el stack concreto, dio reglas de negocio claras, exigi el ciclo RED/GREEN/REFACTOR explicito y especifico las herramientas exactas, eso elimino casi todo el espacio para respuestas genericas.
 
-
-#### 3. Respuesta final
-
-[Escribe tu respuesta definitiva a la pregunta del parcial, integrando lo que aprendiste del LLM pero yendo más allá. Corrige errores, llena omisiones, conecta con conceptos vistos en clase. Esta es tu respuesta: demuestra que tú dominas el tema.]
+#### 6. ¿Que le falta al prompt?
+Tres cosas, pedir edge cases explicitamente, pedir que liste los errores de compilacion esperados en RED para forzar honestidad, y pedir que el refactor incluya una comparacion de dependencias antes despues para razonar el diseno de verdad.

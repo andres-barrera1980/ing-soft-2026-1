@@ -80,4 +80,41 @@ pero menciona cuántas iteraciones hiciste.]
 
 #### 3. Respuesta final
 
-[]
+[O — Open/Closed es la violación más gritada. El if/else if es la señal clásica. Cada vez que llegue un método de pago nuevo — criptomonedas ya está en el enunciado — tienes que abrir ProcesadorPago y agregar otro bloque. El código nunca está "cerrado", siempre hay que modificarlo para extenderlo.
+S — Single Responsibility también se viola porque ProcesadorPago conoce la lógica interna de tres sistemas completamente distintos: el protocolo de Visa/Mastercard, el flujo de redirección de PSE, y el OAuth de PayPal. Si PayPal cambia su API, tienes que tocar esta clase. Si PSE cambia su portal, también. Son razones de cambio independientes viviendo en el mismo lugar.
+D — Dependency Inversion se viola implícitamente porque la clase depende del string "TARJETA", "PSE", "PAYPAL" para decidir qué lógica ejecutar, en lugar de depender de una abstracción.
+-Parte de proponer un Patron de Diseño:
+La idea es crear una interfaz común y una implementación por método de pago:
+javapublic interface MetodoPago {
+    ResultadoPago procesar(Pago pago);
+}
+
+public class PagoTarjeta implements MetodoPago {
+    public ResultadoPago procesar(Pago pago) {
+        // lógica de Visa/Mastercard
+    }
+}
+
+public class PagoPSE implements MetodoPago {
+    public ResultadoPago procesar(Pago pago) {
+        // lógica de PSE
+    }
+}
+
+public class PagoPayPal implements MetodoPago {
+    public ResultadoPago procesar(Pago pago) {
+        // lógica de OAuth PayPal
+    }
+}
+
+public class ProcesadorPago {
+    private MetodoPago metodo;
+
+    public ProcesadorPago(MetodoPago metodo) {
+        this.metodo = metodo;
+    }
+
+    public ResultadoPago procesar(Pago pago) {
+        return metodo.procesar(pago);
+    }
+}]

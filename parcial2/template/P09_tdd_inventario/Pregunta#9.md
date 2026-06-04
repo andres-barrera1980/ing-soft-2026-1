@@ -240,10 +240,15 @@ Esta disciplina garantiza que la implementación esté guiada por requisitos ver
 
 #### 1. ¿Qué hizo bien el prompt?
 
-
+Restringir a la IA para que "no escriba todo el código de golpe" fue la clave del éxito. Los modelos suelen procesar el problema completo internamente y entregar la clase final junto con los tests de una sola vez, lo que arruina por completo la metodología de TDD. Al asignarle el rol de "Agile Coach enseñando a un junior" y pedirle los pasos explícitos, la forzamos a mostrar en orden lógico cómo estructurar la prueba fallida (fase Red) antes de escribir la implementación funcional (fase Green).
 
 #### 2. ¿Qué se puede mejorar?
 
+Aunque el modelo ejecutó mecánicamente bien el ciclo de TDD, cometió un par de errores operativos que no pasarían una revisión técnica:
 
+Primero, introdujo un fallo de idempotencia (el bug del spam). En la fase Green, la lógica indica que si el stock baja a cero, el libro pasa a estado AGOTADO y se dispara una notificación. Pero si el libro ya estaba AGOTADO y se guarda otro cambio (por ejemplo, se actualiza el precio), el sistema volverá a enviar la alerta al vendedor. La IA omitió un ciclo Red/Green crítico: validar que la notificación únicamente se envíe si el estado anterior era DISPONIBLE.
+
+Segundo, realizó un refactoring sin valor estructural. Durante la fase Refactor, el modelo simplemente encapsuló los métodos setter nativos de Java dentro de métodos privados (por ejemplo, meter libro.setEstado(AGOTADO) en un método marcarComoAgotado()). Esto es una práctica de sobre-ingeniería que no soluciona ningún problema de diseño, solo añade una indirección innecesaria. Un rediseño correcto bajo el enfoque de dominio rico (Rich Domain Model) hubiera trasladado la lógica de cambio de estado hacia adentro de la entidad Libro.
 
 #### 3. Respuesta final
+ El documento generado por el LLM sirve como una excelente guía teórica de TDD: demuestra cómo empezar con una prueba que ni siquiera compila (Red), programar el código mínimo indispensable para pasar la validación (Green), iterar sobre nuevos requisitos, y limpiar la estructura (Refactor). Comprender esta disciplina garantiza que el código de producción nazca completamente respaldado por pruebas. Sin embargo, para un proyecto real de la carrera, yo añadiría la iteración que el modelo ignoró para frenar el envío duplicado de notificaciones

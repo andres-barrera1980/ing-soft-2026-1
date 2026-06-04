@@ -4,10 +4,10 @@
 
 ---
 
-## Pregunta [XX]: [Título resumido]
+## Pregunta [P05_patron_notificaciones]
 
 ### Estudiante
-- **Nombre completo**: [Tu nombre y apellido]
+- **Nombre completo**: [Alejandro Andres Perez Diaz]
 
 ---
 
@@ -15,9 +15,9 @@
 
 | Campo | Valor |
 |---|---|
-| **Nombre del LLM** | [Claude / ChatGPT / Gemini / Copilot / DeepSeek / Qwen / Mistral / Otro / **Sin IA — respuesta propia**] |
-| **Modelo específico** | [Ej: Claude Opus 4.5, GPT-4o, Gemini 2.5 Pro, etc. Si respondes sin IA, escribe "N/A"] |
-| **¿Por qué elegiste este LLM?** | [Justifica en 1-3 oraciones. Si respondes sin IA, explica por qué decidiste no usar LLM para esta pregunta.] |
+| **Nombre del LLM** | [Claude] |
+| **Modelo específico** | [sonet 4.6] |
+| **¿Por qué elegiste este LLM?** | [Mejor ia opinion personal] |
 
 ---
 
@@ -26,8 +26,7 @@
 > **Si respondiste sin IA, omite esta sección y ve directamente a Análisis crítico.**
 
 ```
-[Pega aquí el prompt exacto que enviaste al LLM. 
-Incluye TODO el texto, sin editar ni resumir.
+[Actúa como Ingeniero de Software Senior. Diseña e implementa el sistema de notificaciones de OpenLib Market cuando un libro agotado vuelve a estar disponible. El sistema debe notificar por email a usuarios de wishlist, enviar push a favoritos, actualizar caché Redis y registrar en log de auditoría. Usa dos patrones de diseño combinados de los vistos en clase, justifica por qué los elegiste y descarta al menos una alternativa. Incluye el  diagrama de clases , código Java de las clases principales.
 
 Un buen prompt incluye:
 - Contexto del proyecto OpenLib Market
@@ -42,8 +41,83 @@ Un buen prompt incluye:
 ### Respuesta del LLM
 
 > **Si respondiste sin IA, omite esta sección y ve directamente a Análisis crítico.**
-[Pega aquí la respuesta COMPLETA del LLM, sin editar, sin resumir.
-Incluye TODO el texto, código, explicaciones que generó el LLM.
+[Los dos patrones: Observer + Factory Method
+javapublic interface ObservadorLibro {
+    void actualizar(Libro libro);
+}
+
+public class Libro {
+    private List<ObservadorLibro> observadores = new ArrayList<>();
+    private boolean disponible;
+
+    public void registrar(ObservadorLibro o) {
+        observadores.add(o);
+    }
+
+    public void desregistrar(ObservadorLibro o) {
+        observadores.remove(o);
+    }
+
+    public void setDisponible(boolean disponible) {
+        this.disponible = disponible;
+        if (disponible) notificar();
+    }
+
+    private void notificar() {
+        for (ObservadorLibro o : observadores) {
+            try {
+                o.actualizar(this);
+            } catch (Exception e) {
+                Logger.getLogger("OpenLib").warning("Fallo en observador: " + e.getMessage());
+            }
+        }
+    }
+}
+javapublic class NotificadorEmail implements ObservadorLibro {
+    public void actualizar(Libro libro) {
+        // enviar email a usuarios de wishlist
+        System.out.println("Email enviado: " + libro.getTitulo());
+    }
+}
+
+public class NotificadorPush implements ObservadorLibro {
+    public void actualizar(Libro libro) {
+        // enviar push a favoritos
+        System.out.println("Push enviado: " + libro.getTitulo());
+    }
+}
+
+public class ActualizadorCache implements ObservadorLibro {
+    public void actualizar(Libro libro) {
+        // actualizar Redis
+        System.out.println("Cache actualizada: " + libro.getTitulo());
+    }
+}
+
+public class RegistradorLog implements ObservadorLibro {
+    public void actualizar(Libro libro) {
+        System.out.println("Log registrado: " + libro.getTitulo());
+    }
+}
+Factory Method:
+javapublic abstract class NotificadorFactory {
+    public abstract ObservadorLibro crearNotificador();
+}
+
+public class EmailFactory extends NotificadorFactory {
+    public ObservadorLibro crearNotificador() {
+        return new NotificadorEmail();
+    }
+}
+
+public class PushFactory extends NotificadorFactory {
+    public ObservadorLibro crearNotificador() {
+        return new NotificadorPush();
+    }
+}
+Diagrama:
+![alt text](image-2.png)
+.
 
 Si el LLM generó código, asegúrate de que esté correctamente formateado.
 Si tuviste que hacer varias iteraciones, pega la MEJOR respuesta obtenida,
@@ -54,16 +128,4 @@ pero menciona cuántas iteraciones hiciste.]
 
 ### Análisis crítico de la respuesta
 
-#### 1. ¿Qué hizo bien el prompt?
 
-[Evalúa tu propio prompt, no la respuesta del LLM. ¿El contexto fue suficiente? ¿Las restricciones fueron claras? ¿El formato de salida que pediste ayudó a obtener una buena respuesta? ¿Qué parte de tu prompt fue más efectiva? Sé específico: menciona fragmentos concretos de tu prompt que funcionaron bien.]
-
-
-#### 2. ¿Qué se puede mejorar?
-
-[¿Qué le faltó a tu prompt? ¿Qué harías diferente si pudieras reformularlo? ¿El LLM entendió mal algo por falta de claridad en tu prompt? ¿La respuesta tiene errores u omisiones? ¿Qué no cubrió el LLM que tú sí sabes por lo visto en clase?]
-
-
-#### 3. Respuesta final
-
-[Escribe tu respuesta definitiva a la pregunta del parcial, integrando lo que aprendiste del LLM pero yendo más allá. Corrige errores, llena omisiones, conecta con conceptos vistos en clase. Esta es tu respuesta: demuestra que tú dominas el tema.]

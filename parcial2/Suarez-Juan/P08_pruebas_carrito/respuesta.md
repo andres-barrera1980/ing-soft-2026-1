@@ -4,10 +4,10 @@
 
 ---
 
-## Pregunta [XX]: [Título resumido]
+## Pregunta [08]: Pruebas del carrito
 
 ### Estudiante
-- **Nombre completo**: [Tu nombre y apellido]
+- **Nombre completo**: Juan Pablo Suarez Moreno
 
 ---
 
@@ -16,8 +16,8 @@
 | Campo | Valor |
 |---|---|
 | **Nombre del LLM** | Gemini |
-| **Modelo específico** | [Ej: Claude Opus 4.5, GPT-4o, Gemini 2.5 Pro, etc. Si respondes sin IA, escribe "N/A"] |
-| **¿Por qué elegiste este LLM?** | [Justifica en 1-3 oraciones. Si respondes sin IA, explica por qué decidiste no usar LLM para esta pregunta.] |
+| **Modelo específico** | Gemini 3.5|
+| **¿Por qué elegiste este LLM?** | Tiene una capacidad de razonamiento amplia ademas de conectarse con Google para buscar informacion relevante |
 
 ---
 

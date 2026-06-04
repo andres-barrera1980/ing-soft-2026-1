@@ -4,10 +4,10 @@
 
 ---
 
-## Pregunta [XX]: [Título resumido]
+# Pregunta P04: Patrón de diseño para estrategias de descuento
 
 ### Estudiante
-- **Nombre completo**: [Tu nombre y apellido]
+- **Nombre completo**: Juan Camilo Gomez
 
 ---
 
@@ -15,40 +15,180 @@
 
 | Campo | Valor |
 |---|---|
-| **Nombre del LLM** | [Claude / ChatGPT / Gemini / Copilot / DeepSeek / Qwen / Mistral / Otro / **Sin IA — respuesta propia**] |
-| **Modelo específico** | [Ej: Claude Opus 4.5, GPT-4o, Gemini 2.5 Pro, etc. Si respondes sin IA, escribe "N/A"] |
-| **¿Por qué elegiste este LLM?** | [Justifica en 1-3 oraciones. Si respondes sin IA, explica por qué decidiste no usar LLM para esta pregunta.] |
+| **Nombre del LLM** | Claude |
+| **Modelo específico** | Claude Sonnet 4.6 |
+| **¿Por qué elegiste este LLM?** | La pregunta requiere justificar la elección de un patrón y descartar alternativas, lo que exige razonamiento comparativo.
 
 ---
 
 ### Prompt utilizado
 
-> **Si respondiste sin IA, omite esta sección y ve directamente a Análisis crítico.**
+Soy estudiante de Ingeniería de Software en la Pontificia Universidad Javeriana.
+Proyecto: OpenLib Market, plataforma de venta de libros digitales en Colombia.
 
-```
-[Pega aquí el prompt exacto que enviaste al LLM. 
-Incluye TODO el texto, sin editar ni resumir.
+OpenLib Market necesita aplicar diferentes estrategias de descuento:
+- Descuento por fidelidad: 10% para compradores con más de 5 compras
+- Descuento por temporada: 15% en la semana del libro
+- Descuento por volumen: 5% si el carrito supera $200,000 COP
+- Sin descuento: precio normal
+- IMPORTANTE: las estrategias pueden combinarse (ej: cliente fiel en semana del libro = 10% + 15%)
 
-Un buen prompt incluye:
-- Contexto del proyecto OpenLib Market
-- El código o situación específica
-- Lo que esperas que el LLM haga
-- Restricciones (ej: "usa Java 21", "aplica SOLID")
-- Formato de salida esperado (ej: "respuesta en markdown con código Java")]
+El precio final se calcula dinámicamente según la fecha, el perfil del usuario y el contenido del carrito.
+
+Tareas:
+1. Identifica qué patrón de diseño de los vistos en clase (Singleton, Factory, Observer, Strategy, Decorator, Command, Template Method) es el más adecuado para este escenario.
+2. Justifica por qué ese patrón.
+3. Descarta explícitamente al menos otras dos alternativas, explicando por qué no son adecuadas.
+4. Propón una implementación completa en Java 21 con: interfaces, clases concretas, y un ejemplo de uso que muestre descuentos combinados.
+
+Restricciones:
+- Java 21
+- El diseño debe permitir combinar múltiples descuentos
+- El diseño debe permitir agregar nuevas estrategias sin modificar código existente
+- Responde en markdown con bloques de código Java
 ```
 
 ---
 
 ### Respuesta del LLM
 
-> **Si respondiste sin IA, omite esta sección y ve directamente a Análisis crítico.**
-[Pega aquí la respuesta COMPLETA del LLM, sin editar, sin resumir.
-Incluye TODO el texto, código, explicaciones que generó el LLM.
+## Patrón para estrategias de descuento en OpenLib Market
 
-Si el LLM generó código, asegúrate de que esté correctamente formateado.
-Si tuviste que hacer varias iteraciones, pega la MEJOR respuesta obtenida,
-pero menciona cuántas iteraciones hiciste.]
+### Patrón elegido: Strategy + Composite
+
+El escenario requiere dos capacidades:
+1. Encapsular algoritmos de descuento intercambiables → **Strategy**
+2. Combinar múltiples descuentos como si fueran uno solo → **Composite** (o una lista de strategies aplicadas en cadena)
+
+### Alternativas descartadas
+
+**Template Method**: Define el esqueleto de un algoritmo en una clase base y permite que las subclases sobreescriban pasos específicos. El problema es que usa herencia, no composición, lo que dificulta combinar descuentos en tiempo de ejecución. No se puede "mezclar" un `DescuentoFidelidad` con un `DescuentoTemporada` fácilmente.
+
+**Decorator**: Parecería viable porque permite agregar comportamiento en capas, pero su propósito es agregar responsabilidades a un objeto individual, no aplicar algoritmos alternativos sobre el mismo dato. Además, el orden en que se aplican los decoradores afecta el resultado de formas inesperadas.
+
+---
+
+### Implementación
+
+```java
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.LocalDate;
+import java.util.List;
+
+// Abstracción Strategy
+public interface EstrategiaDescuento {
+    BigDecimal calcularDescuento(BigDecimal precioBase, Carrito carrito, Usuario usuario);
+    String getNombre();
+}
 ```
+
+```java
+// Estrategia 1: Descuento por fidelidad
+public class DescuentoFidelidad implements EstrategiaDescuento {
+    private static final BigDecimal PORCENTAJE = new BigDecimal("0.10");
+    private static final int MIN_COMPRAS = 5;
+
+    @Override
+    public BigDecimal calcularDescuento(BigDecimal precioBase, Carrito carrito, Usuario usuario) {
+        if (usuario.getTotalCompras() > MIN_COMPRAS) {
+            return precioBase.multiply(PORCENTAJE).setScale(2, RoundingMode.HALF_UP);
+        }
+        return BigDecimal.ZERO;
+    }
+
+    @Override
+    public String getNombre() { return "Descuento por fidelidad (10%)"; }
+}
+```
+
+```java
+// Estrategia 2: Descuento por temporada
+public class DescuentoTemporada implements EstrategiaDescuento {
+    private static final BigDecimal PORCENTAJE = new BigDecimal("0.15");
+    private final LocalDate inicioSemanaLibro;
+    private final LocalDate finSemanaLibro;
+
+    public DescuentoTemporada(LocalDate inicio, LocalDate fin) {
+        this.inicioSemanaLibro = inicio;
+        this.finSemanaLibro = fin;
+    }
+
+    @Override
+    public BigDecimal calcularDescuento(BigDecimal precioBase, Carrito carrito, Usuario usuario) {
+        LocalDate hoy = LocalDate.now();
+        if (!hoy.isBefore(inicioSemanaLibro) && !hoy.isAfter(finSemanaLibro)) {
+            return precioBase.multiply(PORCENTAJE).setScale(2, RoundingMode.HALF_UP);
+        }
+        return BigDecimal.ZERO;
+    }
+
+    @Override
+    public String getNombre() { return "Descuento por temporada (15%)"; }
+}
+```
+
+```java
+// Estrategia 3: Descuento por volumen
+public class DescuentoVolumen implements EstrategiaDescuento {
+    private static final BigDecimal PORCENTAJE = new BigDecimal("0.05");
+    private static final BigDecimal MINIMO_CARRITO = new BigDecimal("200000");
+
+    @Override
+    public BigDecimal calcularDescuento(BigDecimal precioBase, Carrito carrito, Usuario usuario) {
+        if (carrito.getTotal().compareTo(MINIMO_CARRITO) > 0) {
+            return precioBase.multiply(PORCENTAJE).setScale(2, RoundingMode.HALF_UP);
+        }
+        return BigDecimal.ZERO;
+    }
+
+    @Override
+    public String getNombre() { return "Descuento por volumen (5%)"; }
+}
+```
+
+```java
+// CalculadorDescuentos: aplica todas las estrategias activas y las suma
+public class CalculadorDescuentos {
+    private final List<EstrategiaDescuento> estrategias;
+
+    public CalculadorDescuentos(List<EstrategiaDescuento> estrategias) {
+        this.estrategias = estrategias;
+    }
+
+    public BigDecimal calcularPrecioFinal(BigDecimal precioBase, Carrito carrito, Usuario usuario) {
+        BigDecimal totalDescuento = estrategias.stream()
+            .map(e -> e.calcularDescuento(precioBase, carrito, usuario))
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        // El descuento total no puede superar el precio base
+        if (totalDescuento.compareTo(precioBase) > 0) totalDescuento = precioBase;
+
+        return precioBase.subtract(totalDescuento).setScale(2, RoundingMode.HALF_UP);
+    }
+}
+```
+
+```java
+// Ejemplo de uso con descuentos combinados
+public class EjemploUso {
+    public static void main(String[] args) {
+        List<EstrategiaDescuento> estrategias = List.of(
+            new DescuentoFidelidad(),
+            new DescuentoTemporada(LocalDate.of(2026, 4, 20), LocalDate.of(2026, 4, 27)),
+            new DescuentoVolumen()
+        );
+
+        CalculadorDescuentos calculador = new CalculadorDescuentos(estrategias);
+        BigDecimal precioFinal = calculador.calcularPrecioFinal(
+            new BigDecimal("250000"), carrito, usuarioFiel
+        );
+        // Un cliente fiel con carrito > $200k en semana del libro:
+        // Descuento = 10% + 15% + 5% = 30% → precio final: $175,000 COP
+    }
+}
+```
+
 
 ---
 
@@ -56,12 +196,11 @@ pero menciona cuántas iteraciones hiciste.]
 
 #### 1. ¿Qué hizo bien el prompt?
 
-[Evalúa tu propio prompt, no la respuesta del LLM. ¿El contexto fue suficiente? ¿Las restricciones fueron claras? ¿El formato de salida que pediste ayudó a obtener una buena respuesta? ¿Qué parte de tu prompt fue más efectiva? Sé específico: menciona fragmentos concretos de tu prompt que funcionaron bien.]
+
 
 
 #### 2. ¿Qué se puede mejorar?
 
-[¿Qué le faltó a tu prompt? ¿Qué harías diferente si pudieras reformularlo? ¿El LLM entendió mal algo por falta de claridad en tu prompt? ¿La respuesta tiene errores u omisiones? ¿Qué no cubrió el LLM que tú sí sabes por lo visto en clase?]
 
 
 #### 3. Respuesta final

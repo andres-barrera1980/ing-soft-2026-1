@@ -17,7 +17,7 @@
 |---|---|
 | **Nombre del LLM** | Antigravity (Gemini 3.1 Pro High) |
 | **Modelo específico** | Gemini 3.1 Pro (High) |
-| **¿Por qué elegiste este LLM?** | Por sugerencia de la guía y facilidad para integrar mi flujo de trabajo directamente en el IDE Antigravity. |
+| **¿Por qué elegiste este LLM?** | Elegi este modelo por comodidad propia y debido a que tengo pago gemini pro y ya tengo todo bien organizado para los diferentes trabajos |
 
 ---
 
@@ -163,13 +163,17 @@ public class ProcesadorPago {
 #### 1. ¿Qué hizo bien el prompt?
 
 [Evalúa tu propio prompt, no la respuesta del LLM. ¿El contexto fue suficiente? ¿Las restricciones fueron claras? ¿El formato de salida que pediste ayudó a obtener una buena respuesta? ¿Qué parte de tu prompt fue más efectiva? Sé específico: menciona fragmentos concretos de tu prompt que funcionaron bien.]
+El promt tiene un correcto uso de contexto y el comportamiento que debe utilizar, las restricciones se dejaron correctamente al final del promt para asegurar que el modelo no omitiera estas restricciones y la parte mas efectiva de mi promt fue el paso a paso de lo que necesitaba que realizara. Como por ejemplo: "Necesito que:
+1. Identifiques qué principios SOLID se están violando (detalla al menos dos y explica por qué).
+2. Propongas un refactoring completo utilizando el patrón de diseño más apropiado para eliminar los condicionales `if/else` y hacer el sistema extensible.
+3. Generes el código Java refactorizado (incluye la interfaz, las implementaciones concretas y la clase de contexto/fábrica)."
 
 
 #### 2. ¿Qué se puede mejorar?
 
-[¿Qué le faltó a tu prompt? ¿Qué harías diferente si pudieras reformularlo? ¿El LLM entendió mal algo por falta de claridad en tu prompt? ¿La respuesta tiene errores u omisiones? ¿Qué no cubrió el LLM que tú sí sabes por lo visto en clase?]
+Se puede mejorar el contexto dado al modelo para que tenga mas informacion de donde salen las cosas ademas de detallar mas tanto las restricciones como el codigo en si que debe modificar y lo necesario que debe permanecer.
 
 
 #### 3. Respuesta final
 
-[Escribe tu respuesta definitiva a la pregunta del parcial, integrando lo que aprendiste del LLM pero yendo más allá. Corrige errores, llena omisiones, conecta con conceptos vistos en clase. Esta es tu respuesta: demuestra que tú dominas el tema.]
+En conclusión, el modelo me ayudó a comprender con más detalle varios aspectos que posiblemente habría pasado por alto. Sin embargo, la falta de contexto provocó algunas omisiones en el código, especialmente en relación con otros componentes del sistema que podrían haberse tenido en cuenta para lograr una implementación más completa.

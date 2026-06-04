@@ -128,4 +128,30 @@ pero menciona cuántas iteraciones hiciste.]
 
 ### Análisis crítico de la respuesta
 
+1.)De los princios SOLID se esta violado la s que es la responsabilidad unica que basicamente se viola ya que en este codigo se etan haciendo demaciadas cosas tiene mas de una responsabildiad ya que este guarda libro,valida el libro etc coclusion no cumple con loq ue ice su nombre unica resposabildiad  ademas de violar el patron de Single Responsability. 
 
+
+
+#### 1. ¿Qué hizo bien el prompt?
+
+[Evalúa tu propio prompt, no la respuesta del LLM. ¿El contexto fue suficiente? ¿Las restricciones fueron claras? ¿El formato de salida que pediste ayudó a obtener una buena respuesta? ¿Qué parte de tu prompt fue más efectiva? Sé específico: menciona fragmentos concretos de tu prompt que funcionaron bien.
+-El contexto siento que fue claro ademas eto ayudoq a que la ia generara una buena repuesta]
+
+
+#### 2. ¿Qué se puede mejorar?
+
+[¿Qué le faltó a tu prompt?
+-To diria que nada proque segun yo quedo bien
+ ¿Qué harías diferente si pudieras reformularlo?
+ -nada porque segun lo que analise esta bien
+  ¿El LLM entendió mal algo por falta de claridad en tu prompt?
+  -NO
+   ¿La respuesta tiene errores u omisiones?
+   -si creo que el seudo patron no fue explicado del todo
+    ¿Qué no cubrió el LLM que tú sí sabes por lo visto en clase?
+    -si los cubrio todos los atrones con justiicacin , el diagrama etc]
+
+
+#### 3. Respuesta final
+
+[Lo más importante del diseño es el manejo de fallos. si una notificación falla las demás siguen funcionando. El Factory Method lo cambiaría por Strategy porque está  forzado en este escenario."]

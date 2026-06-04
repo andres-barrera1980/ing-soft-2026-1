@@ -4,10 +4,10 @@
 
 ---
 
-## Pregunta [XX]: [Título resumido]
+## Pregunta [P012_ciclo_Vida_defectos]
 
 ### Estudiante
-- **Nombre completo**: [Tu nombre y apellido]
+- **Nombre completo**: [Alejandro Andres Perez Diaz]
 
 ---
 
@@ -15,9 +15,9 @@
 
 | Campo | Valor |
 |---|---|
-| **Nombre del LLM** | [Claude / ChatGPT / Gemini / Copilot / DeepSeek / Qwen / Mistral / Otro / **Sin IA — respuesta propia**] |
-| **Modelo específico** | [Ej: Claude Opus 4.5, GPT-4o, Gemini 2.5 Pro, etc. Si respondes sin IA, escribe "N/A"] |
-| **¿Por qué elegiste este LLM?** | [Justifica en 1-3 oraciones. Si respondes sin IA, explica por qué decidiste no usar LLM para esta pregunta.] |
+| **Nombre del LLM** | [**Sin IA — respuesta propia**] |
+| **Modelo específico** | [ "N/A"] |
+| **¿Por qué elegiste este LLM?** | [porque tambien tengo lo que hablamos de este tema en el cuaderno ademas que e sun tema qu comprendi bien.] |
 
 ---
 
@@ -66,4 +66,10 @@ pero menciona cuántas iteraciones hiciste.]
 
 #### 3. Respuesta final
 
-[Escribe tu respuesta definitiva a la pregunta del parcial, integrando lo que aprendiste del LLM pero yendo más allá. Corrige errores, llena omisiones, conecta con conceptos vistos en clase. Esta es tu respuesta: demuestra que tú dominas el tema.]
+[El defecto pasa por estos estados:
+Nuevo — el tester lo reporta en Jira con los pasos descritos
+Asignado — el lider tecnico se lo asigna al dev del modulo de carrito
+En progreso — el dev revisa el codigo y encuentra que el limite real es 10 items no 5 entonces hay un bug en el frontend que esta validando diferente al backend
+Resuelto — el dev corrige el bug y sube el fix
+Verificado — el tester repite los mismos pasos y confirma que ya funciona
+Cerrado — se cierra el defecto]

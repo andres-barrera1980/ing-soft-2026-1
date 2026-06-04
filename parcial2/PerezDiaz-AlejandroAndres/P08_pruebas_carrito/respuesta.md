@@ -167,14 +167,31 @@ pero menciona cuántas iteraciones hiciste.]
 
 #### 1. ¿Qué hizo bien el prompt?
 
-[Evalúa tu propio prompt, no la respuesta del LLM. ¿El contexto fue suficiente? ¿Las restricciones fueron claras? ¿El formato de salida que pediste ayudó a obtener una buena respuesta? ¿Qué parte de tu prompt fue más efectiva? Sé específico: menciona fragmentos concretos de tu prompt que funcionaron bien.]
+[Evalúa tu propio prompt, no la respuesta del LLM. ¿El contexto fue suficiente?
+-Yo diria que si 
+ ¿Las restricciones fueron claras?
+ -si la verdad e este pormt siento que si fue espesifico con lo que queria 
+  ¿El formato de salida que pediste ayudó a obtener una buena respuesta? 
+  -si
+  ¿Qué parte de tu prompt fue más efectiva?
+  -La parte más efectiva fue listar explícitamente los casos borde como carrito vacío, carrito lleno con 10 ítems. 
+   Sé específico: menciona fragmentos concretos de tu prompt que funcionaron bien.]
 
 
 #### 2. ¿Qué se puede mejorar?
 
-[¿Qué le faltó a tu prompt? ¿Qué harías diferente si pudieras reformularlo? ¿El LLM entendió mal algo por falta de claridad en tu prompt? ¿La respuesta tiene errores u omisiones? ¿Qué no cubrió el LLM que tú sí sabes por lo visto en clase?]
+[¿Qué le faltó a tu prompt?
+-Depronto mas contexto ni ida proque se que no quedo perfecto
+ ¿Qué harías diferente si pudieras reformularlo?
+ -añadirme mas contexto  o nose porque la respuesta que me dio que analise esta bien 
+  ¿El LLM entendió mal algo por falta de claridad en tu prompt? 
+  -si porque se nota al moemnte de debolver la respuesta 
+  ¿La respuesta tiene errores u omisiones? 
+  -no
+  ¿Qué no cubrió el LLM que tú sí sabes por lo visto en clase?
+  -segun todo lo cubriocasi todo a excepcion de pronto no cumpla con algunos patrones ]
 
 
 #### 3. Respuesta final
 
-[Escribe tu respuesta definitiva a la pregunta del parcial, integrando lo que aprendiste del LLM pero yendo más allá. Corrige errores, llena omisiones, conecta con conceptos vistos en clase. Esta es tu respuesta: demuestra que tú dominas el tema.]
+[Las pruebas unitarias de CarritoService cubren todos los métodos y casos para simular RepositorioLibro sin necesitar infraestructura real. El caso más importante que la IA no cubrió es agregar un ítem que ya existe cuando el carrito está lleno — ese caso no debe lanzar excepción porque la regla aplica solo para ítems nuevos.]

@@ -1,13 +1,7 @@
-# Plantilla de entrega — Parcial 2
-
-> **Instrucción**: Copia esta plantilla para cada pregunta del parcial. Reemplaza `[Pregunta XX]` por el identificador correcto (ej: `P01_solid_srp`) y completa todas las secciones. Haz al menos 2 commits por pregunta: uno con el prompt + respuesta del LLM, y otro con el análisis.
-
----
-
-## Pregunta [XX]: [Título resumido]
+# Pregunta P06: Clean Architecture — Análisis de capas y regla de dependencia
 
 ### Estudiante
-- **Nombre completo**: [Tu nombre y apellido]
+- **Nombre completo**: Juan Camilo Gomez
 
 ---
 
@@ -15,55 +9,62 @@
 
 | Campo | Valor |
 |---|---|
-| **Nombre del LLM** | [Claude / ChatGPT / Gemini / Copilot / DeepSeek / Qwen / Mistral / Otro / **Sin IA — respuesta propia**] |
-| **Modelo específico** | [Ej: Claude Opus 4.5, GPT-4o, Gemini 2.5 Pro, etc. Si respondes sin IA, escribe "N/A"] |
-| **¿Por qué elegiste este LLM?** | [Justifica en 1-3 oraciones. Si respondes sin IA, explica por qué decidiste no usar LLM para esta pregunta.] |
-
----
-
-### Prompt utilizado
-
-> **Si respondiste sin IA, omite esta sección y ve directamente a Análisis crítico.**
-
-```
-[Pega aquí el prompt exacto que enviaste al LLM. 
-Incluye TODO el texto, sin editar ni resumir.
-
-Un buen prompt incluye:
-- Contexto del proyecto OpenLib Market
-- El código o situación específica
-- Lo que esperas que el LLM haga
-- Restricciones (ej: "usa Java 21", "aplica SOLID")
-- Formato de salida esperado (ej: "respuesta en markdown con código Java")]
-```
-
----
-
-### Respuesta del LLM
-
-> **Si respondiste sin IA, omite esta sección y ve directamente a Análisis crítico.**
-[Pega aquí la respuesta COMPLETA del LLM, sin editar, sin resumir.
-Incluye TODO el texto, código, explicaciones que generó el LLM.
-
-Si el LLM generó código, asegúrate de que esté correctamente formateado.
-Si tuviste que hacer varias iteraciones, pega la MEJOR respuesta obtenida,
-pero menciona cuántas iteraciones hiciste.]
-```
+| **Nombre del LLM** | Sin IA — respuesta propia |
+| **Modelo específico** | N/A |
+| **¿Por qué elegiste este LLM?** para ganarme el bono
 
 ---
 
 ### Análisis crítico de la respuesta
 
-#### 1. ¿Qué hizo bien el prompt?
-
-[Evalúa tu propio prompt, no la respuesta del LLM. ¿El contexto fue suficiente? ¿Las restricciones fueron claras? ¿El formato de salida que pediste ayudó a obtener una buena respuesta? ¿Qué parte de tu prompt fue más efectiva? Sé específico: menciona fragmentos concretos de tu prompt que funcionaron bien.]
-
-
-#### 2. ¿Qué se puede mejorar?
-
-[¿Qué le faltó a tu prompt? ¿Qué harías diferente si pudieras reformularlo? ¿El LLM entendió mal algo por falta de claridad en tu prompt? ¿La respuesta tiene errores u omisiones? ¿Qué no cubrió el LLM que tú sí sabes por lo visto en clase?]
-
-
 #### 3. Respuesta final
 
-[Escribe tu respuesta definitiva a la pregunta del parcial, integrando lo que aprendiste del LLM pero yendo más allá. Corrige errores, llena omisiones, conecta con conceptos vistos en clase. Esta es tu respuesta: demuestra que tú dominas el tema.]
+## Clean Architecture: capas, regla de dependencia y comparación con arquitectura tradicional
+
+### Las cuatro capas
+
+1. Entities 
+Contienen las reglas de negocio empresariales mas generales. Son independientes de cualquier framework, base de datos o interfaz. En OpenLib Market: `Libro`, `Usuario`, `Carrito`, `Orden`, `Pago`. Estas clases existen incluso si el sistema no tiene base de datos ni API.
+
+2. Use Cases 
+Contienen la logica de negocio específica de la aplicacion. Orquestan el flujo de datos hacia y desde las entidades. En OpenLib Market: `PublicarLibroUseCase`, `ProcesarPagoUseCase`, `AgregarAlCarritoUseCase`. 
+
+3. Interface Adapters 
+Convierten datos entre el formato más conveniente para los casos de uso y el formato más conveniente para agentes externos . En OpenLib Market: `LibroController` , `LibroRepositorioPostgres`, `LibroPresenter` . Aquí viven los Controllers, Gateways y Presenters.
+
+4. Frameworks & Drivers 
+La capa más externa. Frameworks, bases de datos, servidores web. En OpenLib Market: Spring Boot, PostgreSQL, Elasticsearch, JavaFX, EmailService. Esta capa es la más propensa a cambiar.
+
+---
+
+### La Regla de Dependencia
+
+Las dependencias en el código fuente solo pueden apuntar hacia adentro. Nada en una capa interna puede conocer algo de una capa externa.
+
+
+Esto significa:
+- PublicarLibroUseCase nunca importa una clase de Spring Boot ni de JDBC.
+- Libro no conoce ni LibroController ni LibroRepositorioPostgres.
+- LibroRepositorioPostgres depende de una interfaz RepositorioLibro definida en la capa de Use Cases, no al revés.
+
+---
+
+### Inversión de Dependencia en los límites entre capas
+
+En el límite entre Use Cases e Interface Adapters, la regla de dependencia parece generar un problema: el caso de uso necesita guardar datos , pero el repositorio está en una capa externa. La solución es el Dependency Inversion Principle
+
+El flujo de control va de afuera hacia adentro, pero la dependencia de código fuente va de afuera hacia adentro también: LibroRepositorioPostgres depende de RepositorioLibro, que está en Use Cases. Use Cases NO conoce a LibroRepositorioPostgres.
+
+---
+
+### Comparación con arquitectura en capas tradicional
+
+| Aspecto | Arquitectura tradicional | Clean Architecture |
+
+| **Capas** | Presentación → Lógica → Datos | Entities → Use Cases → Adapters → Frameworks |
+| **Dirección dependencias** | Cualquier direccion | Siempre hacia adentro  |
+| **Base de datos** | Centro del diseño (se diseña el schema primero) | Detalle de implementación (capa más externa) |
+| **Testeabilidad** | Difícil  | Alta |
+| **Cambio de BD** | Afecta multiples capas | Solo afecta la implementación del repositorio |
+| **Frameworks** | Fundamentales  | Reemplazables sin tocar la logica de negocio |
+

@@ -15,9 +15,9 @@
 
 | Campo | Valor |
 |---|---|
-| **Nombre del LLM** | Claude |
-| **Modelo específico** | Claude Sonnet 4.5 |
-| **¿Por qué elegiste este LLM?** | Claude tiene buena comprensión de conceptos arquitectónicos como Clean Architecture y explica la regla de dependencia con claridad, además de generar ejemplos concretos del dominio sin inventar cosas fuera de contexto. |
+| **Nombre del LLM** | Gemini |
+| **Modelo específico** | Gemini 3.1 Pro |
+| **¿Por qué elegiste este LLM?** | Usé Gemini 3.1 Pro en antigravity, ya que ofrece relativamente una buena cantidad de tokens y ofrece un manejo visual de los archivos que me gusta. |
 
 ---
 

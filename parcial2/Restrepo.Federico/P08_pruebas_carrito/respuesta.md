@@ -15,9 +15,9 @@
 
 | Campo | Valor |
 |---|---|
-| **Nombre del LLM** | Claude |
-| **Modelo específico** | Claude Sonnet 4.5 |
-| **¿Por qué elegiste este LLM?** | Claude genera pruebas unitarias completas con JUnit 5 y Mockito con buena cobertura de casos borde, y entiende la lógica de negocio del código que se le proporciona sin inventar comportamientos que no están en el código. |
+| **Nombre del LLM** | Gemini |
+| **Modelo específico** | Gemini 3.1 Pro |
+| **¿Por qué elegiste este LLM?** | Usé Gemini 3.1 Pro en antigravity, ya que ofrece relativamente una buena cantidad de tokens y ofrece un manejo visual de los archivos que me gusta. |
 
 ---
 

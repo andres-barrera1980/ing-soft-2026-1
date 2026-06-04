@@ -15,9 +15,9 @@
 
 | Campo | Valor |
 |---|---|
-| **Nombre del LLM** | Claude |
-| **Modelo específico** | Claude Sonnet 4.5 |
-| **¿Por qué elegiste este LLM?** | Usé Claude Sonnet 4.5 en antigravity, ya que ofrece relativamente una buena cantidad de tokens y ofrece un manejo visual de los archivos que me gusta.  |
+| **Nombre del LLM** | Gemini |
+| **Modelo específico** | Gemini 3.1 Pro |
+| **¿Por qué elegiste este LLM?** | Usé Gemini 3.1 Pro en antigravity, ya que ofrece relativamente una buena cantidad de tokens y ofrece un manejo visual de los archivos que me gusta. |
 
 ---
 

@@ -15,9 +15,9 @@
 
 | Campo | Valor |
 |---|---|
-| **Nombre del LLM** | Claude |
-| **Modelo específico** | Claude Sonnet 4.5 |
-| **¿Por qué elegiste este LLM?** | Elegí Claude Sonnet 4.5 porque maneja bien la combinación de múltiples patrones de diseño y produce diagramas Mermaid correctos junto con código Java limpio. |
+| **Nombre del LLM** | Gemini |
+| **Modelo específico** | Gemini 3.1 Pro |
+| **¿Por qué elegiste este LLM?** | Usé Gemini 3.1 Pro en antigravity, ya que ofrece relativamente una buena cantidad de tokens y ofrece un manejo visual de los archivos que me gusta. |
 
 ---
 

@@ -4,10 +4,10 @@
 
 ---
 
-## Pregunta [XX]: [Título resumido]
+## Pregunta [P07_clean_architecture]
 
 ### Estudiante
-- **Nombre completo**: [Tu nombre y apellido]
+- **Nombre completo**: [Alejandro Andres Perez Diaz]
 
 ---
 
@@ -15,9 +15,9 @@
 
 | Campo | Valor |
 |---|---|
-| **Nombre del LLM** | [Claude / ChatGPT / Gemini / Copilot / DeepSeek / Qwen / Mistral / Otro / **Sin IA — respuesta propia**] |
-| **Modelo específico** | [Ej: Claude Opus 4.5, GPT-4o, Gemini 2.5 Pro, etc. Si respondes sin IA, escribe "N/A"] |
-| **¿Por qué elegiste este LLM?** | [Justifica en 1-3 oraciones. Si respondes sin IA, explica por qué decidiste no usar LLM para esta pregunta.] |
+| **Nombre del LLM** | [Claude ] |
+| **Modelo específico** | [Sonet 4.6 |
+| **¿Por qué elegiste este LLM?** | [mejor ia opnion persnal] |
 
 ---
 
@@ -26,8 +26,7 @@
 > **Si respondiste sin IA, omite esta sección y ve directamente a Análisis crítico.**
 
 ```
-[Pega aquí el prompt exacto que enviaste al LLM. 
-Incluye TODO el texto, sin editar ni resumir.
+[Actúa como Ingeniero de Software Senior. Rediseña el módulo de pagos de OpenLib Market aplicando Clean Architecture. Define qué va en cada capa: Entities, Use Cases, Interface Adapters y Frameworks & Drivers. Dibuja un diagrama en Mermaid de la estructura, muestra cómo se respeta la regla de dependencia y explica cómo se inyectan las dependencias externas sin violar la arquitectura.
 
 Un buen prompt incluye:
 - Contexto del proyecto OpenLib Market
@@ -42,8 +41,84 @@ Un buen prompt incluye:
 ### Respuesta del LLM
 
 > **Si respondiste sin IA, omite esta sección y ve directamente a Análisis crítico.**
-[Pega aquí la respuesta COMPLETA del LLM, sin editar, sin resumir.
-Incluye TODO el texto, código, explicaciones que generó el LLM.
+[Entities:
+javapublic class Pago {
+    private String id;
+    private double monto;
+    private EstadoPago estado;
+    
+    public void confirmar() {
+        this.estado = EstadoPago.CONFIRMADO;
+    }
+}
+
+public class Orden {
+    private String id;
+    private Pago pago;
+    
+    public void marcarPagada() {
+        this.pago.confirmar();
+    }
+}
+Use Cases:
+javapublic interface PagoRepository {
+    void guardar(Pago pago);
+}
+
+public interface NotificadorPago {
+    void notificar(Pago pago);
+}
+
+public interface PasarelaPago {
+    boolean procesar(Pago pago);
+}
+
+public class RealizarPagoUseCase {
+    private final PagoRepository repositorio;
+    private final NotificadorPago notificador;
+    private final PasarelaPago pasarela;
+
+    public RealizarPagoUseCase(PagoRepository repositorio,
+                                NotificadorPago notificador,
+                                PasarelaPago pasarela) {
+        this.repositorio = repositorio;
+        this.notificador = notificador;
+        this.pasarela = pasarela;
+    }
+
+    public void ejecutar(Pago pago) {
+        pasarela.procesar(pago);
+        pago.confirmar();
+        repositorio.guardar(pago);
+        notificador.notificar(pago);
+    }
+}
+Interface Adapters:
+javapublic class PagoController {
+    private final RealizarPagoUseCase useCase;
+
+    public ResponseEntity pagar(@RequestBody PagoDTO dto) {
+        useCase.ejecutar(dto.toDomain());
+        return ResponseEntity.ok().build();
+    }
+}
+
+public class PagoRepositoryImpl implements PagoRepository {
+    public void guardar(Pago pago) {
+        // lógica PostgreSQL
+    }
+}
+
+public class EmailNotificador implements NotificadorPago {
+    public void notificar(Pago pago) {
+        // enviar email
+    }
+}
+Frameworks & Drivers:
+Spring Boot, PostgreSQL, SMTP, pasarela externa de pagos. No contienen lógica de negocio.
+![alt text](image.png)
+Cómo se respeta la regla de dependencia
+Pago y Orden no saben nada de Spring ni de PostgreSQL. RealizarPagoUseCase solo conoce interfaces, nunca implementaciones concretas. Las implementaciones concretas como PagoRepositoryImpl están en la capa de adaptadores y apuntan hacia adentro implementando las interfaces del caso de uso.
 
 Si el LLM generó código, asegúrate de que esté correctamente formateado.
 Si tuviste que hacer varias iteraciones, pega la MEJOR respuesta obtenida,

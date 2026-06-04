@@ -249,3 +249,10 @@ Precio final:    $36382.50
 
 ### Análisis crítico de la respuesta
 
+El prompt funcionó bien porque pegué el código completo y le asigné el rol de Arquitecto Senior, lo que hizo que las respuestas fueran más técnicas y pudiera identificar ISP y LSP directo.
+
+Pero lo que le faltó fue más grave que lo que acertó. Ignoró OCP completamente: si mañana entra un Auditor, hay que modificar la interfaz Usuario entera.
+
+ También mencionó el problema de Vendedor extends Comprador pero muy por encima, sin explicar que un método procesarCompra(Comprador c) puede recibir un Vendedor en tiempo de ejecución y explotar con UnsupportedOperationException sin que el compilador diga nada. Y en el rediseño simplemente asumió que un vendedor también puede comprar, cuando eso es una decisión de negocio que debió preguntar antes.
+La solución es segregar Usuario en interfaces por capacidad, Comprador, Vendedor, Moderador, GestorUsuarios, y que cada clase implemente solo lo que le toca. Así desaparece la herencia rota y agregar roles nuevos no rompe nada existente.
+Para la próxima debí pedir que cubriera todos los principios SOLID y que no asumiera decisiones de negocio sin preguntar.

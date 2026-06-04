@@ -4,10 +4,10 @@
 
 ---
 
-## Pregunta [XX]: [Título resumido]
+## Pregunta [03]: [P03_solid_jerarquia]
 
 ### Estudiante
-- **Nombre completo**: [Tu nombre y apellido]
+- **Nombre completo**: [Danna Gabriela rRojas Bernal]
 
 ---
 
@@ -15,9 +15,9 @@
 
 | Campo | Valor |
 |---|---|
-| **Nombre del LLM** | [Claude / ChatGPT / Gemini / Copilot / DeepSeek / Qwen / Mistral / Otro / **Sin IA — respuesta propia**] |
-| **Modelo específico** | [Ej: Claude Opus 4.5, GPT-4o, Gemini 2.5 Pro, etc. Si respondes sin IA, escribe "N/A"] |
-| **¿Por qué elegiste este LLM?** | [Justifica en 1-3 oraciones. Si respondes sin IA, explica por qué decidiste no usar LLM para esta pregunta.] |
+| **Sin IA — respuesta propia** | [Claude / ChatGPT / Gemini / Copilot / DeepSeek / Qwen / Mistral / Otro / **Sin IA — respuesta propia**] |
+| **N/A** | [Ej: Claude Opus 4.5, GPT-4o, Gemini 2.5 Pro, etc. Si respondes sin IA, escribe "N/A"] |
+| **Por que no me parece complicada la pregunta y estoy en la capacidad de responderla** | [Justifica en 1-3 oraciones. Si respondes sin IA, explica por qué decidiste no usar LLM para esta pregunta.] |
 
 ---
 
@@ -53,6 +53,9 @@ pero menciona cuántas iteraciones hiciste.]
 ---
 
 ### Análisis crítico de la respuesta
+
+**pregunta**: Analiza esta jerarquía de clases.
+AL analizar la jerarquia principalmente se incumple el principio de sustitucion de liskov y el ISP. Ya que la interfaz Usuario obliga a implementar métodos que algunos usuarios realmente no necesitan, lo que lleva a lanzar excepciones como UnsupportedOperationException. También se incumple LSP porque clases como Vendedor modifican el comportamiento heredado de Comprador, impidiendo que puedan sustituirlo correctamente. Por loq ue una solucion sería crear interfaces especificas para cada rol, asi cada usuario implemente únicamente las funcionalidades que le corresponden y sea facil de mantener.
 
 #### 1. ¿Qué hizo bien el prompt?
 

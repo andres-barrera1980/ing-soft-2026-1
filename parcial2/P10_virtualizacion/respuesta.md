@@ -100,14 +100,18 @@ Sabre que tu respuesta es buena si la tabla comparativa me permite ver de un sol
 
 #### 1. ¿Que hizo bien el prompt?
 
-[Evalua tu propio prompt, no la respuesta del LLM. ¿El contexto fue suficiente? ¿Las restricciones fueron claras? ¿El formato de salida que pediste ayudo a obtener una buena respuesta? ¿Que parte de tu prompt fue mas efectiva? Se especifico: menciona fragmentos concretos de tu prompt que funcionaron bien.]
+El prompt fue muy especifico al pedir una tabla comparativa y obligar al LLM a separar los 5 puntos exactos que se discutian en clase. Esto evito que la IA generara una redaccion interminable y logro que la respuesta fuera super facil de leer de un solo vistazo. Lo mas util de mi prompt fue pedirle explicitamente los errores comunes (pitfalls), porque obligo a la IA a entregar escenarios de la vida real como el error de meter una base de datos y la app web en un solo contenedor.
 
 
 #### 2. ¿Que se puede mejorar?
 
-[¿Que le falto a tu prompt? ¿Que harias diferente si pudieras reformularlo? ¿El LLM entendio mal algo por falta de claridad en tu prompt? ¿La respuesta tiene errores u omisiones? ¿Que no cubrio el LLM que tu si sabes por lo visto en clase?]
+A mi prompt le falto exigirle a la IA que profundizara en los problemas de seguridad al comparar estas dos tecnologias. Al no pedirselo, el LLM me dio una explicacion muy superficial de "Aislamiento Medio" pero se comio por completo el concepto mas critico y peligroso que vimos en clase sobre como los contenedores interactuan con el sistema operativo anfitrion.
 
 
 #### 3. Respuesta final
 
-[Escribe tu respuesta definitiva a la pregunta del parcial, integrando lo que aprendiste del LLM pero yendo mas alla. Corrige errores, llena omisiones, conecta con conceptos vistos en clase. Esta es tu respuesta: demuestra que tu dominas el tema.]
+El LLM explico muy bien la diferencia de arquitectura (virtualizar hardware vs virtualizar OS) y las ventajas de cada uno. Los casos de uso que dio son super precisos y realistas, como usar VMs para bases de datos pesadas legacy y contenedores para microservicios agiles.
+
+Sin embargo, el LLM omitio el problema de seguridad mas grave que discutimos en clase: *los contenedores comparten el mismo Kernel del sistema operativo anfitrion*. En una maquina virtual, si hay una vulnerabilidad en su propio Kernel, el atacante se queda encerrado en esa VM (gracias al fuerte aislamiento de hardware del Hypervisor). *Pero en los contenedores, si un proceso malicioso logra explotar una vulnerabilidad o causar un "Kernel Panic" en el OS base, tumba todos y cada uno de los demas contenedores que esten corriendo en esa misma maquina porque no hay un aislamiento real a ese nivel*.
+
+Por otro lado, la explicacion de los pitfalls fue excelente. El "overprovisioning" en VMs (desperdiciar RAM) y los "fat containers" (tratar contenedores como si fueran VMs instalando multiples servicios en uno solo) son antipatrones clasicos que ocurren muchisimo en las migraciones de empresas a la nube.

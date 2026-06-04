@@ -7,7 +7,7 @@
 ## Pregunta [P03_solid_jerarquia]
 
 ### Estudiante
-- **Nombre completo**: [Tu nombre y apellido]
+- **Nombre completo**: [Alejandro andres Perez Diaz]
 
 ---
 

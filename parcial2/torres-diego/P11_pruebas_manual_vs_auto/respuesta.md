@@ -4,66 +4,63 @@
 
 ---
 
-## Pregunta [XX]: [Título resumido]
+## Pregunta [11]: [P11_pruebas_manual_vs_auto]
 
 ### Estudiante
-- **Nombre completo**: [Tu nombre y apellido]
+- **Nombre completo**: [Diego Alejandro Torres Barragan ]
 
----
+Sin uso de IA 
 
-### LLM utilizado
+#### 1. Respuesta final
 
-| Campo | Valor |
-|---|---|
-| **Nombre del LLM** | [Claude / ChatGPT / Gemini / Copilot / DeepSeek / Qwen / Mistral / Otro / **Sin IA — respuesta propia**] |
-| **Modelo específico** | [Ej: Claude Opus 4.5, GPT-4o, Gemini 2.5 Pro, etc. Si respondes sin IA, escribe "N/A"] |
-| **¿Por qué elegiste este LLM?** | [Justifica en 1-3 oraciones. Si respondes sin IA, explica por qué decidiste no usar LLM para esta pregunta.] |
+Pruebas manuales:
+Ventajas:
 
----
+Detectan problemas de usabilidad y experiencia de usuario que una prueba automatizada no puede ver
+No requieren inversion inicial de tiempo para escribir scripts
+Flexibles para explorar flujos no previstos (pruebas exploratorias)
 
-### Prompt utilizado
+Desventajas:
 
-> **Si respondiste sin IA, omite esta sección y ve directamente a Análisis crítico.**
+Lentas y no escalables, no se pueden repetir miles de veces
+Propensas a error humano, dos testers pueden obtener resultados diferentes
+No sirven para regresion frecuente porque consumen mucho tiempo
 
-```
-[Pega aquí el prompt exacto que enviaste al LLM. 
-Incluye TODO el texto, sin editar ni resumir.
+Pruebas automatizadas:
+Ventajas:
 
-Un buen prompt incluye:
-- Contexto del proyecto OpenLib Market
-- El código o situación específica
-- Lo que esperas que el LLM haga
-- Restricciones (ej: "usa Java 21", "aplica SOLID")
-- Formato de salida esperado (ej: "respuesta en markdown con código Java")]
-```
+Se pueden correr en cada commit sin esfuerzo adicional
+Rapidas y consistentes, siempre ejecutan exactamente los mismos pasos
+Ideales para regresion: verifican que nada se rompio con cada cambio
 
----
+Desventajas:
 
-### Respuesta del LLM
+Costo de mantenimiento alto: si cambia el codigo las pruebas hay que actualizarlas tambien
+Inversion inicial de tiempo para escribirlas bien
+No detectan problemas visuales ni de usabilidad
 
-> **Si respondiste sin IA, omite esta sección y ve directamente a Análisis crítico.**
-[Pega aquí la respuesta COMPLETA del LLM, sin editar, sin resumir.
-Incluye TODO el texto, código, explicaciones que generó el LLM.
+| Tipo | Manual | Automatizada |
+|---|---|---|
+| Exploratorias | Si | No |
+| Unitarias | No | Si |
+| Integracion | A veces | Si |
+| Regresion | No (muy costoso) | Si |
+| Usabilidad | Si | No |
+| Carga y estres | No | Si |
 
-Si el LLM generó código, asegúrate de que esté correctamente formateado.
-Si tuviste que hacer varias iteraciones, pega la MEJOR respuesta obtenida,
-pero menciona cuántas iteraciones hiciste.]
-```
+Criterios para decidir:
+Automatizar cuando:
 
----
+La prueba se repite en cada release
+El flujo es estable y no cambia seguido
+Es una prueba de regresion critica
 
-### Análisis crítico de la respuesta
+Hacer manual cuando:
 
-#### 1. ¿Qué hizo bien el prompt?
+Es una prueba exploratoria de un flujo nuevo
+Involucra juicio visual o de experiencia de usuario
+Es una funcionalidad que probablemente cambie pronto
 
-[Evalúa tu propio prompt, no la respuesta del LLM. ¿El contexto fue suficiente? ¿Las restricciones fueron claras? ¿El formato de salida que pediste ayudó a obtener una buena respuesta? ¿Qué parte de tu prompt fue más efectiva? Sé específico: menciona fragmentos concretos de tu prompt que funcionaron bien.]
-
-
-#### 2. ¿Qué se puede mejorar?
-
-[¿Qué le faltó a tu prompt? ¿Qué harías diferente si pudieras reformularlo? ¿El LLM entendió mal algo por falta de claridad en tu prompt? ¿La respuesta tiene errores u omisiones? ¿Qué no cubrió el LLM que tú sí sabes por lo visto en clase?]
-
-
-#### 3. Respuesta final
-
-[Escribe tu respuesta definitiva a la pregunta del parcial, integrando lo que aprendiste del LLM pero yendo más allá. Corrige errores, llena omisiones, conecta con conceptos vistos en clase. Esta es tu respuesta: demuestra que tú dominas el tema.]
+Las Recomendacion para OpenLib Market:
+Automatizar: pruebas unitarias de CarritoService, ControlInventarioService y RealizarPagoUseCase, pruebas de integracion del flujo de pago y pruebas de regresion del checkout.
+Manual: pruebas de usabilidad del flujo de compra, pruebas exploratorias de la interfaz JavaFX y verificacion visual del carrito en diferentes resoluciones.

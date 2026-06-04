@@ -1,5 +1,3 @@
-# Plantilla de entrega — Parcial 2
-
 ## Pregunta [06]: [clean architecture]
 
 
@@ -15,7 +13,7 @@
 | ------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Nombre del LLM**              | ChatGPT                                                                                                                                                                                                                                                                                  |
 | **Modelo específico**           | GPT-5.5 Thinking                                                                                                                                                                                                                                                                         |
-| **¿Por qué elegiste este LLM?** | Elegí este LLM porque permite explicar conceptos de arquitectura de software de forma estructurada y también aterrizarlos a ejemplos concretos en Java y en el contexto de OpenLib Market. Además, ayuda a comparar enfoques arquitectónicos y a detectar posibles errores conceptuales. |
+| **¿Por qué elegiste este LLM?** | Elegí este LLM porque permite explicar conceptos de arquitectura de software de forma estructurada y también aterrizarlos a ejemplos concretos en Java y me ha funcionado en lo personal perfecto para aprender. Además, ayuda a comparar enfoques arquitectónicos y a detectar posibles errores conceptuales. |
 
 ---
 

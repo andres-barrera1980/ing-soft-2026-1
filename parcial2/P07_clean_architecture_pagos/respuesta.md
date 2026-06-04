@@ -1,5 +1,3 @@
-# Plantilla de entrega — Parcial 2
-
 ## Pregunta [07]: [pruebas clean architecture pagos]
 
 ### Estudiante
@@ -13,7 +11,7 @@
 | ------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Nombre del LLM**              | ChatGPT                                                                                                                                                                                                                                  |
 | **Modelo específico**           | GPT-5.5 Thinking                                                                                                                                                                                                                         |
-| **¿Por qué elegiste este LLM?** | Elegí este LLM porque permite analizar código y arquitectura de software con buena estructura, además de generar ejemplos claros en Java y explicar conceptos como Clean Architecture, inversión de dependencias y separación por capas. |
+| **¿Por qué elegiste este LLM?** | Elegí GPT porque nuevamente me permite aprender fácilmente y lo he utilizado varias veces para consultas de libros, además ya tiene el contexto de clean architecture de la previa pregunta. |
 
 ---
 

@@ -4,7 +4,7 @@
 
 ### Estudiante
 
-* **Nombre**: Marlon Garcia
+* **Nombre completo**: [Marlon Garcia]
 
 ---
 
@@ -14,7 +14,7 @@
 | ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | **Nombre del LLM**              | ChatGPT                                                                                                                                                                                                                                          |
 | **Modelo específico**           | GPT-5.5 Thinking                                                                                                                                                                                                                                 |
-| **¿Por qué elegiste este LLM?** | Elegí este LLM porque permite organizar la solución de forma clara, se me hace perfecto para diseñar sistemas y arquitecturas, además para un código que no sea de producción se me hace adecuado y mpas que |
+| **¿Por qué elegiste este LLM?** | Elegí este LLM porque permite organizar la solución de forma clara, se me hace perfecto para diseñar sistemas y arquitecturas, además para un código que no sea de producción se me hace adecuado y más que suficiente |
 
 ---
 

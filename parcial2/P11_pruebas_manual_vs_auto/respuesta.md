@@ -1,9 +1,3 @@
-# Plantilla de entrega — Parcial 2
-
-> **Instrucción**: Copia esta plantilla para cada pregunta del parcial. Reemplaza `[Pregunta XX]` por el identificador correcto (ej: `P01_solid_srp`) y completa todas las secciones. Haz al menos 2 commits por pregunta: uno con el prompt + respuesta del LLM, y otro con el análisis.
-
----
-
 ## Pregunta [11]: [manual vs auto]
 
 ### Estudiante
@@ -18,7 +12,7 @@
 | ------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Nombre del LLM**              | ChatGPT                                                                                                                                                                                                                                 |
 | **Modelo específico**           | GPT-5.5 Thinking                                                                                                                                                                                                                        |
-| **¿Por qué elegiste este LLM?** | Elegí este LLM porque puede comparar conceptos de ingeniería de software de forma organizada y aplicada a un proyecto concreto. Además, permite generar una recomendación práctica para OpenLib Market, no solo una definición general. |
+| **¿Por qué elegiste este LLM?** | Elegi chatgpt porque ya tiene todo el contexto del parcial, ya que lo he utilizado para varias preguntas, por lo que ya entiende mejor la dinámica de este y los outputs que necesito. |
 
 ---
 

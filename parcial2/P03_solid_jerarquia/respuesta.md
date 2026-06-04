@@ -1,13 +1,7 @@
-# Plantilla de entrega — Parcial 2
-
-> **Instrucción**: Copia esta plantilla para cada pregunta del parcial. Reemplaza `[Pregunta XX]` por el identificador correcto (ej: `P01_solid_srp`) y completa todas las secciones. Haz al menos 2 commits por pregunta: uno con el prompt + respuesta del LLM, y otro con el análisis.
-
----
-
 ## Pregunta [03]: [Solid jerarquia]
 
 ### Estudiante
-- **Marlon Garcia**: [Tu nombre y apellido]
+* **Nombre completo**: [Marlon Garcia]
 
 ---
 
@@ -29,8 +23,6 @@ public interface Usuario {
     String getNombre();
     String getEmail();
 }
-
-// ======Interfaces específicas por rol=====
 
 // Solo los usuarios que pueden comprar implementan esta interfaz.
 public interface Comprador extends Usuario {

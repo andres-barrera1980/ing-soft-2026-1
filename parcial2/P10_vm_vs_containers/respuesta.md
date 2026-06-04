@@ -1,5 +1,3 @@
-# Plantilla de entrega — Parcial 2
-
 ## Pregunta [10]: [vm vs containers]
 
 ### Estudiante

@@ -8,8 +8,6 @@
 
 ### Respuesta sin IA
 
-# P.12 — Ciclo de vida de defecto aplicado a OpenLib Market
-
 El defecto reportado indica que el botón “Agregar al carrito” no responde cuando el usuario ya tiene 5 ítems en el carrito e intenta agregar un sexto libro. Según las reglas del sistema, el carrito puede tener hasta 10 ítems diferentes, por lo tanto el sexto libro debería agregarse correctamente. El comportamiento actual es incorrecto porque no se agrega el producto y tampoco se muestra un mensaje de error.
 
 | Fase         | Responsable                                        | Acción tomada                                                                                                                                                                                                                                   | Herramienta usada                                             | Estado en Jira            |

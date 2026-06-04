@@ -209,14 +209,18 @@ Tu caso de uso `ProcesarPagoUseCase` solo sabe que existe una interfaz `Servicio
 
 #### 1. ¿Que hizo bien el prompt?
 
-[Evalua tu propio prompt, no la respuesta del LLM. ¿El contexto fue suficiente? ¿Las restricciones fueron claras? ¿El formato de salida que pediste ayudo a obtener una buena respuesta? ¿Que parte de tu prompt fue mas efectiva? Se especifico: menciona fragmentos concretos de tu prompt que funcionaron bien.]
+El prompt fue muy efectivo porque fui super estricto con las restricciones de Clean Architecture. Al exigirle que usara el Principio de Inversion de Dependencia (DIP) y pedirle explicitamente que justificara como aislaba la base de datos y los correos, logre que el LLM no me diera un codigo generico sino uno que realmente se adapta a la necesidad de OpenLib Market. *La validacion final fue clave para asegurarme de que el diseño cumpliera su proposito real: poder cambiar de base de datos sin romper nada*.
 
 
 #### 2. ¿Que se puede mejorar?
 
-[¿Que le falto a tu prompt? ¿Que harias diferente si pudieras reformularlo? ¿El LLM entendio mal algo por falta de claridad en tu prompt? ¿La respuesta tiene errores u omisiones? ¿Que no cubrio el LLM que tu si sabes por lo visto en clase?]
+A mi prompt le falto pedirle que incluyera una capa de validacion para los datos de entrada (Data Transfer Objects o DTOs). *Como sabemos, pasar los objetos o valores crudos directamente desde el controlador al caso de uso puede ser mala practica si no sanitizamos la entrada*. El LLM uso un objeto `PagoRequest` en el controlador, lo cual esta bien, pero omitio explicar como se mapean esos datos hacia el caso de uso de manera robusta.
 
 
 #### 3. Respuesta final
 
-[Escribe tu respuesta definitiva a la pregunta del parcial, integrando lo que aprendiste del LLM pero yendo mas alla. Corrige errores, llena omisiones, conecta con conceptos vistos en clase. Esta es tu respuesta: demuestra que tu dominas el tema.]
+El LLM hizo un trabajo excelente ubicando cada componente. La entidad `Pago` quedo totalmente limpia de dependencias, y el controlador REST quedo perfectamente aislado, sirviendo solo como un puente (Interface Adapter) que recibe la peticion y llama al `ProcesarPagoUseCase`. 
+
+La regla de dependencia se respeta en todo el diseño gracias a las interfaces (`RepositorioPago`, `ServicioNotificacion`, etc.). *No hay dependencias cruzando en la direccion equivocada porque el controlador (afuera) llama al caso de uso (adentro), y el repositorio de Postgres (afuera) implementa la interfaz que definio el caso de uso (adentro)*.
+
+Este diseño es infinitamente mas testeable que el `PaymentService` original acoplado. En el diseño anterior, si queriamos probar el pago, estabamos obligados a levantar una base de datos Postgres real y mandar correos de verdad. *Ahora, gracias a que el caso de uso recibe las dependencias por constructor (Inyeccion de Dependencias), en las pruebas unitarias de JUnit simplemente le paso un Mock de la base de datos y un Mock del notificador, logrando pruebas ultrarrapidas y 100% aisladas de la infraestructura real*.

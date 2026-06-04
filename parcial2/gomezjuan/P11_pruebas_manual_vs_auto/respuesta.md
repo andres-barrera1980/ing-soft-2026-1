@@ -1,13 +1,7 @@
-# Plantilla de entrega — Parcial 2
-
-> **Instrucción**: Copia esta plantilla para cada pregunta del parcial. Reemplaza `[Pregunta XX]` por el identificador correcto (ej: `P01_solid_srp`) y completa todas las secciones. Haz al menos 2 commits por pregunta: uno con el prompt + respuesta del LLM, y otro con el análisis.
-
----
-
-## Pregunta [XX]: [Título resumido]
+# Pregunta P11: Pruebas manuales vs pruebas automatizadas
 
 ### Estudiante
-- **Nombre completo**: [Tu nombre y apellido]
+- **Nombre completo**: Juan Camilo Gomez
 
 ---
 
@@ -15,55 +9,74 @@
 
 | Campo | Valor |
 |---|---|
-| **Nombre del LLM** | [Claude / ChatGPT / Gemini / Copilot / DeepSeek / Qwen / Mistral / Otro / **Sin IA — respuesta propia**] |
-| **Modelo específico** | [Ej: Claude Opus 4.5, GPT-4o, Gemini 2.5 Pro, etc. Si respondes sin IA, escribe "N/A"] |
-| **¿Por qué elegiste este LLM?** | [Justifica en 1-3 oraciones. Si respondes sin IA, explica por qué decidiste no usar LLM para esta pregunta.] |
-
----
-
-### Prompt utilizado
-
-> **Si respondiste sin IA, omite esta sección y ve directamente a Análisis crítico.**
-
-```
-[Pega aquí el prompt exacto que enviaste al LLM. 
-Incluye TODO el texto, sin editar ni resumir.
-
-Un buen prompt incluye:
-- Contexto del proyecto OpenLib Market
-- El código o situación específica
-- Lo que esperas que el LLM haga
-- Restricciones (ej: "usa Java 21", "aplica SOLID")
-- Formato de salida esperado (ej: "respuesta en markdown con código Java")]
-```
-
----
-
-### Respuesta del LLM
-
-> **Si respondiste sin IA, omite esta sección y ve directamente a Análisis crítico.**
-[Pega aquí la respuesta COMPLETA del LLM, sin editar, sin resumir.
-Incluye TODO el texto, código, explicaciones que generó el LLM.
-
-Si el LLM generó código, asegúrate de que esté correctamente formateado.
-Si tuviste que hacer varias iteraciones, pega la MEJOR respuesta obtenida,
-pero menciona cuántas iteraciones hiciste.]
-```
+| **Nombre del LLM** | Sin IA — respuesta propia |
+| **Modelo específico** | N/A |
+| **¿Por qué elegiste este LLM?** | ganar bono
 
 ---
 
 ### Análisis crítico de la respuesta
 
-#### 1. ¿Qué hizo bien el prompt?
-
-[Evalúa tu propio prompt, no la respuesta del LLM. ¿El contexto fue suficiente? ¿Las restricciones fueron claras? ¿El formato de salida que pediste ayudó a obtener una buena respuesta? ¿Qué parte de tu prompt fue más efectiva? Sé específico: menciona fragmentos concretos de tu prompt que funcionaron bien.]
-
-
-#### 2. ¿Qué se puede mejorar?
-
-[¿Qué le faltó a tu prompt? ¿Qué harías diferente si pudieras reformularlo? ¿El LLM entendió mal algo por falta de claridad en tu prompt? ¿La respuesta tiene errores u omisiones? ¿Qué no cubrió el LLM que tú sí sabes por lo visto en clase?]
-
-
 #### 3. Respuesta final
 
-[Escribe tu respuesta definitiva a la pregunta del parcial, integrando lo que aprendiste del LLM pero yendo más allá. Corrige errores, llena omisiones, conecta con conceptos vistos en clase. Esta es tu respuesta: demuestra que tú dominas el tema.]
+## Pruebas manuales vs automatizadas para OpenLib Market
+
+### Ventajas de las pruebas manuales
+
+1. un tester humano nota si un boton es confuso, si el flujo de compra es frustrante, o si el mensaje de error es incomprensible. Ningun script automatizado puede detectar que el diseño de la pagina de pago genera desconfianza en el usuario.
+
+2. cuando no hay especificaciones completas, un tester puede explorar el sistema de forma creativa, encontrando bugs que nunca se habrian anticipado en un script. En el primer release de OpenLib Market, muchos flujos aún no están completamente especificados.
+
+3.  para una funcionalidad que cambia constantemente, mantener pruebas automatizadas cuesta mas que simplemente probarlas manualmente cada iteración.
+
+### Desventajas de las pruebas manuales
+
+1. dos ejecuciones manuales de la misma prueba pueden diferir en pasos, datos de entrada o condiciones del entorno. Un bug intermitente puede no reproducirse.
+
+2. probar OpenLib Market en 50 navegadores y resoluciones de pantalla diferentes manualmente es impracticable. La regresión completa después de cada release tomaría días.
+
+3. después de ejecutar 200 casos de prueba seguidos, la atención del tester baja. Pasos críticos pueden saltarse inconscientemente.
+
+### Ventajas de las pruebas automatizadas
+
+1. *una suite de pruebas unitarias de 500 tests corre en segundos. Se puede ejecutar en cada commit del pipeline CI/CD sin costo adicional.
+
+2. cada nuevo feature se prueba automáticamente contra todos los comportamientos existentes. Si `ProcesarPagoUseCase` rompe algo en `CarritoService`, el pipeline lo detecta antes del merge.
+
+
+### Desventajas de las pruebas automatizadas
+
+
+1. tener 90% de cobertura de codigo no significa que el sistema este correctamente testeado. Una suite de pruebas que prueba implementacion en lugar de comportamiento puede pasar al 100% y aún tener bugs críticos de logica de negocio.
+
+2. escribir pruebas de calidad, configurar el pipeline CI, los mocks y los ambientes de prueba requiere tiempo significativo antes de ver beneficios.
+
+
+
+### Criterios para decidir cuándo automatizar
+
+Automatizar cuando:
+- La prueba se ejecuta frecuentemente 
+- El comportamiento es estable y no cambia seguido
+- La prueba es repetible y deterministica 
+- La prueba es dificil de ejecutar manualmente 
+
+Dejar manual cuando:
+- La funcionalidad cambia rapidamente en iteraciones tempranas
+- La prueba requiere juicio humano 
+- El costo de automatizar supera el beneficio 
+- Es una prueba exploratoria por primera vez
+
+### Recomendación para OpenLib Market (primer release)
+
+Automatizar:
+- Todas las pruebas unitarias de dominio (`CarritoService`, `ControlInventarioService`, `GestorLibro`)
+- Pruebas de integracion de la API REST 
+- Pruebas de regresion del flujo critico: agregar al carrito → checkout → pago
+
+Dejar manual:
+- Flujo completo de onboarding de vendedores 
+- UI del frontend JavaFX 
+- Pruebas de aceptación con usuarios reales antes del lanzamiento
+
+

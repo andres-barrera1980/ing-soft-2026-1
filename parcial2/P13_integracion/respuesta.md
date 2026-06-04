@@ -196,14 +196,20 @@ Con este diseño moderno, si quieres agregar WhatsApp, solo creas la clase `What
 
 #### 1. ¿Que hizo bien el prompt?
 
-[Evalua tu propio prompt, no la respuesta del LLM. ¿El contexto fue suficiente? ¿Las restricciones fueron claras? ¿El formato de salida que pediste ayudo a obtener una buena respuesta? ¿Que parte de tu prompt fue mas efectiva? Se especifico: menciona fragmentos concretos de tu prompt que funcionaron bien.]
+Primeramente el prompt fue super claro al exigirle al LLM que identificara explicitamente los principios SOLID que se estaban rompiendo. Ahi evite que simplemente me escupiera el codigo arreglado sin enseñarme nada de teoria de diseño. Seguidamente pedirle que incluyera pruebas aislando obligatoriamente el disco fue la jugada maestra, porque lo obligo a crear interfaces limpias (DIP) para poder inyectar Mockito en los tests en lugar de acoplarse al sistema operativo.
 
 
 #### 2. ¿Que se puede mejorar?
 
-[¿Que le falto a tu prompt? ¿Que harias diferente si pudieras reformularlo? ¿El LLM entendio mal algo por falta de claridad en tu prompt? ¿La respuesta tiene errores u omisiones? ¿Que no cubrio el LLM que tu si sabes por lo visto en clase?]
+Basicamente me falto pedirle a la IA que aplicara buenas practicas empresariales y frameworks reales para llevar esto a produccion. Al no hacer eso, la IA me programo un Logger casero usando `Files.write` en lugar de sugerirme una solucion limpia y estandarizada de Java, y tampoco me explico como inyectar agilmente la lista de canales usando el propio framework en el que esta basado OpenLib Market (Spring Boot).
 
 
 #### 3. Respuesta final
 
-[Escribe tu respuesta definitiva a la pregunta del parcial, integrando lo que aprendiste del LLM pero yendo mas alla. Corrige errores, llena omisiones, conecta con conceptos vistos en clase. Esta es tu respuesta: demuestra que tu dominas el tema.]
+Primeramente el LLM identifico a la perfeccion que el codigo original violaba el Single Responsibility Principle (SRP) al mezclar logica de logging y notificacion, y el Open/Closed Principle (OCP) al depender de una cadena de if-else para escoger el canal. 
+
+Seguidamente, el patron Strategy que aplico fue la eleccion mas optima y adecuada. Aca la nueva version si permite agregar un nuevo canal (como WhatsApp) solo creando una clase nueva que implemente la interfaz, sin modificar para nada la clase `Notificador`, respetando asi el principio OCP. Ademas la solucion es 100% testeable gracias a la inyeccion de dependencias, lo cual le permitio al LLM aislar el disco duro en las pruebas unitarias usando Mockito.
+
+Sin embargo, si yo tuviera que implementar esto en produccion real para OpenLib Market jamas usaria la solucion exacta del LLM. Modificaria dos cosas graves. Primeramente reemplazaria esa clase casera `FileLoggerService` por una libreria profesional y real como SLF4J con Logback o Log4j2. *Escribir en disco directamente con `Files.write` en un sistema de alta concurrencia como OpenLib Market es super peligroso y bloqueria los hilos principales; las librerias reales manejan logs asincronos y rotacion de archivos automaticamente*.
+
+Basicamente la segunda modificacion seria aprovechar el framework del proyecto. En lugar de pasar la lista de canales a mano en el constructor como hizo la IA, le agregaria las anotaciones de Spring Boot (`@Service` y `@Component`) a las estrategias para que Spring haga un auto-discovery y me inyecte la lista completa de `CanalNotificacion` de forma automatica sin que yo tenga que armar listas manuales en ningun lado.

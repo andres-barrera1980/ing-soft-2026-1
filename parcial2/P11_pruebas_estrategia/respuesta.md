@@ -110,14 +110,20 @@ Para el primer release (V1.0), recomiendo **automatizar absolutamente todo el fl
 
 #### 1. ¿Que hizo bien el prompt?
 
-[Evalua tu propio prompt, no la respuesta del LLM. ¿El contexto fue suficiente? ¿Las restricciones fueron claras? ¿El formato de salida que pediste ayudo a obtener una buena respuesta? ¿Que parte de tu prompt fue mas efectiva? Se especifico: menciona fragmentos concretos de tu prompt que funcionaron bien.]
+Primeramente el prompt fue directo al exigir cinco puntos super concretos, incluyendo los criterios de decision y la recomendacion final aplicada a OpenLib Market. Ahi le quite el modo enciclopedia a la IA y la obligue a darme respuestas aplicadas al contexto de nuestro proyecto. Basicamente restringir la recomendacion a un "primer release" fue la jugada clave en el prompt para poder evaluar la verdadera capacidad estrategica del LLM.
 
 
 #### 2. ¿Que se puede mejorar?
 
-[¿Que le falto a tu prompt? ¿Que harias diferente si pudieras reformularlo? ¿El LLM entendio mal algo por falta de claridad en tu prompt? ¿La respuesta tiene errores u omisiones? ¿Que no cubrio el LLM que tu si sabes por lo visto en clase?]
+Seguidamente veo que a mi prompt le falto pedirle que considerara explicitamente el presupuesto y el ciclo de vida a largo plazo del proyecto. Al no hacer eso, la IA solo se enfoco en el costo inicial de infraestructura y cayo en la trampa comun de pensar que la automatizacion grafica (UI) lo soluciona todo sin consecuencias.
 
 
 #### 3. Respuesta final
 
-[Escribe tu respuesta definitiva a la pregunta del parcial, integrando lo que aprendiste del LLM pero yendo mas alla. Corrige errores, llena omisiones, conecta con conceptos vistos en clase. Esta es tu respuesta: demuestra que tu dominas el tema.]
+Basicamente el LLM capturo bien las ventajas base y los criterios teoricos para decidir que automatizar. Sus definiciones de pruebas exploratorias y regresion son muy acertadas. Sin embargo, su recomendacion final para OpenLib Market es completamente irrealista y fragil.
+
+El LLM recomendo automatizar todo el flujo E2E desde la UI para un primer release. Aca hay un problema grave, porque *como vimos en clase con la Piramide de Pruebas, las pruebas de UI son las mas lentas, fragiles y caras de automatizar*. En una V1.0 la interfaz cambia constantemente. Si automatizamos toda la UI hoy, los scripts se van a romper mañana simplemente porque un diseñador movio un boton o cambio el ID de un campo. 
+
+Ahi es donde entra la desventaja critica que el LLM omitio por completo: **el altisimo costo de mantenimiento a largo plazo de los scripts automatizados**. El LLM hablo de inversion inicial, pero ignoro que las pruebas automatizadas son codigo, y el codigo se oxida si no se mantiene.
+
+Para OpenLib Market mi recomendacion real seria invertir la piramide. Primeramente para la V1.0 debemos automatizar intensivamente la logica de negocio por debajo usando Pruebas Unitarias (Carrito) y Pruebas de API (Pagos), ya que son super rapidas y baratas. Seguidamente usaremos pruebas manuales y exploratorias para revisar la UI. La automatizacion pesada E2E con Selenium en la vista grafica solo deberia hacerse mas adelante cuando la UI este fija.

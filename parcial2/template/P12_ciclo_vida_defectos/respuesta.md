@@ -4,10 +4,10 @@
 
 ---
 
-## Pregunta [XX]: [Título resumido]
+## Pregunta [12]: [P12_ciclo_vida_defectos]
 
 ### Estudiante
-- **Nombre completo**: [Tu nombre y apellido]
+- **Nombre completo**: [Danna Gabrieal RoJAS bERNAL]
 
 ---
 
@@ -15,9 +15,9 @@
 
 | Campo | Valor |
 |---|---|
-| **Nombre del LLM** | [Claude / ChatGPT / Gemini / Copilot / DeepSeek / Qwen / Mistral / Otro / **Sin IA — respuesta propia**] |
-| **Modelo específico** | [Ej: Claude Opus 4.5, GPT-4o, Gemini 2.5 Pro, etc. Si respondes sin IA, escribe "N/A"] |
-| **¿Por qué elegiste este LLM?** | [Justifica en 1-3 oraciones. Si respondes sin IA, explica por qué decidiste no usar LLM para esta pregunta.] |
+| **Sin IA — respuesta propia** | [Claude / ChatGPT / Gemini / Copilot / DeepSeek / Qwen / Mistral / Otro / **Sin IA — respuesta propia**] |
+| **N/A** | [Ej: Claude Opus 4.5, GPT-4o, Gemini 2.5 Pro, etc. Si respondes sin IA, escribe "N/A"] |
+| **Es lograble hacerla yo sola** | [Justifica en 1-3 oraciones. Si respondes sin IA, explica por qué decidiste no usar LLM para esta pregunta.] |
 
 ---
 
@@ -53,6 +53,9 @@ pero menciona cuántas iteraciones hiciste.]
 ---
 
 ### Análisis crítico de la respuesta
+*pregunta**: Gestiona este defecto aplicando el ciclo de vida de defectos visto en clase
+
+Siguiendo el ciclo de vida de defectos, el error primero se encuentra en estado Nuevo (New), ya que el tester lo registra en Jira incluyendo la descripción del problema, los pasos para reproducirlo y el resultado esperado. Luego pasa a estado Asignado (Assigned), donde el defecto es entregado a un desarrollador para su análisis. Después se marca como En Progreso (In Progress) mientras se investiga la causa y se implementa una solución. Una vez corregido, el defecto pasa a estado Resuelto (Resolved) y se envía nuevamente al equipo de pruebas. El tester realiza una revalidación para comprobar que ahora sí es posible agregar un sexto libro al carrito y que el contador se actualiza correctamente. Si todo funciona como se espera, el defecto se marca como Cerrado (Closed). Si el problema persiste, el defecto se Reabre (Reopened) y vuelve al desarrollador para realizar una nueva corrección.
 
 #### 1. ¿Qué hizo bien el prompt?
 

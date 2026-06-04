@@ -4,13 +4,12 @@
 
 ---
 
-## Pregunta [XX]: [Título resumido]
+## Pregunta [01]: [P01_solid_srp]
 
 ### Estudiante
-- **Nombre completo**: [Tu nombre y apellido]
-
+- **Danna Gabriela Rojas Bernal**
 ---
-
+NO utilice AI
 ### LLM utilizado
 
 | Campo | Valor |
@@ -25,45 +24,12 @@
 
 > **Si respondiste sin IA, omite esta sección y ve directamente a Análisis crítico.**
 
-```
-[Pega aquí el prompt exacto que enviaste al LLM. 
-Incluye TODO el texto, sin editar ni resumir.
-
-Un buen prompt incluye:
-- Contexto del proyecto OpenLib Market
-- El código o situación específica
-- Lo que esperas que el LLM haga
-- Restricciones (ej: "usa Java 21", "aplica SOLID")
-- Formato de salida esperado (ej: "respuesta en markdown con código Java")]
-```
-
----
-
-### Respuesta del LLM
-
-> **Si respondiste sin IA, omite esta sección y ve directamente a Análisis crítico.**
-[Pega aquí la respuesta COMPLETA del LLM, sin editar, sin resumir.
-Incluye TODO el texto, código, explicaciones que generó el LLM.
-
-Si el LLM generó código, asegúrate de que esté correctamente formateado.
-Si tuviste que hacer varias iteraciones, pega la MEJOR respuesta obtenida,
-pero menciona cuántas iteraciones hiciste.]
-```
-
----
 
 ### Análisis crítico de la respuesta
 
-#### 1. ¿Qué hizo bien el prompt?
+**Pregunta**: Identifica qué principio SOLID se está violando (más de uno puede aplicar, pero enfócate en el principal).
 
-[Evalúa tu propio prompt, no la respuesta del LLM. ¿El contexto fue suficiente? ¿Las restricciones fueron claras? ¿El formato de salida que pediste ayudó a obtener una buena respuesta? ¿Qué parte de tu prompt fue más efectiva? Sé específico: menciona fragmentos concretos de tu prompt que funcionaron bien.]
-
-
-#### 2. ¿Qué se puede mejorar?
-
-[¿Qué le faltó a tu prompt? ¿Qué harías diferente si pudieras reformularlo? ¿El LLM entendió mal algo por falta de claridad en tu prompt? ¿La respuesta tiene errores u omisiones? ¿Qué no cubrió el LLM que tú sí sabes por lo visto en clase?]
+El principal principio de solid que se esta violando es el principio de responsabililidad unica ya que en el metodo de publicarlibro() contiene varias responsabilidades dentro de una misma clase, en lugar de encargarse de su logica, tmabien realiza la persistencia en la base de datos, el envio de correos electrónicos, etc; por lo que implica que la clase tiene al menos seis razones diferentes para cambiar, lo que contradice el SRP.
 
 
-#### 3. Respuesta final
 
-[Escribe tu respuesta definitiva a la pregunta del parcial, integrando lo que aprendiste del LLM pero yendo más allá. Corrige errores, llena omisiones, conecta con conceptos vistos en clase. Esta es tu respuesta: demuestra que tú dominas el tema.]

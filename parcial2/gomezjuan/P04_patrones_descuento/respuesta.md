@@ -196,13 +196,18 @@ public class EjemploUso {
 
 #### 1. ¿Qué hizo bien el prompt?
 
-
+mejoro mucho que definiera que las estrategias "pueden combinarse", lo que guio al LLM hacia una solución mas profunda. El prompt tambien señalo los patrones vistos en clase, lo que evito respuestas con patrones fuera de lo estipulado y por ultimo la restriccion de "descarta explicitamente al menos dos alternativas" hizo que hiciera el analisis comparativo que se necesitaba
 
 
 #### 2. ¿Qué se puede mejorar?
 
-
+no pidio que el LLM considerara el caso de descuentos con tope y no se pregunto por el orden de aplicación de los descuentos. por lo que la respuesta aplica todos los descuentos sobre el precio base, no de forma encadenada, lo que hace diferencia
 
 #### 3. Respuesta final
 
-[Escribe tu respuesta definitiva a la pregunta del parcial, integrando lo que aprendiste del LLM pero yendo más allá. Corrige errores, llena omisiones, conecta con conceptos vistos en clase. Esta es tu respuesta: demuestra que tú dominas el tema.]
+El patron strategy con una lista de estrategias es la solución correcta para este escenario. lo que hace que,
+- Encapsular cada regla de descuento en su propia clase 
+- Agregar nuevas estrategias sin modificar calcular descuentos
+- Combinar estrategias en tiempo de ejecución según el contexto
+
+La respuesta del LLM es buena pero se salta el tope de descuento. En un sistema de produccion, el descuento acumulado no deberia poder superar el precio del producto ni generar precios negativos

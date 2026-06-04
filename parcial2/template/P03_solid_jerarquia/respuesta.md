@@ -81,3 +81,31 @@ public class UsuarioVendedor implements Vendedor {
     public void generarReporteVentas() { /* implementación real */ }
 }
 
+// Un administrador puede tener múltiples capacidades
+// sin que una implique la otra
+public class UsuarioAdministrador implements Comprador, Vendedor, Moderador, AdministradorSistema {
+    @Override
+    public void comprar(Libro libro) { /* implementación */ }
+    @Override
+    public void vender(Libro libro) { /* implementación */ }
+    @Override
+    public void moderarComentario(Comentario c) { /* implementación */ }
+    @Override
+    public void gestionarUsuarios() { /* implementación */ }
+    @Override
+    public void generarReporteVentas() { /* implementación */ }
+}
+```
+
+Por que no usar herencia aqui?
+
+La herencia expresa relacion "es-un". Un Vendedor NO "es-un" Comprador en OpenLib Market — son roles distintos. La jerarquia original lo modeló mal. La composicion de interfaces es la solucion correcta: un Administrador "puede comprar" Y "puede vender" Y "puede moderar", pero no porque herede de ellos, sino porque implementa esas capacidades de forma independiente.
+
+Consecuencia real de la violacion LSP: Si algun componente del sistema hace:
+
+```java
+List<Comprador> compradores = obtenerCompradores(); // puede contener Vendedores
+compradores.forEach(c -> c.comprar(unLibro));       // NullPointerException o UnsupportedOperationException en runtime
+```
+
+Este bug solo aparece en producción. Con el rediseño, la lista de `Comprador` solo puede contener objetos que genuinamente saben comprar — el compilador lo garantiza.

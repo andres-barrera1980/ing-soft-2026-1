@@ -102,14 +102,20 @@ Sabre que tu respuesta es util si asignas los roles correctamente y propones una
 
 #### 1. ¿Que hizo bien el prompt?
 
-[Evalua tu propio prompt, no la respuesta del LLM. ¿El contexto fue suficiente? ¿Las restricciones fueron claras? ¿El formato de salida que pediste ayudo a obtener una buena respuesta? ¿Que parte de tu prompt fue mas efectiva? Se especifico: menciona fragmentos concretos de tu prompt que funcionaron bien.]
+Primeramente el prompt fue super claro al darle todo el formato del bug de Jira (resumen, pasos, resultados). Ahi logre que la IA no me diera teoria generica sino que lo aplicara directo a OpenLib Market. Seguidamente exigirle las restricciones de responsables, acciones y estados en Jira hizo que la respuesta fuera una guia perfecta paso a paso y muy facil de leer.
 
 
 #### 2. ¿Que se puede mejorar?
 
-[¿Que le falto a tu prompt? ¿Que harias diferente si pudieras reformularlo? ¿El LLM entendio mal algo por falta de claridad en tu prompt? ¿La respuesta tiene errores u omisiones? ¿Que no cubrio el LLM que tu si sabes por lo visto en clase?]
+Basicamente le di mucho contexto visual del bug pero no le aclare cual era la verdadera regla de negocio del sistema. Aca el LLM asumio equivocadamente que el limite maximo del carrito era 5 y se invento una causa raiz basada en esa mentira, en lugar de saber que el limite real es 10. Tambien me falto exigirle que separara estrictamente el Diagnostico de la Correccion.
 
 
 #### 3. Respuesta final
 
-[Escribe tu respuesta definitiva a la pregunta del parcial, integrando lo que aprendiste del LLM pero yendo mas alla. Corrige errores, llena omisiones, conecta con conceptos vistos en clase. Esta es tu respuesta: demuestra que tu dominas el tema.]
+Primeramente el LLM asigno muy bien los responsables y el flujo basico de estados en Jira (`NEW` -> `ASSIGNED` -> `IN PROGRESS` -> `RESOLVED` -> `CLOSED`). Las diferencias entre estados y herramientas usadas quedaron claras. 
+
+Sin embargo, el LLM fallo terriblemente en dos conceptos que vimos en clase. Seguidamente, el LLM trato de manera super superficial la fase de **Diagnostico**, fusionandola con la fase de Correccion. *Como sabemos, el diagnostico es la etapa mas critica y demorada donde el desarrollador aisla el error leyendo logs o usando el debugger, antes de escribir una sola linea de codigo para solucionarlo. Saltarse el diagnostico es un error grave de concepto.*
+
+Ahi es donde entra el segundo error: la causa raiz. El LLM dijo que el desarrollador "se dio cuenta que el limite estaba en 5". Aca el LLM se equivoco feo. *Segun las reglas de negocio de OpenLib Market (vista en la Pregunta 8), el carrito tiene un limite maximo real de 10 items. Si el boton dejo de responder al item numero 6, la verdadera causa raiz es un defecto en el Frontend que no esta manejando correctamente la respuesta asincrona del Backend, o un error de validacion prematura en el Javascript de la vista, no un limite quemado de 5*.
+
+Basicamente, el ciclo real debio tener un paso dedicado a diagnosticar por que la UI fallo silenciosamente al llegar al item 6, luego corregir esa logica de JS para que muestre el error adecuado, y pasar a `READY FOR TEST` para que el tester lo valide agregando items hasta llegar a 10 (no a 6) para comprobar que todo funciona.

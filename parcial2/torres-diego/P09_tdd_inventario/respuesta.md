@@ -4,10 +4,10 @@
 
 ---
 
-## Pregunta [XX]: [Título resumido]
+## Pregunta [09]: [P09_tdd_inventario]
 
 ### Estudiante
-- **Nombre completo**: [Tu nombre y apellido]
+- **Nombre completo**: [Diego Alejandro Torres Barrgan]
 
 ---
 
@@ -15,9 +15,9 @@
 
 | Campo | Valor |
 |---|---|
-| **Nombre del LLM** | [Claude / ChatGPT / Gemini / Copilot / DeepSeek / Qwen / Mistral / Otro / **Sin IA — respuesta propia**] |
-| **Modelo específico** | [Ej: Claude Opus 4.5, GPT-4o, Gemini 2.5 Pro, etc. Si respondes sin IA, escribe "N/A"] |
-| **¿Por qué elegiste este LLM?** | [Justifica en 1-3 oraciones. Si respondes sin IA, explica por qué decidiste no usar LLM para esta pregunta.] |
+| **Nombre del LLM** | [Claude] |
+| **Modelo específico** | [Ej: Claude Sonnet 4.6/bajo]|
+| **¿Por qué elegiste este LLM?** | [Es el modelo que actualmente mas uso y en el que estoy confiando, ademas que es muy poderoso para generar codigo y para explicarlo ] |
 
 ---
 
@@ -26,28 +26,133 @@
 > **Si respondiste sin IA, omite esta sección y ve directamente a Análisis crítico.**
 
 ```
-[Pega aquí el prompt exacto que enviaste al LLM. 
-Incluye TODO el texto, sin editar ni resumir.
+[Actua como un desarrollador que aplica TDD estrictamente. Necesito implementar ControlInventarioService para OpenLib Market. Esta clase debe: marcar un libro como AGOTADO cuando el stock llega a cero, notificar al vendedor cuando eso pasa, y marcarlo como DISPONIBLE cuando el vendedor repone stock.
+Aplica el ciclo completo Red-Green-Refactor:
 
-Un buen prompt incluye:
-- Contexto del proyecto OpenLib Market
-- El código o situación específica
-- Lo que esperas que el LLM haga
-- Restricciones (ej: "usa Java 21", "aplica SOLID")
-- Formato de salida esperado (ej: "respuesta en markdown con código Java")]
+Primero escribe las pruebas con JUnit 5 y Mockito que fallen porque la implementacion no existe
+Luego escribe la implementacion minima para que pasen
+Finalmente refactoriza sin romper las pruebas
+
+Es importante que el orden sea ese: pruebas primero, implementacion despues.]
 ```
 
 ---
 
 ### Respuesta del LLM
 
-> **Si respondiste sin IA, omite esta sección y ve directamente a Análisis crítico.**
-[Pega aquí la respuesta COMPLETA del LLM, sin editar, sin resumir.
-Incluye TODO el texto, código, explicaciones que generó el LLM.
+RED — pruebas que fallan (no existe implementacion aun):
+```java
+java@ExtendWith(MockitoExtension.class)
+class ControlInventarioServiceTest {
 
-Si el LLM generó código, asegúrate de que esté correctamente formateado.
-Si tuviste que hacer varias iteraciones, pega la MEJOR respuesta obtenida,
-pero menciona cuántas iteraciones hiciste.]
+    @Mock
+    private RepositorioLibro repositorioLibro;
+
+    @Mock
+    private ServicioNotificacion notificacion;
+
+    @InjectMocks
+    private ControlInventarioService inventarioService;
+
+    @Test
+    void cuandoStockLlegaACero_debeMarcarComoAgotado() {
+        Libro libro = new Libro(1L, "Clean Code", 1, EstadoLibro.DISPONIBLE);
+        when(repositorioLibro.buscarPorId(1L)).thenReturn(Optional.of(libro));
+
+        inventarioService.reducirStock(1L, 1);
+
+        assertEquals(EstadoLibro.AGOTADO, libro.getEstado());
+        verify(repositorioLibro).guardar(libro);
+    }
+
+    @Test
+    void cuandoStockLlegaACero_debeNotificarAlVendedor() {
+        Libro libro = new Libro(1L, "Clean Code", 1, EstadoLibro.DISPONIBLE);
+        when(repositorioLibro.buscarPorId(1L)).thenReturn(Optional.of(libro));
+
+        inventarioService.reducirStock(1L, 1);
+
+        verify(notificacion).notificar(libro.getEmailVendedor(), "Tu libro esta agotado");
+    }
+
+    @Test
+    void cuandoVendedorReponaStock_debeMarcarComoDisponible() {
+        Libro libro = new Libro(1L, "Clean Code", 0, EstadoLibro.AGOTADO);
+        when(repositorioLibro.buscarPorId(1L)).thenReturn(Optional.of(libro));
+
+        inventarioService.reponerStock(1L, 5);
+
+        assertEquals(EstadoLibro.DISPONIBLE, libro.getEstado());
+        verify(repositorioLibro).guardar(libro);
+    }
+
+    @Test
+    void cuandoStockNoLlegaACero_noDebeNotificar() {
+        Libro libro = new Libro(1L, "Clean Code", 5, EstadoLibro.DISPONIBLE);
+        when(repositorioLibro.buscarPorId(1L)).thenReturn(Optional.of(libro));
+
+        inventarioService.reducirStock(1L, 2);
+
+        verify(notificacion, never()).notificar(any(), any());
+    }
+}
+```
+
+GREEN — implementacion minima para que pasen:
+```java
+javapublic class ControlInventarioService {
+
+    private final RepositorioLibro repositorioLibro;
+    private final ServicioNotificacion notificacion;
+
+    public ControlInventarioService(RepositorioLibro repositorioLibro,
+                                     ServicioNotificacion notificacion) {
+        this.repositorioLibro = repositorioLibro;
+        this.notificacion = notificacion;
+    }
+
+    public void reducirStock(Long libroId, int cantidad) {
+        Libro libro = repositorioLibro.buscarPorId(libroId)
+            .orElseThrow(() -> new NoSuchElementException("Libro no encontrado"));
+
+        libro.setStock(libro.getStock() - cantidad);
+
+        if (libro.getStock() == 0) {
+            libro.setEstado(EstadoLibro.AGOTADO);
+            notificacion.notificar(libro.getEmailVendedor(), "Tu libro esta agotado");
+        }
+
+        repositorioLibro.guardar(libro);
+    }
+
+    public void reponerStock(Long libroId, int cantidad) {
+        Libro libro = repositorioLibro.buscarPorId(libroId)
+            .orElseThrow(() -> new NoSuchElementException("Libro no encontrado"));
+
+        libro.setStock(libro.getStock() + cantidad);
+        libro.setEstado(EstadoLibro.DISPONIBLE);
+        repositorioLibro.guardar(libro);
+    }
+}
+```
+REFACTOR — mejorar sin romper pruebas:
+```java
+javapublic void reducirStock(Long libroId, int cantidad) {
+    Libro libro = buscarLibro(libroId);
+    libro.setStock(libro.getStock() - cantidad);
+    if (libro.estaAgotado()) {
+        libro.setEstado(EstadoLibro.AGOTADO);
+        notificacion.notificar(libro.getEmailVendedor(), "Tu libro esta agotado");
+    }
+    repositorioLibro.guardar(libro);
+}
+
+private Libro buscarLibro(Long libroId) {
+    return repositorioLibro.buscarPorId(libroId)
+        .orElseThrow(() -> new NoSuchElementException("Libro no encontrado"));
+}
+```
+Se mueve la logica de stock == 0 a un metodo estaAgotado() dentro de Libro, que es donde debe vivir esa regla de negocio.
 ```
 
 ---
@@ -56,14 +161,38 @@ pero menciona cuántas iteraciones hiciste.]
 
 #### 1. ¿Qué hizo bien el prompt?
 
-[Evalúa tu propio prompt, no la respuesta del LLM. ¿El contexto fue suficiente? ¿Las restricciones fueron claras? ¿El formato de salida que pediste ayudó a obtener una buena respuesta? ¿Qué parte de tu prompt fue más efectiva? Sé específico: menciona fragmentos concretos de tu prompt que funcionaron bien.]
+[Pedir explicitamente el orden Red-Green-Refactor fue lo que mas ayudo porque el LLM no se salto ninguna fase. Tambien ayudo aclarar "pruebas primero, implementacion despues" porque sin eso el LLM tiende a escribir todo junto sin respetar el ciclo]
 
 
 #### 2. ¿Qué se puede mejorar?
 
-[¿Qué le faltó a tu prompt? ¿Qué harías diferente si pudieras reformularlo? ¿El LLM entendió mal algo por falta de claridad en tu prompt? ¿La respuesta tiene errores u omisiones? ¿Qué no cubrió el LLM que tú sí sabes por lo visto en clase?]
+[No se pidio cubrir casos borde como stock negativo o reponer stock en un libro que ya estaba disponible, entonces el LLM no los incluyo. Tambien faltaria pedir que explicara como verificar que las pruebas realmente fallan antes de la implementacion, que es la parte mas importante del TDD y quedo un poco superficial.]
 
 
 #### 3. Respuesta final
 
-[Escribe tu respuesta definitiva a la pregunta del parcial, integrando lo que aprendiste del LLM pero yendo más allá. Corrige errores, llena omisiones, conecta con conceptos vistos en clase. Esta es tu respuesta: demuestra que tú dominas el tema.]
+El ciclo TDD se aplico correctamente: pruebas primero, implementacion minima despues, y luego refactoring. Lo importante del Red es que las pruebas deben fallar antes de escribir cualquier codigo, eso garantiza que no estan hechas a la medida de una implementacion que ya existia.
+
+Lo que le falto a la respuesta fueron dos casos borde: reducir el stock a un valor negativo y reponer stock en un libro que ya estaba disponible. Estos son bugs potenciales en produccion y deberian tener su prueba. Los agregaria asi:
+```java
+@Test
+void reducirStock_masDelDisponible_deberiaLanzarExcepcion() {
+    Libro libro = new Libro(1L, "Clean Code", 2, EstadoLibro.DISPONIBLE);
+    when(repositorioLibro.buscarPorId(1L)).thenReturn(Optional.of(libro));
+
+    assertThrows(IllegalStateException.class, 
+        () -> inventarioService.reducirStock(1L, 5));
+}
+
+@Test
+void reponerStock_libroYaDisponible_deberiaSeguirDisponible() {
+    Libro libro = new Libro(1L, "Clean Code", 3, EstadoLibro.DISPONIBLE);
+    when(repositorioLibro.buscarPorId(1L)).thenReturn(Optional.of(libro));
+
+    inventarioService.reponerStock(1L, 2);
+
+    assertEquals(EstadoLibro.DISPONIBLE, libro.getEstado());
+}
+```
+El refactoring fue pequeño pero correcto, extraer buscarLibro() evita repetir el mismo bloque en los dos metodos y hace el codigo mas legible.
+

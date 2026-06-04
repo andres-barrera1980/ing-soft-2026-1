@@ -230,14 +230,17 @@ CASO DE SALIDA
 
 #### 1. ¿Qué hizo bien el prompt?
 
-[Evalúa tu propio prompt, no la respuesta del LLM. ¿El contexto fue suficiente? ¿Las restricciones fueron claras? ¿El formato de salida que pediste ayudó a obtener una buena respuesta? ¿Qué parte de tu prompt fue más efectiva? Sé específico: menciona fragmentos concretos de tu prompt que funcionaron bien.]
+[El contexto fue suficiente, siempre y cuando el prompt presente todo, en este caso, el prompt fue bueno pero falto un poco mas de entendimiento y de conscentimiento directo para que pueda actuar basandose en lo necesario.]
 
 
 #### 2. ¿Qué se puede mejorar?
 
-[¿Qué le faltó a tu prompt? ¿Qué harías diferente si pudieras reformularlo? ¿El LLM entendió mal algo por falta de claridad en tu prompt? ¿La respuesta tiene errores u omisiones? ¿Qué no cubrió el LLM que tú sí sabes por lo visto en clase?]
+[Se puede mejorar el prompt generando preguntas para que la IA se pueda pregunatr y pueda obtener mas respeusta asi misma y con ello pueda cargar su base de datos y dar una respuesta mas certera]
 
 
 #### 3. Respuesta final
 
-[]
+[¿El LLM identificó el patrón adecuado? Para esto, si lo identifico bien, el decorator, ya que el problema requiere aplicar multiples capas de comportamiento.
+ ¿Consideró la posibilidad de composición de estrategias? Sí, fue el argumento central de su elección. Explicó que los descuentos no son mutuamente excluyentes, sino que se deben apilar o encadenar 
+  ¿Qué alternativas mencionó y fueron correctamente descartadas? Descarto strategy, dado que tocaria crear mas clases para cada combinacion.
+   ¿La implementación es correcta y funcional? ¿Qué le faltó?]Sí, la estructura de clases e interfaces respeta la estructura del patrón Decorator.

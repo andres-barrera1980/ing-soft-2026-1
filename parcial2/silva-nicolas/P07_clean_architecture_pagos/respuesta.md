@@ -258,14 +258,19 @@ public class CasoUsoConfig {
 
 #### 1. ¿Qué hizo bien el prompt?
 
-[Evalúa tu propio prompt, no la respuesta del LLM. ¿El contexto fue suficiente? ¿Las restricciones fueron claras? ¿El formato de salida que pediste ayudó a obtener una buena respuesta? ¿Qué parte de tu prompt fue más efectiva? Sé específico: menciona fragmentos concretos de tu prompt que funcionaron bien.]
+Le exigi directamente usar el DPI en la linea "explicar cómo se inyectan las dependencias externas sin violar la arquitectura". Esto obligó al LLM a evitar las anotaciones de tipo spring y utilizar el constructor del interactor para mandar los datos a los puertos necesarios, cumpliendo así con el principio de inversión de dependencias. 
+
+Al pedir "definir qué va en cada capa (Entities, Use Cases, Interface Adapters, Frameworks & Drivers)", obligue a la IA a categorizar cada componente antes de programarlo, lo cual previno la mezcla de responsabilidades.
 
 
 #### 2. ¿Qué se puede mejorar?
 
-[¿Qué le faltó a tu prompt? ¿Qué harías diferente si pudieras reformularlo? ¿El LLM entendió mal algo por falta de claridad en tu prompt? ¿La respuesta tiene errores u omisiones? ¿Qué no cubrió el LLM que tú sí sabes por lo visto en clase?]
+- Le pedi al LLM refactorizar para soportar múltiples métodos de pago (tarjeta, PSE, PayPal), pero no le especifiqué que debía mostrar la lógica de enrutamiento, por lo que simplemente me mostró un caso particular de uso (tarjeta de crédito), evadiendo la lógica de enrutamiento.Debí pedirle que integrara un patrón de diseño (como Strategy o Factory) en la capa de Adaptadores para decidir dinámicamente qué pasarela (Stripe, PSE, PayPal) usar según la petición del usuario.
 
 
 #### 3. Respuesta final
 
-[Escribe tu respuesta definitiva a la pregunta del parcial, integrando lo que aprendiste del LLM pero yendo más allá. Corrige errores, llena omisiones, conecta con conceptos vistos en clase. Esta es tu respuesta: demuestra que tú dominas el tema.]
+Debi solicitar un patron Strategy especifico para evitar el bloque de ifs que determina el metodo de pago a utilizar, arreglando asi el problema de enrutamiento de pagos en la capa de Adaptadores. 
+
+En resumen, la arquitectura correcta para manejar el problema de los pagos es Clean Architecture, la cual organiza el código en capas concéntricas que dependen únicamente hacia adentro. En el centro se encuentran las entidades y casos de uso (lógica de negocio pura), y en la periferia los adaptadores y frameworks (detalles de implementación como bases de datos o APIs externas). El flujo de control y dependencias debe ser así: el cliente llama al controlador, este delega al caso de uso, y el caso de uso interactúa con los puertos (interfaces) que luego son implementados por los adaptadores en la capa externa.
+

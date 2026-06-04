@@ -4,66 +4,23 @@
 
 ---
 
-## Pregunta [XX]: [Título resumido]
+## Pregunta [04]: [Patrones ]
 
 ### Estudiante
-- **Nombre completo**: [Tu nombre y apellido]
+- **Marlon Garcia**: [Tu nombre y apellido]
 
 ---
 
-### LLM utilizado
 
-| Campo | Valor |
-|---|---|
-| **Nombre del LLM** | [Claude / ChatGPT / Gemini / Copilot / DeepSeek / Qwen / Mistral / Otro / **Sin IA — respuesta propia**] |
-| **Modelo específico** | [Ej: Claude Opus 4.5, GPT-4o, Gemini 2.5 Pro, etc. Si respondes sin IA, escribe "N/A"] |
-| **¿Por qué elegiste este LLM?** | [Justifica en 1-3 oraciones. Si respondes sin IA, explica por qué decidiste no usar LLM para esta pregunta.] |
+### Respuesta sin IA 
 
----
+El patrón principal a proponer es Strategy, porque existen distintos tipos de descuentos y cada uno tiene una forma diferente de calcularse. Sin embargo, como en este caso no se aplica necesariamente un solo descuento por compra, sino que varios descuentos pueden combinarse, también sería adecuado usar Composite. Este patrón permitiría agrupar varias estrategias de descuento y aplicarlas en orden para obtener el precio final.
 
-### Prompt utilizado
+Y las opciones para descartar:
 
-> **Si respondiste sin IA, omite esta sección y ve directamente a Análisis crítico.**
+* Decorator: porque, aunque permite apilar descuentos, en este caso puede volver el diseño más complejo de lo necesario. Como los descuentos solo deben agruparse y aplicarse en secuencia, Composite resulta más claro y fácil de mantener.
 
-```
-[Pega aquí el prompt exacto que enviaste al LLM. 
-Incluye TODO el texto, sin editar ni resumir.
-
-Un buen prompt incluye:
-- Contexto del proyecto OpenLib Market
-- El código o situación específica
-- Lo que esperas que el LLM haga
-- Restricciones (ej: "usa Java 21", "aplica SOLID")
-- Formato de salida esperado (ej: "respuesta en markdown con código Java")]
-```
-
----
-
-### Respuesta del LLM
-
-> **Si respondiste sin IA, omite esta sección y ve directamente a Análisis crítico.**
-[Pega aquí la respuesta COMPLETA del LLM, sin editar, sin resumir.
-Incluye TODO el texto, código, explicaciones que generó el LLM.
-
-Si el LLM generó código, asegúrate de que esté correctamente formateado.
-Si tuviste que hacer varias iteraciones, pega la MEJOR respuesta obtenida,
-pero menciona cuántas iteraciones hiciste.]
-```
-
----
-
-### Análisis crítico de la respuesta
-
-#### 1. ¿Qué hizo bien el prompt?
-
-[Evalúa tu propio prompt, no la respuesta del LLM. ¿El contexto fue suficiente? ¿Las restricciones fueron claras? ¿El formato de salida que pediste ayudó a obtener una buena respuesta? ¿Qué parte de tu prompt fue más efectiva? Sé específico: menciona fragmentos concretos de tu prompt que funcionaron bien.]
+* Chain of Responsibility: este patrón se usa más cuando una solicitud pasa por varios manejadores y alguno decide si la procesa o la delega. En este caso no se busca que un descuento “maneje” o “rechace” la compra, sino aplicar todas las estrategias de descuento que correspondan.
 
 
-#### 2. ¿Qué se puede mejorar?
 
-[¿Qué le faltó a tu prompt? ¿Qué harías diferente si pudieras reformularlo? ¿El LLM entendió mal algo por falta de claridad en tu prompt? ¿La respuesta tiene errores u omisiones? ¿Qué no cubrió el LLM que tú sí sabes por lo visto en clase?]
-
-
-#### 3. Respuesta final
-
-[Escribe tu respuesta definitiva a la pregunta del parcial, integrando lo que aprendiste del LLM pero yendo más allá. Corrige errores, llena omisiones, conecta con conceptos vistos en clase. Esta es tu respuesta: demuestra que tú dominas el tema.]

@@ -1,13 +1,10 @@
 # Plantilla de entrega — Parcial 2
 
-> **Instrucción**: Copia esta plantilla para cada pregunta del parcial. Reemplaza `[Pregunta XX]` por el identificador correcto (ej: `P01_solid_srp`) y completa todas las secciones. Haz al menos 2 commits por pregunta: uno con el prompt + respuesta del LLM, y otro con el análisis.
 
----
-
-## Pregunta [XX]: [Título resumido]
+## Pregunta [13]: [P13_integracion_refactoring]
 
 ### Estudiante
-- **Nombre completo**: [Tu nombre y apellido]
+- **Nombre completo**: [Danna Gabriela Rojas BBernal]
 
 ---
 
@@ -15,9 +12,9 @@
 
 | Campo | Valor |
 |---|---|
-| **Nombre del LLM** | [Claude / ChatGPT / Gemini / Copilot / DeepSeek / Qwen / Mistral / Otro / **Sin IA — respuesta propia**] |
-| **Modelo específico** | [Ej: Claude Opus 4.5, GPT-4o, Gemini 2.5 Pro, etc. Si respondes sin IA, escribe "N/A"] |
-| **¿Por qué elegiste este LLM?** | [Justifica en 1-3 oraciones. Si respondes sin IA, explica por qué decidiste no usar LLM para esta pregunta.] |
+| **Sin IA — respuesta propia** | [Claude / ChatGPT / Gemini / Copilot / DeepSeek / Qwen / Mistral / Otro / **Sin IA — respuesta propia**] |
+| **N/A** | [Ej: Claude Opus 4.5, GPT-4o, Gemini 2.5 Pro, etc. Si respondes sin IA, escribe "N/A"] |
+| **s epuede hacer sin AI** | [Justifica en 1-3 oraciones. Si respondes sin IA, explica por qué decidiste no usar LLM para esta pregunta.] |
 
 ---
 
@@ -53,6 +50,29 @@ pero menciona cuántas iteraciones hiciste.]
 ---
 
 ### Análisis crítico de la respuesta
+La clase Notificador presenta problemas de diseño porque concentra varias responsabilidades en un solo lugar. Por un lado, se encarga de enviar distintos tipos de notificaciones (Email, SMS y Push) y, por otro, también realiza el registro de logs. Esto viola el principio de Responsabilidad Única . Además, el uso de múltiples if-else provoca que cada vez que se agregue o modifique un tipo de notificación sea necesario cambiar la clase, incumpliendo el principio Abierto/Cerrado (OCP).
+
+Para refactorizarla, se puede aplicar el patrón Strategy creando una interfaz Notificacion con un método enviar(), y luego implementar clases específicas como EmailNotificacion, SMSNotificacion y PushNotificacion. De igual forma, el registro de logs debería moverse a una clase independiente encargada únicamente de esa tarea.Seria ago asi para que se eleiminan las condicionales y cada clase tenga su unica responsabilidad:
+Interface Notificacion
+    enviar(destinatario, mensaje)
+
+EmailNotificacion implementa Notificacion
+
+SMSNotificacion implementa Notificacion
+
+PushNotificacion implementa Notificacion
+LoggerService
+    registrar(...)
+
+Notificador
+
+    Notificacion estrategia
+    LoggerService logger
+
+    enviar(destinatario, mensaje)
+        estrategia.enviar(destinatario, mensaje)
+        logger.registrar(...)
+
 
 #### 1. ¿Qué hizo bien el prompt?
 

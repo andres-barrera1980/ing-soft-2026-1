@@ -849,26 +849,184 @@ se hizo test primero e implemntacion despues, las pruebas cubren pocos escenario
 
 
 
-# pregunta 10
-# promp
+Pregunta 10: Comparación entre máquinas virtuales y contenedores
+Estudiante
+Nombre completo: Juan Duarte
+LLM utilizado
+Campo	Valor
+Nombre del LLM	Gemini
+Modelo específico	N/A
+¿Por qué elegiste este LLM?	Se utilizó para realizar una comparación entre máquinas virtuales y contenedores teniendo en cuenta arquitectura, ventajas, casos de uso y errores comunes.
+Prompt utilizado
 podrias comparar maquinas virtuales y contenedores teniendo en cuenta: (a) arquitectura y cómo funciona cada uno, (b) ventajas de VMs sobre contenedores, (c) ventajas de contenedores sobre VMs, (d) casos de uso donde conviene cada uno, y (e) common pitfalls o errores comunes al adoptar cada tecnología
 
-el formato de salida debe ser una tabla comparativa con sus explicaciones 
+el formato de salida debe ser una tabla comparativa con sus explicaciones
+Respuesta del LLM
+Esta es una comparación fundamental en la ingeniería de sistemas moderna. La diferencia principal radica en qué nivel de la infraestructura se virtualiza: el hardware (VMs) o el sistema operativo (contenedores).
 
+Tabla Comparativa: VMs vs. Contenedores
 
-# respuesta llm
-Esta es una comparación fundamental en la ingeniería de sistemas moderna. La diferencia principal radica en qué nivel de la infraestructura se virtualiza: el hardware (VMs) o el sistema operativo (contenedores).Tabla Comparativa: VMs vs. ContenedoresCaracterísticaMáquinas Virtuales (VMs)ContenedoresArquitecturaVirtualizan el hardware mediante un hipervisor. Incluyen un SO completo.Virtualizan el SO mediante el motor de contenedores. Comparten el kernel.AislamientoAlto (basado en hardware). Entornos totalmente independientes.Moderado (basado en procesos). Comparten kernel, mayor riesgo.TamañoGrande (Gigabytes por imagen).Pequeño (Megabytes por imagen).ArranqueLento (minutos, al cargar el SO completo).Instantáneo (milisegundos).PortabilidadBaja (depende de la imagen del disco/formato del hipervisor).Muy alta (funciona igual en cualquier entorno con el runtime).Explicación de los puntos clave(a) Arquitectura y FuncionamientoVMs: El hipervisor emula hardware físico. Cada VM tiene su propio sistema operativo "invitado" (guest OS), bibliotecas y aplicación. Es como tener muchas computadoras dentro de una sola.Contenedores: El motor (como Docker) aprovecha las funcionalidades del Kernel del SO anfitrión (host OS) para aislar procesos. No hay sistema operativo invitado; los contenedores comparten el mismo núcleo del sistema, haciendo que solo se empaquete la aplicación y sus dependencias.(b) Ventajas de las VMsSeguridad y Aislamiento: Si una VM se compromete, es muy difícil que el atacante "salte" al SO anfitrión, ya que existe una barrera de hardware real.Sistemas Operativos Mixtos: Puedes ejecutar Windows y Linux simultáneamente sobre el mismo servidor físico sin conflictos.(c) Ventajas de los ContenedoresEficiencia: Permiten una densidad mucho mayor (puedes ejecutar 50 contenedores donde solo cabrían 5 VMs), reduciendo costos de nube.Desarrollo/CI/CD: Facilitan el concepto "funciona en mi máquina, funciona en producción" al empaquetar exactamente lo que la aplicación necesita.(d) Casos de UsoCuándo usar VMs:Ejecutar aplicaciones monolíticas heredadas (legacy).Necesidad de seguridad extrema (aislamiento total).Cuando se requieren múltiples kernels de SO distintos en el mismo hardware.Cuándo usar Contenedores:Microservicios y arquitectura nativa de la nube.Entornos de desarrollo y pruebas ágiles.Escalado horizontal rápido (necesidad de levantar 100 instancias ante picos de tráfico).(e) Errores comunes (Common Pitfalls)En VMs: Over-provisioning. Asignar demasiados recursos (CPU/RAM) a cada VM, desperdiciando capacidad del servidor físico.En Contenedores: Persistencia de datos. Olvidar que los contenedores son efímeros; si el contenedor se borra, todo lo que no esté en un volumen externo se pierde.Seguridad en contenedores: Ejecutar contenedores como usuario root por defecto, lo cual aumenta el riesgo de que una vulnerabilidad del contenedor afecte al kernel del host.¿Te gustaría entender cómo el concepto de Orquestación (como Kubernetes) ayuda a gestionar esta complejidad cuando decidimos escalar con contenedores?
+Característica        Máquinas Virtuales (VMs)                Contenedores
 
-# respuesta analisis
+Arquitectura          Virtualizan el hardware mediante        Virtualizan el SO mediante
+                      un hipervisor. Incluyen un SO           el motor de contenedores.
+                      completo.                               Comparten el kernel.
+
+Aislamiento           Alto (basado en hardware).              Moderado (basado en procesos).
+                      Entornos totalmente independientes.     Comparten kernel.
+
+Tamaño                Grande (Gigabytes por imagen).          Pequeño (Megabytes por imagen).
+
+Arranque              Lento (minutos).                        Instantáneo (milisegundos).
+
+Portabilidad          Baja.                                   Muy alta.
+
+(a) Arquitectura y Funcionamiento
+
+VMs: El hipervisor emula hardware físico. Cada VM tiene su propio sistema operativo invitado.
+
+Contenedores: El motor aprovecha las funcionalidades del Kernel del SO anfitrión para aislar procesos.
+
+(b) Ventajas de las VMs
+
+- Seguridad y Aislamiento.
+- Sistemas Operativos Mixtos.
+
+(c) Ventajas de los Contenedores
+
+- Eficiencia.
+- Mayor densidad.
+- Facilitan CI/CD.
+
+(d) Casos de Uso
+
+Cuándo usar VMs:
+
+- Aplicaciones monolíticas heredadas.
+- Necesidad de seguridad extrema.
+- Múltiples kernels distintos.
+
+Cuándo usar Contenedores:
+
+- Microservicios.
+- Desarrollo y pruebas ágiles.
+- Escalado horizontal.
+
+(e) Errores comunes
+
+En VMs:
+
+- Over-provisioning.
+
+En Contenedores:
+
+- Persistencia de datos.
+- Ejecutar contenedores como usuario root.
+Análisis crítico de la respuesta
+1. ¿Qué hizo bien el prompt?
+
+El prompt fue bastante claro al especificar los puntos a comparar y pedir explícitamente una tabla comparativa con explicaciones.
+
+2. ¿Qué se puede mejorar?
+
+Se podría pedir una comparación más detallada en cuanto a seguridad y riesgos asociados a cada tecnología.
+
+3. Respuesta final
+
 se explica correctamente las diferencias entre las arquitecturas, se memcionan ventajas precisas, no habla de seguridad ni menciona los pitfalls, esos puntos fueron omitidos
 
 
-# pregunta 11
-# promp
-por favor una tabla comparaativa entre pruebas manuales y automatizadas considerando: ventahas de cada una (mínimo 3), desventajas de cada una (mínimo 3), tipos de pruebas que aplican a cada enfoque, criterios para decidir cuándo automatizar una prueba y cuándo hacerla manual y de paso una recomendacion concreta de que pruebas deberian ser manuales y cuales automaticas 
+## Pregunta 11: Comparación entre pruebas manuales y automatizadas
 
-# respuesta llm
-Para definir la estrategia de testing en OpenLib Market, es crucial entender que no se trata de elegir una u otra, sino de encontrar el equilibrio correcto. A continuación, presento la comparativa solicitada para orientar su estrategia de release.Comparativa: Pruebas Manuales vs. AutomatizadasCaracterísticaPruebas ManualesPruebas AutomatizadasVentajas1. Intuición humana (UX). 2. Sin costo inicial de desarrollo. 3. Ideal para pruebas exploratorias.1. Ejecución rápida y repetible. 2. Alta confiabilidad (sin error humano). 3. Soporte para pruebas de carga.Desventajas1. Lentas y propensas al error. 2. No escalables. 3. Costosas a largo plazo.1. Alta inversión inicial. 2. Requieren mantenimiento constante. 3. No detectan problemas de usabilidad.Tipos de pruebaExploratorias, Usabilidad, Ad-hoc, Aceptación (UAT).Regresión, Carga/Estrés, Funcionales (Smoke), Integración.¿Cuándo automatizar y cuándo hacer manual?Para maximizar el retorno de inversión (ROI) en el desarrollo, considera estos criterios:Automatiza si:La prueba se repite frecuentemente: Si tienes que probar el carrito de compras en cada build.Son propensas al error humano: Cálculos complejos de impuestos o descuentos donde un pequeño error pasa desapercibido.Requieren grandes conjuntos de datos: Validar múltiples combinaciones de usuarios y roles.Son críticas para el negocio: El flujo de "Pago" no puede fallar.Hazlo manualmente si:La prueba es exploratoria: Cuando quieres "jugar" con la aplicación para ver si algo se siente extraño o está fuera de lugar.El diseño cambia constantemente: Automatizar pruebas sobre una UI que cambia cada día es una pesadilla de mantenimiento.Se realiza solo una vez: Pruebas de configuración inicial o entornos de un solo uso.Evaluación de experiencia de usuario (UX): Un script no puede decirte si un botón es estéticamente agradable o si el flujo se siente frustrante.Recomendación Estratégica para OpenLib MarketComo están en su primer release, les sugiero seguir la "Pirámide de Testing":Automatizadas (Prioridad Alta):Unitarias: (JUnit) para toda la lógica de negocio (calculadoras de descuento, validación de stock).Integración: Conexión a base de datos y pasarelas de pago.Regresión crítica: El flujo de compra (añadir, calcular total, pagar). Si esto se rompe, el negocio muere.Manuales (Prioridad Alta):Pruebas de Usabilidad (UX): Navegar por el frontend JavaFX para asegurar que la experiencia es intuitiva.Pruebas Exploratorias: Intentar "romper" el sistema realizando acciones fuera de lo común que los desarrolladores no previeron.Validación de UI: Verificar que los elementos visuales se rendericen correctamente en diferentes resoluciones o sistemas operativos donde corre el cliente de JavaFX.Resumen: Automatiza lo que es mecánico y crítico para evitar errores de regresión; mantén manual lo que es subjetivo y creativo para asegurar la calidad de la experiencia del usuario.¿Te gustaría que diseñemos un pequeño plan de ejecución para automatizar el flujo de "Agregar al carrito" usando Selenium o alguna herramienta de pruebas funcionales?
+### Estudiante
 
-# respuesta analisis
+* **Nombre completo**: Juan Duarte
+
+---
+
+### LLM utilizado
+
+| Campo                           | Valor                                                                                              |
+| ------------------------------- | -------------------------------------------------------------------------------------------------- |
+| **Nombre del LLM**              | Gemini                                                                                             |
+| **Modelo específico**           | N/A                                                                                                |
+| **¿Por qué elegiste este LLM?** | Se utilizó para comparar pruebas manuales y automatizadas y obtener recomendaciones de aplicación. |
+
+---
+
+### Prompt utilizado
+
+```text
+por favor una tabla comparaativa entre pruebas manuales y automatizadas considerando: ventahas de cada una (mínimo 3), desventajas de cada una (mínimo 3), tipos de pruebas que aplican a cada enfoque, criterios para decidir cuándo automatizar una prueba y cuándo hacerla manual y de paso una recomendacion concreta de que pruebas deberian ser manuales y cuales automaticas
+```
+
+---
+
+### Respuesta del LLM
+
+```text
+Comparativa: Pruebas Manuales vs. Automatizadas
+
+Característica              Pruebas Manuales                      Pruebas Automatizadas
+
+Ventajas                    1. Intuición humana (UX).            1. Ejecución rápida.
+                             2. Sin costo inicial.                2. Alta confiabilidad.
+                             3. Ideal para exploratorias.         3. Soporte para carga.
+
+Desventajas                 1. Lentas.                           1. Alta inversión inicial.
+                             2. No escalables.                    2. Mantenimiento constante.
+                             3. Costosas a largo plazo.           3. No detectan problemas de usabilidad.
+
+Tipos de prueba             Exploratorias, Usabilidad, UAT.      Regresión, Integración, Carga.
+
+¿Cuándo automatizar?
+
+- Pruebas repetitivas.
+- Procesos críticos.
+- Cálculos complejos.
+- Grandes conjuntos de datos.
+
+¿Cuándo hacer pruebas manuales?
+
+- Pruebas exploratorias.
+- Interfaces que cambian constantemente.
+- Pruebas de UX.
+- Configuraciones de un solo uso.
+
+Recomendación para OpenLib Market
+
+Automatizadas:
+
+- Unitarias.
+- Integración.
+- Regresión crítica del flujo de compra.
+
+Manuales:
+
+- Pruebas de usabilidad.
+- Pruebas exploratorias.
+- Validación visual de la UI.
+
+Resumen:
+
+Automatiza lo mecánico y crítico; mantén manual lo subjetivo y creativo.
+```
+
+---
+
+### Análisis crítico de la respuesta
+
+#### 1. ¿Qué hizo bien el prompt?
+
+El prompt permitió obtener ventajas, desventajas, tipos de pruebas y recomendaciones concretas para ambos enfoques.
+
+#### 2. ¿Qué se puede mejorar?
+
+Se podría haber solicitado ejemplos más específicos dentro del contexto de OpenLib Market.
+
+#### 3. Respuesta final
+
 Se capturan correctamente las ventajas y desventajas; menciona precios, costos; pero0 los criterios si son genericos y no hay ejemplo para open lib market, omitio algo importante y es que pueden haber detalles que la automatizacion falle, es donde entra quien conoce el codigo realmente para modificarlo sin agregar cosas innecesarias como lo haria un llm, solo añade complejidad
+
+```
+```

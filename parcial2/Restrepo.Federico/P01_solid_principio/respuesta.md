@@ -101,44 +101,8 @@ public class PublicadorDeLibros {
 
 ### Análisis crítico de la respuesta
 
-El prompt fue efectivo porque no solo copió y pegó el código, sino que brindó el contexto del proyecto (OpenLib Market) e impuso restricciones técnicas arquitectónicas muy claras (Java 21, sin frameworks externos y exigiendo inyección de dependencias). Esto obligó al LLM a entregar una solución de "Java puro" orientada a interfaces, lo cual evita que la IA genere un código acoplado con anotaciones de Spring Boot que ocultarían el verdadero rediseño.
+El prompt funcionó bien porque no fue solo copiar y pegar el código. Le di contexto del proyecto (OpenLib Market) y puse restricciones técnicas concretas: Java 21, sin frameworks externos y con inyección de dependencias. Eso obligó al LLM a dar una solución en Java puro orientada a interfaces, lo que evita que genere código lleno de anotaciones de Spring Boot que básicamente esconderían el problema real.
+Igual, aunque identificó bien la violación del SRP y separó base de datos, correos y logs en interfaces, cometió un error que no noté hasta después: dejó la validación (validarLibro) dentro de la clase PublicadorDeLibros. O sea, si mañana cambian las reglas de negocio, por ejemplo que el libro necesite precio obligatorio, esa clase vuelve a cambiar y ahí estamos violando SRP otra vez. En el prompt debí haber sido más explícito y pedir que separara absolutamente todas las responsabilidades, incluyendo validaciones.
+El problema principal de la clase original es que mezcla todo: infraestructura (JDBC), notificaciones (Email) y lógica de negocio (slugs, validaciones) todo junto y acoplado. Eso es SRP roto desde el inicio.
+Para que el refactoring quede bien de verdad, hay que sacar también la validación a su propio componente, algo como LibroValidator. Así PublicadorDeLibros queda solo como orquestador del caso de uso y ya cumple tanto SRP como DIP.
 
-
-Aunque el LLM identificó correctamente la violación del Principio de Responsabilidad Única (SRP) y separó la base de datos, correos y logs en interfaces, cometió un pequeño error de diseño en su respuesta: dejó la lógica de validación (`validarLibro`) anidada dentro de la nueva clase orquestadora `PublicadorDeLibros`. Esto significa que si mañana cambian las reglas de negocio (ej. el libro requiere un precio obligatorio), la clase `PublicadorDeLibros` volverá a cambiar, violando de nuevo el SRP. En mi prompt debí ser más estricto exigiendo aislar TODAS las responsabilidades, incluidas las validaciones.
-
-
-El principio principal que se viola es el **SRP (Single Responsibility Principle)**, ya que la clase original tiene infraestructura (JDBC), notificaciones (Email) y lógica de negocio (Slugs/Validación) fuertemente acopladas. 
-
-Para que el refactoring sea 100% correcto y respete el SRP, no basta con lo que propuso la IA; debemos extraer también la validación a un componente independiente (`LibroValidator`). De este modo, `PublicadorDeLibros` queda exclusivamente como un caso de uso orquestador (fachada) y cumple estrictamente con SRP y DIP (Dependency Inversion Principle).
-
-```java
-public interface LibroValidator { void validar(Libro libro); }
-
-public class PublicadorDeLibros {
-    private final LibroValidator validator;
-    private final LibroRepository repository;
-    private final GeneradorSlug generadorSlug;
-    private final Notificador notificador;
-    private final BuscadorIndex buscadorIndex;
-    private final LoggerService logger;
-
-    public PublicadorDeLibros(LibroValidator validator, LibroRepository repository, GeneradorSlug generadorSlug,
-                              Notificador notificador, BuscadorIndex buscadorIndex, LoggerService logger) {
-        this.validator = validator;
-        this.repository = repository;
-        this.generadorSlug = generadorSlug;
-        this.notificador = notificador;
-        this.buscadorIndex = buscadorIndex;
-        this.logger = logger;
-    }
-
-    public void publicarLibro(Libro libro, Usuario vendedor) {
-        validator.validar(libro);
-        libro.setSlug(generadorSlug.generarPara(libro.getTitulo()));
-        repository.guardar(libro);
-        buscadorIndex.indexar(libro);
-        notificador.notificarPublicacion(vendedor, libro);
-        logger.info("Libro publicado: " + libro.getIsbn());
-    }
-}
-```

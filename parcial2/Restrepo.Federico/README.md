@@ -13,8 +13,7 @@
 |---|---|
 | **Nombre del LLM** | Gemini |
 | **Modelo específico** | Gemini 3.1 Pro (High) |
-| **¿Por qué elegiste este LLM?** | Gemini 3.1 Pro ofrece un excelente nivel de razonamiento para arquitectura de software, patrones de diseño y refactorización, lo que lo hace ideal para resolver este tipo de exámenes complejos paso a paso. |
-
+| **¿Por qué elegiste este LLM?** | Usé Gemini 3.1 Pro en antigravity, ya que ofrece relativamente una buena cantidad de tokens y ofrece un manejo visual de los archivos que me gusta
 ## Estructura de la entrega
 
 | Pregunta | Tema | Puntos | Recomendada sin IA | Archivo |

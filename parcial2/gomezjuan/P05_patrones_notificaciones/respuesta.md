@@ -254,14 +254,21 @@ public class EjemploUso {
 
 #### 1. ¿Qué hizo bien el prompt?
 
-[Evalúa tu propio prompt, no la respuesta del LLM. ¿El contexto fue suficiente? ¿Las restricciones fueron claras? ¿El formato de salida que pediste ayudó a obtener una buena respuesta? ¿Qué parte de tu prompt fue más efectiva? Sé específico: menciona fragmentos concretos de tu prompt que funcionaron bien.]
+El prompt fue muy especifico al pedir los dos patrones por nombre y exigir justificacion de cómo se complementan. La restricción de "una falla en un componente no debe detener a los demás" fue importante pa obtener el bloque trycatch
 
 
 #### 2. ¿Qué se puede mejorar?
 
-[¿Qué le faltó a tu prompt? ¿Qué harías diferente si pudieras reformularlo? ¿El LLM entendió mal algo por falta de claridad en tu prompt? ¿La respuesta tiene errores u omisiones? ¿Qué no cubrió el LLM que tú sí sabes por lo visto en clase?]
+Faltó una estrategia de reintentos para fallas transitorias
 
 
 #### 3. Respuesta final
 
-[Escribe tu respuesta definitiva a la pregunta del parcial, integrando lo que aprendiste del LLM pero yendo más allá. Corrige errores, llena omisiones, conecta con conceptos vistos en clase. Esta es tu respuesta: demuestra que tú dominas el tema.]
+La combinación Observer + Strategy es correcta para este caso. El diseño cumple con:
+- Registro/desregistro 
+- Aislamiento de fallas 
+- OCP al agregar WhatsApp como canal es solo implementar disponibilidad y registrarlo
+
+Lo que agregaria en produccion:
+Reintentos con backoff exponencial para fallas transitorias.
+y un logging estructurado del resultado de cada observer

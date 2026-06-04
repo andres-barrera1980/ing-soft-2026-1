@@ -1,10 +1,10 @@
 # Plantilla de entrega — Parcial 2
 
-## Pregunta [09]: [vm vs containers]
+## Pregunta [10]: [vm vs containers]
 
 ### Estudiante
 
-* **Nombre completo**: Marlon Garcia
+* **Nombre completo**: [Marlon Garcia]
 
 ---
 

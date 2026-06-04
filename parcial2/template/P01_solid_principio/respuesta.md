@@ -146,3 +146,88 @@ public class EmailNotificacionService implements NotificacionService {
     }
 }
 
+// Interfaz de indexación
+public interface BuscadorService {
+    void indexar(Libro libro);
+}
+
+// Implementación Elasticsearch
+@Service
+public class ElasticsearchBuscadorService implements BuscadorService {
+    @Value("${elasticsearch.url}") private String esUrl;
+    
+    @Override
+    public void indexar(Libro libro) {
+        // Lógica de indexación
+    }
+}
+
+// Servicio de validación
+@Service
+public class LibroValidadorService {
+    public void validar(Libro libro) {
+        if (libro.getIsbn() == null || libro.getTitulo() == null || libro.getAutor() == null) {
+            throw new IllegalArgumentException("Datos del libro incompletos");
+        }
+    }
+}
+
+// GestorLibro refactorizado — solo coordina
+@Service
+public class GestorLibro {
+    private static final Logger log = LoggerFactory.getLogger(GestorLibro.class);
+    
+    private final LibroRepository libroRepository;
+    private final SlugService slugService;
+    private final NotificacionService notificacionService;
+    private final BuscadorService buscadorService;
+    private final LibroValidadorService validadorService;
+    
+    public GestorLibro(
+        LibroRepository libroRepository,
+        SlugService slugService,
+        NotificacionService notificacionService,
+        BuscadorService buscadorService,
+        LibroValidadorService validadorService
+    ) {
+        this.libroRepository = libroRepository;
+        this.slugService = slugService;
+        this.notificacionService = notificacionService;
+        this.buscadorService = buscadorService;
+        this.validadorService = validadorService;
+    }
+    
+    public void publicarLibro(Libro libro, Usuario vendedor) {
+        validadorService.validar(libro);
+        libro.setSlug(slugService.generarSlug(libro.getTitulo()));
+        libroRepository.guardar(libro);
+        notificacionService.notificarPublicacion(vendedor, libro);
+        buscadorService.indexar(libro);
+        log.info("Libro publicado: {} por {}", libro.getIsbn(), vendedor.getNombre());
+    }
+}
+```
+
+---
+
+### Analisis crítico de la respuesta
+
+#### 1. ¿Que hizo bien el prompt?
+
+El prompt fue efectivo en distintos aspectos. Primero, **el contexto del proyecto** fue suficientemente especifico: mencionar Java 21, Spring Boot 3.x y PostgreSQL orientó al LLM hacia respuestas con esas tecnologías. Segundo, pedir el **formato de salida estructurado** con secciones nombradas facilitó una respuesta organizada y comparable con la rúbrica.
+
+La parte de "justificación tecnica referenciando el codigo" fue útil: el LLM explico *por que* cada fragmento de código viola el SRP en lugar de dar una respuesta genérica.
+
+#### 2. ¿Qué se puede mejorar?
+
+El prompt podria haber pedido explicitamente **pruebas unitarias** para el `GestorLibro` refactorizado, lo que habría demostrado mejor la testabilidad del diseño resultante. Tambien falto pedir que el LLM considerara **transaccionalidad**: en el refactoring, si el email falla después de guardar en DB, ¿la transacción se revierte? El LLM no mencionó `@Transactional` ni el manejo de fallos parciales.
+
+Otro punto débil: el LLM creó un `LibroValidadorService` separado, lo cual es cuestionable — la validación básica podría vivir dentro del mismo `GestorLibro` o en la entidad `Libro` misma (un enfoque de dominio rico). El LLM optó por la solución más "mecánica" de separar todo.
+
+#### 3. Respuesta final
+
+**Principio violado principal: SRP (Single Responsibility Principle)**
+
+`GestorLibro.publicarLibro()` viola el SRP porque tiene *seis razones para cambiar*: cambio de proveedor de email, cambio de motor de búsqueda, cambio de esquema de BD, cambio en formato del slug, cambio en política de logging, y cambio en reglas de validación. El SRP dice que una clase debe tener una sola razón para cambiar.
+
+**Secundariamente viola DIP**, porque depende directamente de `EmailService` (clase concreta), `SearchIndex` (clase concreta) y `DriverManager` (API de bajo nivel) en lugar de abstracciones. Esto hace imposible testear `GestorLibro` sin una BD real, un servidor SMTP real y Elasticsearch real.

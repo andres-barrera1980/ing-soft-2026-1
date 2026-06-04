@@ -253,4 +253,4 @@ Pegar el código completo fue clave, el LLM tuvo el mismo punto de partida y el 
 #### 2. ¿Qué se puede mejorar?
 Solo identificó SRP y OCP pero ignoró DIP, que también se viola porque el código depende directamente de Files y Paths, implementaciones concretas de infraestructura. Curioso porque después lo soluciona con AuditoriaLog sin haberlo nombrado como problema. Los tests también quedaron incompletos, solo cubre EMAIL y tipo inválido, falta SMS, verificar que el logger recibe los parámetros correctos, y qué pasa si la estrategia lanza una excepción interna. Además el Map.of en el setUp no incluye PUSH aunque existe PushNotificacion, lo cual es confuso.
 #### 3. Respuesta final
-El código refactorizado es limpio y testeable. Para la próxima le pediría que identifique DIP desde el análisis inicial, complete los casos de prueba y que el mapa de estrategias en los tests refleje todo lo que existe en el código.
+El código refactorizado es limpio y testeable. Para la próxima le pediría que identifique DIP desde el análisis inicial, complete los casos de prueba y que el mapa de estrategias en los tests refleje todo lo que existe en el código.          

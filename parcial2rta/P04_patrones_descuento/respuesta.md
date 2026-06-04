@@ -23,7 +23,7 @@
 
 > **Si respondiste sin IA, omite esta sección y ve directamente a Análisis crítico.**
 
-```text
+```
 Actúa como un arquitecto de software senior. En el proyecto OpenLib Market necesitamos implementar un sistema para aplicar diferentes estrategias de descuento sobre el precio final del carrito de compras:
 - Descuento por fidelidad: 10% para compradores con más de 5 compras.
 - Descuento por temporada: 15% en la semana del libro (supongamos del 23 al 30 de abril).

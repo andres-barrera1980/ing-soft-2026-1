@@ -4,10 +4,10 @@
 
 ---
 
-## Pregunta [XX]: [Título resumido]
+## Pregunta [P13_integracion_refactoring]
 
 ### Estudiante
-- **Nombre completo**: [Tu nombre y apellido]
+- **Nombre completo**: [Alrjandro ANdres Perez Diaz]
 
 ---
 
@@ -15,9 +15,9 @@
 
 | Campo | Valor |
 |---|---|
-| **Nombre del LLM** | [Claude / ChatGPT / Gemini / Copilot / DeepSeek / Qwen / Mistral / Otro / **Sin IA — respuesta propia**] |
-| **Modelo específico** | [Ej: Claude Opus 4.5, GPT-4o, Gemini 2.5 Pro, etc. Si respondes sin IA, escribe "N/A"] |
-| **¿Por qué elegiste este LLM?** | [Justifica en 1-3 oraciones. Si respondes sin IA, explica por qué decidiste no usar LLM para esta pregunta.] |
+| **Nombre del LLM** | [ **Sin IA — respuesta propia**] |
+| **Modelo específico** | [ "N/A"] |
+| **¿Por qué elegiste este LLM?** | [tengo aputes en el cuaderno de este tema que discutimos en clase] |
 
 ---
 
@@ -66,4 +66,55 @@ pero menciona cuántas iteraciones hiciste.]
 
 #### 3. Respuesta final
 
-[Escribe tu respuesta definitiva a la pregunta del parcial, integrando lo que aprendiste del LLM pero yendo más allá. Corrige errores, llena omisiones, conecta con conceptos vistos en clase. Esta es tu respuesta: demuestra que tú dominas el tema.]
+[public interface CanalNotificacion {
+    void enviar(String destinatario, String mensaje);
+}
+
+public class NotificacionEmail implements CanalNotificacion {
+    public void enviar(String destinatario, String mensaje) {
+        System.out.println("EMAIL a " + destinatario + ": " + mensaje);
+    }
+}
+
+public class NotificacionSMS implements CanalNotificacion {
+    public void enviar(String destinatario, String mensaje) {
+        System.out.println("SMS a " + destinatario + ": " + mensaje);
+    }
+}
+
+public class NotificacionPush implements CanalNotificacion {
+    public void enviar(String destinatario, String mensaje) {
+        System.out.println("PUSH a " + destinatario + ": " + mensaje);
+    }
+}
+
+public class LogNotificaciones {
+    public void registrar(String tipo, String destinatario, String mensaje) {
+        try {
+            Files.write(Paths.get("/var/log/openlib/notificaciones.log"),
+                (tipo + "|" + destinatario + "|" + mensaje + "\n").getBytes(),
+                StandardOpenOption.APPEND);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+public class Notificador {
+    private final CanalNotificacion canal;
+    private final LogNotificaciones log;
+
+    public Notificador(CanalNotificacion canal, LogNotificaciones log) {
+        this.canal = canal;
+        this.log = log;
+    }
+
+    public void enviar(String tipo, String destinatario, String mensaje) {
+        canal.enviar(destinatario, mensaje);
+        log.registrar(tipo, destinatario, mensaje);
+    }
+}
+que se hizo?
+Lo que se hize fue crear una interfaz CanalNotificacion para que cada tipo de notificacion tenga su propia clase. Asi si manana agregan WhatsApp solo crean NotificacionWhatsApp sin tocar nada existente.
+El log tambien se saco aparte en LogNotificaciones porque no tiene nada que ver con enviar notificaciones son responsabilidades distintas. ademas el notificador ahora resibe el canal intectado.
+]

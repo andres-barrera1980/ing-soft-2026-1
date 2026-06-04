@@ -4,66 +4,94 @@
 
 ---
 
-## Pregunta [XX]: [Título resumido]
+## Pregunta [03]: [TP03_solid_jerarquia]
 
 ### Estudiante
-- **Nombre completo**: [Tu nombre y apellido]
+- **Nombre completo**: [Diego Alejandro Torres Barragan]
 
----
+-Respuesta hecha sin IA 
 
-### LLM utilizado
+#### 1. Respuesta final
 
-| Campo | Valor |
-|---|---|
-| **Nombre del LLM** | [Claude / ChatGPT / Gemini / Copilot / DeepSeek / Qwen / Mistral / Otro / **Sin IA — respuesta propia**] |
-| **Modelo específico** | [Ej: Claude Opus 4.5, GPT-4o, Gemini 2.5 Pro, etc. Si respondes sin IA, escribe "N/A"] |
-| **¿Por qué elegiste este LLM?** | [Justifica en 1-3 oraciones. Si respondes sin IA, explica por qué decidiste no usar LLM para esta pregunta.] |
+[En este punto el principio que se esta violando es la I ( Interface Segregation Principle) ya que la interfaz usuario tiene 5 metodos (comprar, vender, moderarComentario, GenerarReporteVenta y gestionarUsuarios), lo cual afecta bastante ya que ningun tipo de usuario necesita todos los metodos que tiene, comprador puede implementar la interfaz pero 4 de sus 5 metodos lanzarar un error ya que se le esta obligando a implementar cosas que no le corresponde. 
 
----
+Otro principio que se esta violando es la L(Liskov Substitution principle)en la jerarquia Vendedor extiende de  Comprador pero sobrescribe Comprar lanzando una execepcion, eso hace que se rompa LSP porque se tiene un comprador y lo remplazo por un vendedor , el programa ahi se romperia, ya que una subclase no deberia romper el comportamiento de su padre. ]
 
-### Prompt utilizado
+- El rediseñor que yo propongo es el siguiente 
 
-> **Si respondiste sin IA, omite esta sección y ve directamente a Análisis crítico.**
+separar la interfaz grande en interfaces pequeñas , una por cada capacidad 
 
+ -Comprable con metodo comprar
+ -Vendible con metodo vender
+ -Moderador con el metodo moderarCometario
+ -reportable con el metodo generarReporteVentas
+ -gestorUsuarios con el metodo gestionarUsuarios
+
+ Cada clase solo implementaria las interfaces que le corresponden.Asi nadie esta obligado a tener metodos que no usa. 
+ 
+```java
+// Interfaces separadas por capacidad
+public interface Comprable {
+    void comprar(Libro libro);
+}
+
+public interface Vendible {
+    void vender(Libro libro);
+}
+
+public interface Moderador {
+    void moderarComentario(Comentario comentario);
+}
+
+public interface Reportable {
+    void generarReporteVentas();
+}
+
+public interface GestorUsuarios {
+    void gestionarUsuarios();
+}
+
+// Comprador solo puede comprar
+public class Comprador implements Comprable {
+    @Override
+    public void comprar(Libro libro) {
+       
+    }
+}
+
+// Vendedor solo puede vender
+public class Vendedor implements Vendible {
+    @Override
+    public void vender(Libro libro) {
+        
+    }
+}
+
+// Administrador tiene todas las capacidades
+public class Administrador implements Comprable, Vendible, Moderador, Reportable, GestorUsuarios {
+    @Override
+    public void comprar(Libro libro) {
+       
+    }
+
+    @Override
+    public void vender(Libro libro) {
+        
+    }
+
+    @Override
+    public void moderarComentario(Comentario comentario) {
+        
+    }
+
+    @Override
+    public void generarReporteVentas() {
+        
+    }
+
+    @Override
+    public void gestionarUsuarios() {
+        
+    }
+}
 ```
-[Pega aquí el prompt exacto que enviaste al LLM. 
-Incluye TODO el texto, sin editar ni resumir.
-
-Un buen prompt incluye:
-- Contexto del proyecto OpenLib Market
-- El código o situación específica
-- Lo que esperas que el LLM haga
-- Restricciones (ej: "usa Java 21", "aplica SOLID")
-- Formato de salida esperado (ej: "respuesta en markdown con código Java")]
-```
-
----
-
-### Respuesta del LLM
-
-> **Si respondiste sin IA, omite esta sección y ve directamente a Análisis crítico.**
-[Pega aquí la respuesta COMPLETA del LLM, sin editar, sin resumir.
-Incluye TODO el texto, código, explicaciones que generó el LLM.
-
-Si el LLM generó código, asegúrate de que esté correctamente formateado.
-Si tuviste que hacer varias iteraciones, pega la MEJOR respuesta obtenida,
-pero menciona cuántas iteraciones hiciste.]
-```
-
----
-
-### Análisis crítico de la respuesta
-
-#### 1. ¿Qué hizo bien el prompt?
-
-[Evalúa tu propio prompt, no la respuesta del LLM. ¿El contexto fue suficiente? ¿Las restricciones fueron claras? ¿El formato de salida que pediste ayudó a obtener una buena respuesta? ¿Qué parte de tu prompt fue más efectiva? Sé específico: menciona fragmentos concretos de tu prompt que funcionaron bien.]
-
-
-#### 2. ¿Qué se puede mejorar?
-
-[¿Qué le faltó a tu prompt? ¿Qué harías diferente si pudieras reformularlo? ¿El LLM entendió mal algo por falta de claridad en tu prompt? ¿La respuesta tiene errores u omisiones? ¿Qué no cubrió el LLM que tú sí sabes por lo visto en clase?]
-
-
-#### 3. Respuesta final
-
-[Escribe tu respuesta definitiva a la pregunta del parcial, integrando lo que aprendiste del LLM pero yendo más allá. Corrige errores, llena omisiones, conecta con conceptos vistos en clase. Esta es tu respuesta: demuestra que tú dominas el tema.]

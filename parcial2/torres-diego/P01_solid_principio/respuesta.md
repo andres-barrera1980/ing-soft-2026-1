@@ -30,7 +30,7 @@ LibroRepositorio —> maneja la persistencia en base de datos
 SlugGenerator —> genera el slug a partir del título
 NotificadorVendedor —>envía el correo al vendedor
 IndiceLibros —>indexa el libro en el motor de búsqueda]
-
+```java
 // Valida que el libro tenga los datos obligatorios
 public class ValidadorLibro {
     public void validar(Libro libro) {
@@ -92,3 +92,4 @@ public class GestorLibro {
         Logger.getLogger("OpenLib").info("Libro publicado: " + libro.getIsbn());
     }
 }
+```

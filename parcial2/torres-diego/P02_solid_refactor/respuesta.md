@@ -22,7 +22,7 @@ Otro patron que violando es la S de los SOLID ya que como en el punto anterior s
 Ahora el patron que yo propondira para refactorizar este punto es Strategy 
 
 pues este praton no ayuda a que en ves de tener un if/else por tipo de pago , se crea una interfaz metodoPago, asi cada tipo de pago tendria su propia clase. asi ProcesarPAgo solo tendria que recibir metodo de pago y ejecutarlo sin importar cual sea , asi solucionando el proble aya que si llega un metodo de pago nuevo , solo es crea una clase nueva sin hacerle cambios a lo que ya existe  ]
-
+```java
 // Interfaz que deben implementar todos los métodos de pago
 public interface MetodoPago {
     ResultadoPago procesar(Pago pago);
@@ -71,3 +71,4 @@ public class ProcesadorPago {
         return metodoPago.procesar(pago);
     }
 }
+```

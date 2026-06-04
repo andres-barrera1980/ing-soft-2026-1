@@ -14,7 +14,7 @@
 |---|---|
 | **Nombre del LLM** | Claude |
 | **Modelo específico** | sonnet 4.6 |
-| **¿Por qué elegiste este LLM?** |  |
+| **¿Por qué elegiste este LLM?** | Sonnet es excelente evaluando patrones de disenio y aplicando principios SOLID en jerarquías de clases |
 
 ---
 
@@ -610,10 +610,12 @@ void procesarPago_conCripto_noCambiaClaseProcesadorPago() {
 
 #### 1. ¿Qué hizo bien el prompt?
 
+Pedir restricciones claras funcionó. Exigir que justificara el patrón frente a otras alternativas y plantear un caso de uso futuro (criptomonedas) obligó a la IA a pensar. No pudo limitarse a escupir código; tuvo que argumentar por qué descartaba Template Method o State. Pedir "principios violados" en plural también fue clave. La IA encontró el SRP obvio, pero escarbó hasta dar con el OCP y el DIP. El diagnóstico arquitectónico quedó completo.
 
 
 #### 2. ¿Qué se puede mejorar?
 
-
+Ignoró instrucciones y rompió contratos. El prompt decía: "solo POO pura, cero librerías externas para la lógica central". La IA ignoró esto y amarró toda la solución a Spring (@Component, @Service, @Configuration). El código original usaba una clase con estado: public ProcesadorPago(String tipoPago). La IA lo transformó en un servicio sin estado que saca el tipo de pago directamente del objeto. A nivel de arquitectura tiene sentido, pero modificó la firma original sin dar explicaciones. Y abusó de Java 21. Por cumplir la regla de usar "características modernas", metió un switch con pattern matching en el Factory. Complejidad innecesaria. Un simple Map.getOrDefault() resolvía el problema.
 
 #### 3. Respuesta final
+El diagnóstico inicial es impecable. El código base viola SRP, OCP y DIP. Strategy combinado con Factory es la solución correcta. Pero yo descartaría la implementación de la IA. Para respetar la regla de POO pura, eliminaría cualquier rastro de Spring. Un PagoStrategyFactory limpio con un registro explícito en el constructor basta para mantener el desacoplamiento sin depender de un framework. También dejaría por escrito el cambio de stateful a stateless en ProcesadorPago. Inyectar el tipo de pago en el constructor limitaba la reutilización de la instancia. El cambio era necesario, pero hay que documentarlo.

@@ -22,48 +22,201 @@
 ---
 
 ### Prompt utilizado
-
-> **Si respondiste sin IA, omite esta sección y ve directamente a Análisis crítico.**
-
-```
-[Pega aquí el prompt exacto que enviaste al LLM. 
-Incluye TODO el texto, sin editar ni resumir.
-
-Un buen prompt incluye:
-- Contexto del proyecto OpenLib Market
-- El código o situación específica
-- Lo que esperas que el LLM haga
-- Restricciones (ej: "usa Java 21", "aplica SOLID")
-- Formato de salida esperado (ej: "respuesta en markdown con código Java")]
-```
+Explica el ciclo de vida de un defecto aplicado al caso del botón “Agregar al carrito” en OpenLib Market. Para cada fase (detección → reporte → asignación → diagnóstico → corrección → verificación → cierre) indica: ¿quién es responsable?, ¿qué acción se toma?, ¿qué herramienta se usa?, ¿cuál sería el siguiente estado del defecto en Jira?
 
 ---
 
 ### Respuesta del LLM
 
-> **Si respondiste sin IA, omite esta sección y ve directamente a Análisis crítico.**
-[Pega aquí la respuesta COMPLETA del LLM, sin editar, sin resumir.
-Incluye TODO el texto, código, explicaciones que generó el LLM.
+A continuación tienes el ciclo de vida de un defecto aplicado al caso real de OpenLib Market (botón “Agregar al carrito” no responde al intentar agregar un sexto libro), con enfoque práctico de QA y Jira.
 
-Si el LLM generó código, asegúrate de que esté correctamente formateado.
-Si tuviste que hacer varias iteraciones, pega la MEJOR respuesta obtenida,
-pero menciona cuántas iteraciones hiciste.]
+🧩 Ciclo de Vida del Defecto
+🧪 Caso
+
+El usuario intenta agregar un sexto libro al carrito, pero:
+
+El botón no responde
+No hay mensaje de error
+No se agrega el libro
+1. Detección
+👤 Responsable
+
+Tester QA
+
+⚙️ Acción
+Ejecuta casos de prueba funcionales del carrito
+Detecta comportamiento incorrecto en el flujo de compra
+🛠️ Herramienta
+Ambiente QA / Staging
+Navegador web
+Plan de pruebas
+📌 Estado en Jira
+
+(No creado aún)
+
+Luego de detectar el bug:
+
+➡️ Se crea el ticket en Jira
+
+2. Reporte
+👤 Responsable
+
+Tester QA
+
+⚙️ Acción
+Registra el defecto en Jira con:
+Pasos para reproducir
+Resultado esperado vs actual
+Evidencia (capturas / video)
+Severidad y prioridad
+🛠️ Herramienta
+
+Jira
+
+📌 Estado en Jira
+
+OPEN / NEW
+
+3. Asignación
+👤 Responsable
+
+Scrum Master / Tech Lead / QA Lead
+
+⚙️ Acción
+Evalúa impacto del bug
+Asigna al desarrollador responsable del módulo de carrito
+Define prioridad (ej: Alta por impacto en ventas)
+🛠️ Herramienta
+
+Jira (tablero Scrum/Kanban)
+
+📌 Estado en Jira
+
+ASSIGNED / TO DO
+
+4. Diagnóstico
+👤 Responsable
+
+Desarrollador
+
+⚙️ Acción
+Reproduce el error localmente
+Revisa logs del frontend y backend
+Inspecciona lógica del carrito
+Posible causa raíz típica:
+if (carrito.size() >= 5) {
+    return; // bloquea el sexto libro incorrectamente
+}
+
+o error frontend:
+
+if (items.length === 5) disableButton();
+🛠️ Herramientas
+IDE (IntelliJ / VS Code)
+Debugger
+Logs de aplicación
+Browser DevTools
+Jira
+📌 Estado en Jira
+
+IN PROGRESS
+
+5. Corrección
+👤 Responsable
+
+Desarrollador
+
+⚙️ Acción
+Corrige la lógica del carrito
+Ajusta validación incorrecta
+Ejecuta pruebas unitarias y manuales locales
+Ejemplo de fix:
+// eliminar límite incorrecto o corregir regla de negocio
+if (carrito.size() > MAX_ITEMS) {
+    throw new BusinessException();
+}
+🛠️ Herramientas
+IDE
+Git
+Tests unitarios (JUnit)
+CI local
+📌 Estado en Jira
+
+RESOLVED / READY FOR TEST
+
+6. Verificación
+👤 Responsable
+
+Tester QA
+
+⚙️ Acción
+Repite el escenario original:
+Agregar 6 libros al carrito
+Ejecuta pruebas de regresión:
+agregar 1–10 libros
+eliminar libros
+checkout
+🛠️ Herramientas
+Jira
+Ambiente QA
+Suite de pruebas manuales / automatizadas
+📌 Estado en Jira
+
+TESTING / VERIFYING
+
+7. Cierre
+👤 Responsable
+
+QA Lead / Tester QA
+
+⚙️ Acción
+Confirma que el bug no ocurre más
+Verifica que no haya regresiones
+Aprueba el ticket como finalizado
+🛠️ Herramientas
+Jira
+Evidencia de pruebas
+📌 Estado en Jira
+
+CLOSED
+
+🔁 Resumen del flujo en Jira
+OPEN
+  ↓
+ASSIGNED
+  ↓
+IN PROGRESS
+  ↓
+RESOLVED
+  ↓
+TESTING
+  ↓
+CLOSED
+⚠️ Estados adicionales posibles
+Estado	Cuándo ocurre
+REOPENED	El bug reaparece tras la corrección
+REJECTED	No es un bug (comportamiento esperado)
+DUPLICATE	Ya existe otro ticket igual
+DEFERRED	Se pospone para otra versión
+🧠 Conclusión
+
+El ciclo de vida del defecto en OpenLib Market asegura trazabilidad completa desde la detección hasta el cierre. Cada fase tiene un responsable claro, una herramienta asociada (principalmente Jira), y un estado definido que permite controlar el progreso del error. Este flujo garantiza calidad del software, comunicación entre equipos y validación correcta antes de liberar nuevas versiones del sistema.
 ```
 
 ---
 
 ### Análisis crítico de la respuesta
-
+La respuesta del LLM aplicó correctamente el ciclo de vida del defecto al caso de OpenLib Market, mostrando un flujo claro desde la detección hasta el cierre, con responsables definidos, acciones concretas y estados en Jira bien descritos; además, incluyó estados adicionales como Reopened o Duplicate, lo que demuestra exhaustividad, y conectó la teoría con la práctica al dar un ejemplo de causa raíz en la validación del carrito.
 #### 1. ¿Qué hizo bien el prompt?
 
-[Evalúa tu propio prompt, no la respuesta del LLM. ¿El contexto fue suficiente? ¿Las restricciones fueron claras? ¿El formato de salida que pediste ayudó a obtener una buena respuesta? ¿Qué parte de tu prompt fue más efectiva? Sé específico: menciona fragmentos concretos de tu prompt que funcionaron bien.]
+Lo más acertado fue que cubrió todas las fases sin omitir ninguna, asignó responsables adecuados (tester, QA lead, desarrollador), vinculó cada fase con herramientas específicas (Jira, IDE, DevTools), y dio ejemplos de código que ilustran la causa raíz, lo que aporta realismo y aplicabilidad; también destacó la importancia de la trazabilidad en Jira y la validación en QA antes del cierre.
 
 
 #### 2. ¿Qué se puede mejorar?
 
-[¿Qué le faltó a tu prompt? ¿Qué harías diferente si pudieras reformularlo? ¿El LLM entendió mal algo por falta de claridad en tu prompt? ¿La respuesta tiene errores u omisiones? ¿Qué no cubrió el LLM que tú sí sabes por lo visto en clase?]
+La fase de diagnóstico fue tratada de manera superficial, ya que no profundizó en cómo se documenta la causa raíz ni en la diferencia entre un bug funcional y uno de interfaz; además, podría haber enfatizado más la comunicación entre QA y desarrollo durante la verificación y detallado cómo se asegura la trazabilidad completa en Jira, lo que haría la respuesta más sólida y cercana a las prácticas profesionales de gestión de defectos.
 
 
 #### 3. Respuesta final
 
-[Escribe tu respuesta definitiva a la pregunta del parcial, integrando lo que aprendiste del LLM pero yendo más allá. Corrige errores, llena omisiones, conecta con conceptos vistos en clase. Esta es tu respuesta: demuestra que tú dominas el tema.]
+el defecto del botón “Agregar al carrito” sigue el ciclo de vida estándar: primero es detectado por el tester al ejecutar pruebas funcionales, luego reportado en Jira con pasos, evidencia y severidad, después asignado por el QA Lead o Scrum Master al desarrollador responsable, quien en la fase de diagnóstico reproduce el error y encuentra la causa raíz en una validación incorrecta que bloquea el sexto ítem; en la fase de corrección el desarrollador ajusta la lógica y valida con pruebas unitarias, luego el tester realiza la verificación en ambiente QA confirmando que el carrito acepta más de cinco libros y que el contador se actualiza, y finalmente el defecto se cierra en Jira tras comprobar que no hay regresiones; este flujo asegura trazabilidad, responsables claros y estados definidos (Nuevo → Asignado → En progreso → Resuelto → Verificado → Cerrado), y demuestra cómo la gestión disciplinada de defectos garantiza calidad y comunicación efectiva en OpenLib Market.

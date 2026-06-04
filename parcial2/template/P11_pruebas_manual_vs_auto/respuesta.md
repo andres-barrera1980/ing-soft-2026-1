@@ -1,6 +1,5 @@
 # Plantilla de entrega — Parcial 2
 
-> **Instrucción**: Copia esta plantilla para cada pregunta del parcial. Reemplaza `[Pregunta XX]` por el identificador correcto (ej: `P01_solid_srp`) y completa todas las secciones. Haz al menos 2 commits por pregunta: uno con el prompt + respuesta del LLM, y otro con el análisis.
 
 ---
 
@@ -283,3 +282,4 @@ ambién habría sido útil pedir una justificación más profunda sobre el impac
 #### 3. Respuesta final
 
 [Escribe tu respuesta definitiva a la pregunta del parcial, integrando lo que aprendiste del LLM pero yendo más allá. Corrige errores, llena omisiones, conecta con conceptos vistos en clase. Esta es tu respuesta: demuestra que tú dominas el tema.]
+Las pruebas manuales y automatizadas se complementan entre sí. Las manuales son mejores para evaluar la experiencia del usuario y detectar problemas visuales o de usabilidad, mientras que las automatizadas son ideales para tareas repetitivas como validar pagos, inventario o reglas de negocio. Para OpenLib Market no sería conveniente automatizar todo desde el inicio, ya que implica un costo alto y muchas funcionalidades aún pueden cambiar. Lo más recomendable es automatizar los procesos críticos y mantener manuales las pruebas relacionadas con la experiencia de usuario, logrando así un buen equilibrio entre calidad, tiempo y costos.

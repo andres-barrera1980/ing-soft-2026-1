@@ -4,10 +4,10 @@
 
 ---
 
-## Pregunta [XX]: [Título resumido]
+## Pregunta [12]: [P12_ciclo_vida_defectos]
 
 ### Estudiante
-- **Nombre completo**: [Tu nombre y apellido]
+- **Nombre completo**: [Jhoan Galeano]
 
 ---
 
@@ -15,9 +15,9 @@
 
 | Campo | Valor |
 |---|---|
-| **Nombre del LLM** | [Claude / ChatGPT / Gemini / Copilot / DeepSeek / Qwen / Mistral / Otro / **Sin IA — respuesta propia**] |
-| **Modelo específico** | [Ej: Claude Opus 4.5, GPT-4o, Gemini 2.5 Pro, etc. Si respondes sin IA, escribe "N/A"] |
-| **¿Por qué elegiste este LLM?** | [Justifica en 1-3 oraciones. Si respondes sin IA, explica por qué decidiste no usar LLM para esta pregunta.] |
+| **Nombre del LLM** | **Sin IA — respuesta propia**] |
+| **Modelo específico** | "N/A"] |
+| **¿Por qué elegiste este LLM?** | Es una pregunat de paso a paso, que vimos y si se analiza bien se puede obetener la respuesta.] |
 
 ---
 
@@ -66,4 +66,4 @@ pero menciona cuántas iteraciones hiciste.]
 
 #### 3. Respuesta final
 
-[Escribe tu respuesta definitiva a la pregunta del parcial, integrando lo que aprendiste del LLM pero yendo más allá. Corrige errores, llena omisiones, conecta con conceptos vistos en clase. Esta es tu respuesta: demuestra que tú dominas el tema.]
+[Para gestionar este defecto,  inicia con la Detección y Reporte, donde el Tester identifica el fallo al intentar añadir el sexto libro y crea el ticket en Jira con los pasos de reproducción; el estado del defecto pasa a  Nuevo. Luego, en la Asignación, el Project Manager revisa el ticket en Jira y se lo asigna a un Desarrollador, cambiando el estado a asignado.]

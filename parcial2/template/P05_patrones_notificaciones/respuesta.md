@@ -221,3 +221,51 @@ public class NotificacionConfig {
 }
 ```
 
+## Flujo completo de ejemplo
+
+```java
+// Cuando el vendedor repone stock:
+@Service
+public class InventarioService {
+    private final GestorDisponibilidad gestorDisponibilidad;
+    private final LibroRepository libroRepository;
+    
+    public void reponerStock(Long libroId, int cantidad) {
+        Libro libro = libroRepository.findById(libroId).orElseThrow();
+        boolean eraAgotado = libro.getEstado() == EstadoLibro.AGOTADO;
+        
+        libro.setStock(libro.getStock() + cantidad);
+        if (libro.getStock() > 0) {
+            libro.setEstado(EstadoLibro.DISPONIBLE);
+        }
+        libroRepository.save(libro);
+        
+        // Solo notificar si el libro VOLVIÓ a estar disponible (no si ya estaba)
+        if (eraAgotado && libro.getEstado() == EstadoLibro.DISPONIBLE) {
+            gestorDisponibilidad.notificarDisponibilidad(libro);
+        }
+    }
+}
+```
+
+---
+
+### Análisis crítico de la respuesta
+
+#### 1. ¿Qué hizo bien el prompt?
+
+El prompt fue muy efectivo al especificar el **requisito de aislamiento de fallos** ("si la notificación push falla, no debe interrumpir el email"). Esto llevó al LLM a implementar el `try-catch` en el loop de observers, que es la solución correcta. Sin esta restricción explícita, el LLM hubiera omitido el manejo de errores.
+
+La solicitud de **diagrama Mermaid + código + flujo completo** forzó una respuesta integral que permite evaluar el diseño de principio a fin.
+
+#### 2. ¿Qué se puede mejorar?
+
+El LLM no consideró **notificaciones asíncronas**. En producción, notificar a todos los usuarios de la wishlist de forma síncrona en el mismo hilo que repone el stock es un antipatrón — si hay 10,000 usuarios en la wishlist, el método `reponerStock()` tarda minutos. La solución real usa eventos de Spring (`@EventListener` + `@Async`) o un message broker como Kafka/RabbitMQ.
+
+También omitió **deduplicación de eventos**: si `reponerStock()` se llama dos veces seguidas (por error o concurrencia), se enviarían dos emails al mismo usuario. Falta un mecanismo de idempotencia.
+
+El `CopyOnWriteArrayList` es correcta para thread-safety, pero el LLM no explicó por qué eligió esa estructura.
+
+#### 3. Respuesta final
+
+**Los patrones Observer + Strategy (implícito en los observers)** son la elección correcta para este escenario. Observer desacopla el libro de los sistemas de notificación; cada observer encapsula su estrategia de notificación (email vs. push vs. caché).

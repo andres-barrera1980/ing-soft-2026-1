@@ -243,7 +243,7 @@ public class Main {
 
 #### 1. ¿Qué hizo bien el prompt?
 
-[El prompt fue suficiente pero para este caso fue un poco ambiguo a la hora de explicar que se necesitaba el diagrmaa de clases, debia enfatizar un poc mas directo.]
+[El prompt fue suficiente pero para este caso fue un poco ambiguo a la hora de explicar que se necesitaba el diagrmaa de clases, debia enfatizar un poco mas directo.]
 
 
 #### 2. ¿Qué se puede mejorar?
@@ -253,4 +253,8 @@ public class Main {
 
 #### 3. Respuesta final
 
-[Escribe tu respuesta definitiva a la pregunta del parcial, integrando lo que aprendiste del LLM pero yendo más allá. Corrige errores, llena omisiones, conecta con conceptos vistos en clase. Esta es tu respuesta: demuestra que tú dominas el tema.]
+[¿El LLM eligió patrones adecuados para este escenario?  Para este caso si, el principal que se escogio fue observer, es bueno ya que este escenario puede resolver el problema de notificar a multiples interesados cuando el estaod del objeto cambia.
+¿La combinación de patrones tiene sentido o están forzados? Si, tiene sentido.
+ ¿El diseño permite registrar y desregistrar dinámicamente los componentes interesados?Si, dado que pued permitir registrar y realizar diferente dinamicas de los componentes. 
+ ¿Cómo manejaría el caso de que una notificación falle? se podria interrumpir el ciclo y evitar que  que se actualice la cache.
+  ¿El acoplamiento entre los componentes es el adecuado?] es adecuado pero no perfecto,  dado que la clase permite que se emita el evento pero n o conoce los detalles tecnicos.

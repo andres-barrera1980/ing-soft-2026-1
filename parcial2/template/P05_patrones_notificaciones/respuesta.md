@@ -4,10 +4,10 @@
 
 ---
 
-## Pregunta [XX]: [Título resumido]
+## Pregunta [05]: [P05_patrones_notificaciones]
 
 ### Estudiante
-- **Nombre completo**: [Tu nombre y apellido]
+- **Nombre completo**: [Danna Gabriela Rojas Bernal]
 
 ---
 
@@ -15,9 +15,9 @@
 
 | Campo | Valor |
 |---|---|
-| **Nombre del LLM** | [Claude / ChatGPT / Gemini / Copilot / DeepSeek / Qwen / Mistral / Otro / **Sin IA — respuesta propia**] |
-| **Modelo específico** | [Ej: Claude Opus 4.5, GPT-4o, Gemini 2.5 Pro, etc. Si respondes sin IA, escribe "N/A"] |
-| **¿Por qué elegiste este LLM?** | [Justifica en 1-3 oraciones. Si respondes sin IA, explica por qué decidiste no usar LLM para esta pregunta.] |
+| **Sin IA — respuesta propia** | [Claude / ChatGPT / Gemini / Copilot / DeepSeek / Qwen / Mistral / Otro / **Sin IA — respuesta propia**] |
+| **N/A** | [Ej: Claude Opus 4.5, GPT-4o, Gemini 2.5 Pro, etc. Si respondes sin IA, escribe "N/A"] |
+| ** No es necesario** | [Justifica en 1-3 oraciones. Si respondes sin IA, explica por qué decidiste no usar LLM para esta pregunta.] |
 
 ---
 
@@ -53,17 +53,70 @@ pero menciona cuántas iteraciones hiciste.]
 ---
 
 ### Análisis crítico de la respuesta
+**Pregunta **: Diseña e implementa este sistema usando **dos patrones de diseño de los vistos en clase** que trabajen en conjunto.
 
-#### 1. ¿Qué hizo bien el prompt?
+Para este problema utilizaría una combinacion de los patrones Observer y Strategy, pues el patron Observer permite que cuando un libro vuelva a estar disponible, todos los componentes interesados sean notificados automaticamente como el servicio de correos, las notificaciones push o el sistema de auditoria. De esta forma, el libro no necesita conocer los detalles de cada accion que se ejecuta despues del cambio de estado. Y el patrOn Strategy permite que cada tipo de notificación implemente su propia logica de manera independiente, por ejemplo, enviar un correo, una notificación móvil o registrar información en un log.
 
-[Evalúa tu propio prompt, no la respuesta del LLM. ¿El contexto fue suficiente? ¿Las restricciones fueron claras? ¿El formato de salida que pediste ayudó a obtener una buena respuesta? ¿Qué parte de tu prompt fue más efectiva? Sé específico: menciona fragmentos concretos de tu prompt que funcionaron bien.]
+Para observer:
+public interface ObservadorDisponibilidad {
+    void actualizar(Libro libro);
+}
+public class NotificadorCorreo implements ObservadorDisponibilidad {
 
+    @Override
+    public void actualizar(Libro libro) {
+        System.out.println(
+            "Enviando correo a usuarios con el libro "
+            + libro.getTitulo()
+            + " en su wishlist."
+        );
+    }
+}
+public class NotificadorPush implements ObservadorDisponibilidad {
 
-#### 2. ¿Qué se puede mejorar?
+    @Override
+    public void actualizar(Libro libro) {
+        System.out.println(
+            "Enviando notificación push a usuarios favoritos de "
+            + libro.getTitulo()
+        );
+    }
+}
+public class ActualizadorRedis implements ObservadorDisponibilidad {
 
-[¿Qué le faltó a tu prompt? ¿Qué harías diferente si pudieras reformularlo? ¿El LLM entendió mal algo por falta de claridad en tu prompt? ¿La respuesta tiene errores u omisiones? ¿Qué no cubrió el LLM que tú sí sabes por lo visto en clase?]
+    @Override
+    public void actualizar(Libro libro) {
+        System.out.println(
+            "Actualizando caché Redis para "
+            + libro.getTitulo()
+        );
+    }
+}
+public class AuditoriaLog implements ObservadorDisponibilidad {
 
+    @Override
+    public void actualizar(Libro libro) {
+        System.out.println(
+            "Registrando evento de auditoría para "
+            + libro.getTitulo()
+        );
+    }
+}
+Strategy
+public interface EstrategiaNotificacion {
+    void ejecutar(Libro libro);
+}
+public class CorreoStrategy implements EstrategiaNotificacion {
 
-#### 3. Respuesta final
+    @Override
+    public void ejecutar(Libro libro) {
+        System.out.println("Enviando correo para " + libro.getTitulo());
+    }
+}
+public class RedisStrategy implements EstrategiaNotificacion {
 
-[Escribe tu respuesta definitiva a la pregunta del parcial, integrando lo que aprendiste del LLM pero yendo más allá. Corrige errores, llena omisiones, conecta con conceptos vistos en clase. Esta es tu respuesta: demuestra que tú dominas el tema.]
+    @Override
+    public void ejecutar(Libro libro) {
+        System.out.println("Actualizando Redis para " + libro.getTitulo());
+    }
+}

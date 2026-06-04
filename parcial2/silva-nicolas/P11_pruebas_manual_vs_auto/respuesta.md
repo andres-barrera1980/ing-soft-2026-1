@@ -1,13 +1,7 @@
-# Plantilla de entrega — Parcial 2
-
-> **Instrucción**: Copia esta plantilla para cada pregunta del parcial. Reemplaza `[Pregunta XX]` por el identificador correcto (ej: `P01_solid_srp`) y completa todas las secciones. Haz al menos 2 commits por pregunta: uno con el prompt + respuesta del LLM, y otro con el análisis.
-
----
-
-## Pregunta [XX]: [Título resumido]
+## Pregunta 11
 
 ### Estudiante
-- **Nombre completo**: [Tu nombre y apellido]
+- **Nombre completo**: Nicolas Silva García
 
 ---
 
@@ -15,11 +9,20 @@
 
 | Campo | Valor |
 |---|---|
-| **Nombre del LLM** | [Claude / ChatGPT / Gemini / Copilot / DeepSeek / Qwen / Mistral / Otro / **Sin IA — respuesta propia**] |
-| **Modelo específico** | [Ej: Claude Opus 4.5, GPT-4o, Gemini 2.5 Pro, etc. Si respondes sin IA, escribe "N/A"] |
-| **¿Por qué elegiste este LLM?** | [Justifica en 1-3 oraciones. Si respondes sin IA, explica por qué decidiste no usar LLM para esta pregunta.] |
+| **Nombre del LLM** | [**Sin IA — respuesta propia**] |
+| **Modelo específico** | [N/A] |
+| **¿Por qué elegiste este LLM?** | [Decidi responder sin IA porque es un tema bastante manejable y no requeria de una IA] |
 
 ---
+
+### Pregunta 11
+
+En el proceso de desarrollo de software, existen dos enfoques principales para las pruebas: **pruebas manuales** y **pruebas automatizadas**. Cada uno tiene ventajas, desventajas y contextos donde es más apropiado. OpenLib Market está definiendo su estrategia de testing para el primer release.
+
+**Tarea**:
+
+1. **Prompt**: Pídele a tu LLM que compare pruebas manuales y automatizadas considerando: ventajas de cada una (mínimo 3), desventajas de cada una (mínimo 3), tipos de pruebas que aplican a cada enfoque, criterios para decidir cuándo automatizar una prueba y cuándo hacerla manual, y una recomendación concreta de qué pruebas deberían ser manuales y cuáles automatizadas en OpenLib Market. Pega el prompt y la respuesta.
+2. **Análisis**: ¿El LLM capturó correctamente las ventajas y desventajas de cada enfoque? ¿Mencionó el costo de mantenimiento de las pruebas automatizadas? ¿Los criterios de decisión son prácticos o genéricos? ¿La recomendación para OpenLib Market es realista para el contexto del proyecto? ¿Qué ventaja o desventaja importante omitió el LLM?
 
 ### Prompt utilizado
 
@@ -48,7 +51,7 @@ Incluye TODO el texto, código, explicaciones que generó el LLM.
 Si el LLM generó código, asegúrate de que esté correctamente formateado.
 Si tuviste que hacer varias iteraciones, pega la MEJOR respuesta obtenida,
 pero menciona cuántas iteraciones hiciste.]
-```
+
 
 ---
 
@@ -56,14 +59,61 @@ pero menciona cuántas iteraciones hiciste.]
 
 #### 1. ¿Qué hizo bien el prompt?
 
-[Evalúa tu propio prompt, no la respuesta del LLM. ¿El contexto fue suficiente? ¿Las restricciones fueron claras? ¿El formato de salida que pediste ayudó a obtener una buena respuesta? ¿Qué parte de tu prompt fue más efectiva? Sé específico: menciona fragmentos concretos de tu prompt que funcionaron bien.]
-
+No aplica, esta respuesta es mia propia
 
 #### 2. ¿Qué se puede mejorar?
 
-[¿Qué le faltó a tu prompt? ¿Qué harías diferente si pudieras reformularlo? ¿El LLM entendió mal algo por falta de claridad en tu prompt? ¿La respuesta tiene errores u omisiones? ¿Qué no cubrió el LLM que tú sí sabes por lo visto en clase?]
-
+No aplica, esta respuesta es mia propia
 
 #### 3. Respuesta final
 
-[Escribe tu respuesta definitiva a la pregunta del parcial, integrando lo que aprendiste del LLM pero yendo más allá. Corrige errores, llena omisiones, conecta con conceptos vistos en clase. Esta es tu respuesta: demuestra que tú dominas el tema.]
+Pruebas Manuales
+
+ventajas
+- Permite descubrir errores visuales, de usabilidad (UX) y flujos ilógicos que un script no puede detectar.
+- No requiere programar código ni configurar infraestructura compleja para empezar a probar.
+- Ideal para características que cambian constantemente, donde mantener scripts automatizados sería una pérdida de tiempo.
+
+desventajas
+- Son extremadamente lentas
+- Susceptibles a subjetividad y error humano
+- Dificiles de escalar
+
+Pruebas Automatizadas
+
+ventajas
+- Se pueden ejecutar miles de veces en minutos (o segundos), garantizando consistencia absoluta.s
+- Permiten validar cada commit o Pull Request instantáneamente, previniendo regresiones.
+- Facilitan las pruebas basadas en datos, probando un mismo algoritmo con resto de entradas diferentes.
+
+desventajas
+- Requieren inversión inicial en tiempo y herramientas
+- No detectan problemas de UX/UI
+- Requieren mantenimiento constante
+
+Tipos de Pruebas Manuales:
+
+    Pruebas Exploratorias: El tester navega por el programa intentando encontrar errores, basandose en su experiencia.
+
+    Pruebas de Usabilidad (UX/UI): Evaluar si el diseño es intuitivo y estéticamente correcto.
+
+    User Acceptance Testing (UAT): Pruebas de aceptación realizadas por el cliente final o Product Owner para validar si el software cumple las expectativas del negocio.
+
+Tipos de Pruebas Automatizadas:
+
+    Pruebas Unitarias: Validar el comportamiento aislado de funciones o clases.
+
+    Pruebas de Integración: Verificar que diferentes módulos se comuniquen correctamente.
+
+Cuándo Automatizar:
+
+    La tarea es repetitiva y predecible 
+    Es un Core Business Path donde un fallo significa pérdida de dinero inmediata 
+    Es necesario ejecutar la prueba en múltiples navegadores o dispositivos sistemáticamente.
+    Se requiere probar combinaciones masivas de datos 
+
+Cuándo hacer Pruebas Manuales:
+
+    La funcionalidad es un MVP (Producto Mínimo Viable) y su flujo cambiará drásticamente la próxima semana.
+    Se requiere validar la "sensación" de la aplicación (¿El botón de checkout invita a hacer clic? ¿El color rojo de "Agotado" se ve bien?).
+    Casos de uso de una sola vez cuyo esfuerzo de programación es mayor que el beneficio.

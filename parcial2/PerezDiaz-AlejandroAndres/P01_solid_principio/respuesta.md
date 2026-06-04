@@ -66,4 +66,4 @@ pero menciona cuántas iteraciones hiciste.]
 
 #### 3. Respuesta final
 (No use  IA)
-[De los princios SOLID se esta violado la s que es la responsabilidad unica que basicamente se viola ya que en este codigo se etan haciendo demaciadas cosas tiene mas de una responsabildiad ya que este guarda libro,valida el libro etc coclusion no cumple con loq ue ice su nombre unica resposabildiad  ademas de violar el patron de Single Responsability. ]
+[De los princios SOLID se esta violado la s que es la responsabilidad unica que basicamente se viola ya que en este codigo se etan haciendo demaciadas cosas tiene mas de una responsabildiad ya que este guarda libro,valida el libro etc coclusion no cumple con lo que dice su nombre unica resposabildiad. ]

@@ -447,14 +447,23 @@ Para robustecer la aplicación en producción, se deberían iterar los siguiente
 
 #### 1. ¿Qué hizo bien el prompt?
 
-[Evalúa tu propio prompt, no la respuesta del LLM. ¿El contexto fue suficiente? ¿Las restricciones fueron claras? ¿El formato de salida que pediste ayudó a obtener una buena respuesta? ¿Qué parte de tu prompt fue más efectiva? Sé específico: menciona fragmentos concretos de tu prompt que funcionaron bien.]
-
+El prompt fue bueno porque definio claramente las reglas de negocio y obligo al LLM a seguir el proceso completo de TDD. Ademas, especifico el orden RED , GREEN ,REFACTOR, evitando que la implementacion apareciera antes de las pruebas. Tambien fue util exigir JUnit 5, Mockito y una explicacion de cada fase, ya que eso produjo una respuesta mas organizada y facil de analizar.
 
 #### 2. ¿Qué se puede mejorar?
 
-[¿Qué le faltó a tu prompt? ¿Qué harías diferente si pudieras reformularlo? ¿El LLM entendió mal algo por falta de claridad en tu prompt? ¿La respuesta tiene errores u omisiones? ¿Qué no cubrió el LLM que tú sí sabes por lo visto en clase?]
+Aunque la respuesta sigue correctamente las fases de TDD, faltaron algunos escenarios importantes. No se incluyeron pruebas para validar que no se pueda reducir mas stock del disponible ni para cantidades negativas o cero. Tampoco se verifico que al reponer inventario no se genere una nueva notificacion al vendedor.
+
+Ademas, no existe una forma de demostrar con certeza que las pruebas fueron escritas antes que la implementacion. Lo unico que puede evaluarse es si la explicacion respeta el flujo de TDD y si la implementacion minima parece derivarse directamente de las pruebas planteadas.
 
 
 #### 3. Respuesta final
 
-[Escribe tu respuesta definitiva a la pregunta del parcial, integrando lo que aprendiste del LLM pero yendo más allá. Corrige errores, llena omisiones, conecta con conceptos vistos en clase. Esta es tu respuesta: demuestra que tú dominas el tema.]
+La respuesta aplica de manera adecuada el enfoque TDD porque comienza con la definicion de pruebas que representan los comportamientos esperados del sistema, despues desarrolla una implementacion minima para satisfacer esas pruebas y finalmente realiza un refactoring para mejorar el diseño sin modificar el resultado funcional.
+
+Los escenarios principales del enunciado fueron cubiertos correctamente. Se valida que un libro pase a estado AGOTADO cuando el stock llega a cero, que se notifique al vendedor cuando ocurre ese cambio, que el libro permanezca DISPONIBLE mientras exista stock y que vuelva a estar DISPONIBLE cuando el inventario sea repuesto.
+
+El refactoring tambien aporta mejoras al diseño porque traslada parte de la logica de negocio a la entidad Libro, logrando un mejor encapsulamiento y reduciendo responsabilidades dentro del servicio. Esto hace que el codigo sea mas mantenible y coherente con principios de orientacion a objetos.
+
+Sin embargo, agregaria pruebas adicionales para validar reducciones de stock superiores a la cantidad disponible, reposiciones con valores invalidos y la confirmacion de que reponer inventario no genera nuevas notificaciones. Estas pruebas aumentarian la cobertura y harian mas robusta la solucion.
+
+En general, considero que la respuesta sigue correctamente el ciclo RED-GREEN-REFACTOR y representa una aplicacion razonable de TDD para la funcionalidad planteada.

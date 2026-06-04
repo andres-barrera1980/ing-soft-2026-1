@@ -99,3 +99,7 @@ public class AdministradorSistema implements IComprador, IVendedor, IAdministrad
 ---
 
 ### Análisis crítico de la respuesta
+El prompt funcionó bien porque pegué el código completo de la jerarquía y le asigné el rol de Arquitecto Senior, lo que lo orientó a dar respuestas más técnicas. Eso permitió que identificara ISP y LSP directamente.
+Lo que le faltó fue más grave que lo que acertó. Primero, ignoró OCP: si mañana entra un Auditor, toca modificar la interfaz Usuario entera. Segundo, mencionó superficialmente el problema de Vendedor extends Comprador pero no explicó el impacto real: un método procesarCompra(Comprador c) puede recibir un Vendedor en tiempo de ejecución y explotar con UnsupportedOperationException sin que el compilador avise nada. Tercero, en su rediseño asumió que un vendedor también puede comprar sin cuestionarlo, cuando eso es una decisión de negocio que debió preguntar.
+La solución correcta es segregar Usuario en interfaces por capacidad real, Comprador, Vendedor, Moderador, GestorUsuarios, y que cada clase implemente solo lo que necesita. Así se elimina la herencia rota, cada rol queda aislado y agregar nuevos tipos de usuario no toca el código existente.
+En el prompt debí pedir explícitamente que cubriera todos los principios SOLID y que justificara las decisiones de negocio antes de asumir qué puede hacer cada rol.

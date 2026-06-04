@@ -1,13 +1,7 @@
-# Plantilla de entrega — Parcial 2
-
-> **Instrucción**: Copia esta plantilla para cada pregunta del parcial. Reemplaza `[Pregunta XX]` por el identificador correcto (ej: `P01_solid_srp`) y completa todas las secciones. Haz al menos 2 commits por pregunta: uno con el prompt + respuesta del LLM, y otro con el análisis.
-
----
-
-## Pregunta [XX]: [Título resumido]
+# Pregunta P03: SOLID — Jerarquía de usuarios ⭐
 
 ### Estudiante
-- **Nombre completo**: [Tu nombre y apellido]
+- **Nombre completo**: Mateo Traslaviña Moreno
 
 ---
 
@@ -15,55 +9,75 @@
 
 | Campo | Valor |
 |---|---|
-| **Nombre del LLM** | [Claude / ChatGPT / Gemini / Copilot / DeepSeek / Qwen / Mistral / Otro / **Sin IA — respuesta propia**] |
-| **Modelo específico** | [Ej: Claude Opus 4.5, GPT-4o, Gemini 2.5 Pro, etc. Si respondes sin IA, escribe "N/A"] |
-| **¿Por qué elegiste este LLM?** | [Justifica en 1-3 oraciones. Si respondes sin IA, explica por qué decidiste no usar LLM para esta pregunta.] |
+| **Nombre del LLM** | Sin IA — respuesta propia |
+| **Modelo especifico** | N/A |
+| **¿Por que elegiste este LLM?** | Esta pregunta es marcada con ⭐ como recomendada sin IA. Ademas, los principios ISP y LSP en jerarquias de herencia son temas que estudie directamente en clase y tengo criterio propio para identificar las violaciones sin necesitar asistencia de un modelo de lenguaje. Responder sin IA me otorga el bono del +20%. |
 
 ---
 
-### Prompt utilizado
+### Analisis crítico de la respuesta
 
-> **Si respondiste sin IA, omite esta sección y ve directamente a Análisis crítico.**
+## Principios SOLID violados en esta jerarquia
 
-```
-[Pega aquí el prompt exacto que enviaste al LLM. 
-Incluye TODO el texto, sin editar ni resumir.
+**1. ISP — Interface Segregation Principle (violacion principal)**
 
-Un buen prompt incluye:
-- Contexto del proyecto OpenLib Market
-- El código o situación específica
-- Lo que esperas que el LLM haga
-- Restricciones (ej: "usa Java 21", "aplica SOLID")
-- Formato de salida esperado (ej: "respuesta en markdown con código Java")]
-```
+La interfaz `Usuario` obliga a TODOS los tipos de usuario a declarar metodos que no les corresponden:
 
----
-
-### Respuesta del LLM
-
-> **Si respondiste sin IA, omite esta sección y ve directamente a Análisis crítico.**
-[Pega aquí la respuesta COMPLETA del LLM, sin editar, sin resumir.
-Incluye TODO el texto, código, explicaciones que generó el LLM.
-
-Si el LLM generó código, asegúrate de que esté correctamente formateado.
-Si tuviste que hacer varias iteraciones, pega la MEJOR respuesta obtenida,
-pero menciona cuántas iteraciones hiciste.]
+```java
+public interface Usuario {
+    void comprar(Libro libro);       // No aplica a Administrador puro
+    void vender(Libro libro);        // No aplica a Comprador
+    void moderarComentario(...);     // Solo Administrador
+    void generarReporteVentas();     // Solo Administrador
+    void gestionarUsuarios();        // Solo Administrador
+}
 ```
 
----
+`Comprador` implementa `vender()`, `moderarComentario()`, `generarReporteVentas()` y `gestionarUsuarios()` lanzando `UnsupportedOperationException`. Esto es exactamente lo que ISP prohíbe: una clase nunca debería verse forzada a implementar métodos que no usa.
 
-### Análisis crítico de la respuesta
+**2. LSP — Liskov Substitution Principle (violación grave en tiempo de ejecución)**
 
-#### 1. ¿Qué hizo bien el prompt?
+Vendedor extends Comprador y sobrescribe comprar() lanzando UnsupportedOperationException. Esto viola LSP brutalmente: si tengo una referencia de tipo Comprador y le paso un Vendedor, llamar comprar() lanza una excepcion en tiempo de ejecucion que el codigo cliente no esperaba. Un Vendedor NO es sustituible por un Comprador — la herencia esta invertida conceptualmente.
 
-[Evalúa tu propio prompt, no la respuesta del LLM. ¿El contexto fue suficiente? ¿Las restricciones fueron claras? ¿El formato de salida que pediste ayudó a obtener una buena respuesta? ¿Qué parte de tu prompt fue más efectiva? Sé específico: menciona fragmentos concretos de tu prompt que funcionaron bien.]
+```java
+Comprador c = new Vendedor(); // Compila sin problema
+c.comprar(unLibro);           // ¡Explota en runtime! LSP violado
+```
 
+**3. SRP secundario**: Administrador hereda de Vendedor (que hereda de Comprador), acoplando tres roles distintos en una jerarquia de herencia profunda. Si el rol de Vendedor cambia, Administrador se ve afectado automaticamente.
 
-#### 2. ¿Qué se puede mejorar?
+**Rediseño correcto aplicando ISP y composición sobre herencia:**
 
-[¿Qué le faltó a tu prompt? ¿Qué harías diferente si pudieras reformularlo? ¿El LLM entendió mal algo por falta de claridad en tu prompt? ¿La respuesta tiene errores u omisiones? ¿Qué no cubrió el LLM que tú sí sabes por lo visto en clase?]
+```java
+// Interfaces segregadas por capacidad
+public interface Comprador {
+    void comprar(Libro libro);
+}
 
+public interface Vendedor {
+    void vender(Libro libro);
+    void generarReporteVentas();
+}
 
-#### 3. Respuesta final
+public interface Moderador {
+    void moderarComentario(Comentario comentario);
+}
 
-[Escribe tu respuesta definitiva a la pregunta del parcial, integrando lo que aprendiste del LLM pero yendo más allá. Corrige errores, llena omisiones, conecta con conceptos vistos en clase. Esta es tu respuesta: demuestra que tú dominas el tema.]
+public interface AdministradorSistema {
+    void gestionarUsuarios();
+}
+
+// Implementaciones con exactamente las capacidades que necesitan
+public class UsuarioComprador implements Comprador {
+    @Override
+    public void comprar(Libro libro) { /* implementación real */ }
+}
+
+public class UsuarioVendedor implements Vendedor {
+    @Override
+    public void vender(Libro libro) { /* implementación real */ }
+    
+    @Override
+    public void generarReporteVentas() { /* implementación real */ }
+}
+

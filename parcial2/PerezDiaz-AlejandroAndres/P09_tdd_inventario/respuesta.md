@@ -4,10 +4,10 @@
 
 ---
 
-## Pregunta [XX]: [Título resumido]
+## Pregunta [P09_tdd_invetario]
 
 ### Estudiante
-- **Nombre completo**: [Tu nombre y apellido]
+- **Nombre completo**: [Alejandro Andres Perez Diaz]
 
 ---
 
@@ -15,9 +15,9 @@
 
 | Campo | Valor |
 |---|---|
-| **Nombre del LLM** | [Claude / ChatGPT / Gemini / Copilot / DeepSeek / Qwen / Mistral / Otro / **Sin IA — respuesta propia**] |
-| **Modelo específico** | [Ej: Claude Opus 4.5, GPT-4o, Gemini 2.5 Pro, etc. Si respondes sin IA, escribe "N/A"] |
-| **¿Por qué elegiste este LLM?** | [Justifica en 1-3 oraciones. Si respondes sin IA, explica por qué decidiste no usar LLM para esta pregunta.] |
+| **Nombre del LLM** | [**Sin IA — respuesta propia**] |
+| **Modelo específico** | ["N/A"] |
+| **¿Por qué elegiste este LLM?** | [Porue es implemetnar algo de codigo y anasis de lo que se hiso.] |
 
 ---
 
@@ -65,5 +65,31 @@ pero menciona cuántas iteraciones hiciste.]
 
 
 #### 3. Respuesta final
+parte de codigo:
+public class ControlInventarioService {
+    private final LibroRepository repositorio;
+    private final NotificadorVendedor notificador;
 
-[Escribe tu respuesta definitiva a la pregunta del parcial, integrando lo que aprendiste del LLM pero yendo más allá. Corrige errores, llena omisiones, conecta con conceptos vistos en clase. Esta es tu respuesta: demuestra que tú dominas el tema.]
+    public ControlInventarioService(LibroRepository repositorio,
+                                     NotificadorVendedor notificador) {
+        this.repositorio = repositorio;
+        this.notificador = notificador;
+    }
+
+    public void actualizarStock(Libro libro, int nuevoStock) {
+        if (nuevoStock < 0)
+            throw new IllegalArgumentException("Stock no puede ser negativo");
+
+        libro.setStock(nuevoStock);
+
+        if (nuevoStock == 0) {
+            libro.setEstado(EstadoLibro.AGOTADO);
+            notificador.notificarAgotado(libro.getVendedor());
+        } else {
+            libro.setEstado(EstadoLibro.DISPONIBLE);
+        }
+
+        repositorio.guardar(libro);
+    }
+}
+[El TDD es genuino cuando las pruebas se escriben antes de que exista la clase. La diferencia entre Green y Refactor es que en Green el código es feo pero funciona, y en Refactor se extrae lógica a métodos privados como validarStock y actualizarEstado sin cambiar el comportamiento — las pruebas siguen pasando exactamente igual.]

@@ -4,10 +4,10 @@
 
 ---
 
-## Pregunta [XX]: [Título resumido]
+# Pregunta P03: Evaluación de jerarquía de clases — Principios SOLID violados
 
 ### Estudiante
-- **Nombre completo**: [Tu nombre y apellido]
+- **Nombre completo**: Juan Camilo Gomez
 
 ---
 
@@ -15,9 +15,9 @@
 
 | Campo | Valor |
 |---|---|
-| **Nombre del LLM** | [Claude / ChatGPT / Gemini / Copilot / DeepSeek / Qwen / Mistral / Otro / **Sin IA — respuesta propia**] |
+| **Nombre del LLM** no use
 | **Modelo específico** | [Ej: Claude Opus 4.5, GPT-4o, Gemini 2.5 Pro, etc. Si respondes sin IA, escribe "N/A"] |
-| **¿Por qué elegiste este LLM?** | [Justifica en 1-3 oraciones. Si respondes sin IA, explica por qué decidiste no usar LLM para esta pregunta.] |
+| **¿Por qué elegiste este LLM?** para tratar de ganarme el bono asi no este completamente bien
 
 ---
 
@@ -66,4 +66,68 @@ pero menciona cuántas iteraciones hiciste.]
 
 #### 3. Respuesta final
 
-[Escribe tu respuesta definitiva a la pregunta del parcial, integrando lo que aprendiste del LLM pero yendo más allá. Corrige errores, llena omisiones, conecta con conceptos vistos en clase. Esta es tu respuesta: demuestra que tú dominas el tema.]
+
+
+Interface Segregation Principle 
+
+La interfaz Usuario es una interfaz gruesa que obliga a todas las implementaciones a conocer metodos que no les corresponden:
+
+public interface Usuario {
+    void comprar(Libro libro);       // Solo Comprador
+    void vender(Libro libro);        // Solo Vendedor
+    void moderarComentario(...);     // Solo Administrador
+    void generarReporteVentas();     // Solo Administrador/Vendedor
+    void gestionarUsuarios();        // Solo Administrador
+
+
+Comprador implementa Usuario pero lanza UnsupportedOperationException en cuatro de los cinco métodos. Esto viola ISP pues los clientes no deben depender de interfaces que no usan.
+
+por otro lado :Liskov Substitution Principle
+
+`Vendedor` hereda `comprar()` de `Comprador` y lo sobreescribe lanzando una excepción. Esto significa que un `Vendedor` no puede sustituir a un `Comprador` sin romper el comportamiento esperado.
+
+rediseño:
+
+public interface Comprador {
+    void comprar(Libro libro);
+}
+
+public interface Vendedor {
+    void vender(Libro libro);
+}
+
+public interface Moderador {
+    void moderarComentario(Comentario comentario);
+}
+
+public interface Administrador {
+    void gestionarUsuarios();
+    void generarReporteVentas();
+}
+
+public class UsuarioComprador implements Comprador {
+    @Override
+    public void comprar(Libro libro) {
+        // implementación
+    }
+}
+
+public class UsuarioVendedor implements Comprador, Vendedor {
+
+    @Override
+    public void comprar(Libro libro) {
+        // implementación
+    }
+
+    @Override
+    public void vender(Libro libro) {
+        // implementación
+    }
+}
+
+Se aplica ISP porque cada interfaz tiene una responsabilidad especifica.
+Ya no hay metodos que lancen UnsupportedOperationException.
+También mejora LSP porque ninguna clase implementa comportamientos invalidos.
+El diseño es mas flexible para agregar nuevos tipos de usuario.
+
+

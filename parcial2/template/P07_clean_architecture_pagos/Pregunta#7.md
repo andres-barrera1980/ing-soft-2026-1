@@ -294,10 +294,19 @@ JavaFX y la capa web permanecen desacopladas de la lógica de negocio.
 
 #### 1. ¿Qué hizo bien el prompt?
 
-
+ Listar las responsabilidades originales de la clase monolítica (PaymentService) y exigir un rediseño estricto funcionó bastante bien. Pedir un diagrama en Mermaid con las direcciones de las flechas obligó a la IA a demostrar visualmente la Regla de Dependencia, un concepto central que analizamos constantemente en las clases de Arquitectura de Software. Prohibirle escribir código en Java también fue clave; de esta forma evitamos revisar cientos de líneas autogeneradas y logramos enfocarnos netamente en la estructura de puertos y adaptadores.
 
 #### 2. ¿Qué se puede mejorar?
 
+ Aunque el diagrama general sirve como guía inicial, noté varias fallas conceptuales respecto a la bibliografía formal del curso:
 
+Primero, olvidó el Input Boundary. En su propuesta de inyección de dependencias, sugiere que el entorno (la configuración o JavaFX) inyecte directamente la clase ProcessPaymentInteractor. Esto rompe la regla de aislamiento: el controlador debe depender de la interfaz del caso de uso (el Input Port), jamás de su implementación concreta.
+
+Segundo, el diagrama dejó al Presentador desconectado. La gráfica muestra al controlador llamando al caso de uso, y luego deja una flecha suelta desde el presentador hacia la interfaz gráfica. Omitió por completo el Output Port. El caso de uso debe recibir ese puerto en su ejecución para enviarle el modelo de respuesta, sin retornar los datos directamente al controlador.
+
+Tercero, sobrecargó el caso de uso con decisiones de infraestructura. La IA sugirió que el caso de uso maneje una fábrica o estrategia para elegir la pasarela de pago. Si la selección depende del entorno (como Spring), el caso de uso se contamina. El diseño correcto requiere un único adaptador (PaymentGatewayProcessor) que resuelva internamente el enrutamiento hacia PayPal o PSE, manteniendo el caso de uso completamente limpio.
 
 #### 3. Respuesta final
+La distribución que plantea el modelo sirve como base de estudio estructural. Extrae correctamente las reglas de negocio a las Entities, delega la orquestación al Interactor y aísla la persistencia y los correos en sus respectivos adaptadores. En el diagrama se aprecia cómo las dependencias fluyen de afuera hacia adentro.
+
+Sin embargo, para presentar un diagrama sólido en una sustentación o proyecto final, yo reestructuraría el flujo de salida. El PaymentController recibe la petición y llama a la interfaz del caso de uso. El interactor procesa el pago y, al terminar, le pasa un objeto plano de datos (DTO) a un PaymentOutputPort. Es el PaymentPresenter, implementando ese puerto, quien se encarga de moldear la respuesta final para que la consuma JavaFX o un formato JSON. Con esa corrección logramos un flujo unidireccional y eliminamos los cabos sueltos que dejó la IA.

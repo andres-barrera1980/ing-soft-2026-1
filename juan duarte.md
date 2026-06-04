@@ -120,3 +120,244 @@ ProcesarPago
 
 la propuesto de diseño cambia algo de codigo encapsulando su propia logica
 yo dejaria el codigo asi como esta, ya que esta funcionando como deberia
+
+
+
+# pregunta 3
+# promp
+Este código presenta un problema clásico de diseño que se encuentra frecuentemente cuando se escala una aplicación. A continuación, analizo las violaciones y propongo una solución completa. 
+
+# Respuesta LLM
+Esta jerarquía es un ejemplo de manual de lo que sucede cuando se fuerza una estructura de herencia sin considerar las capacidades reales de los objetos. Has creado una estructura que, aunque compila, es funcionalmente frágil y conceptualmente incorrecta.
+
+Análisis de los principios SOLID violados
+Principio de Segregación de Interfaz (ISP): Esta es la violación principal. La interfaz Usuario es una "Interfaz Gordo" (Fat Interface). Obliga a las clases a implementar métodos que no necesitan o que no pueden ejecutar. Una interfaz debe ser específica para un rol; los clientes no deberían verse obligados a depender de métodos que no utilizan.
+
+Principio de Sustitución de Liskov (LSP): Esta es la violación más grave en cuanto a comportamiento. Si un código espera un Usuario y recibe un Comprador, al llamar a vender(), el sistema explota con una UnsupportedOperationException. Un subtipo (Comprador) no puede alterar el contrato de la clase base (Usuario) de esa manera. Si un método está en la interfaz, el sistema asume que cualquier implementación puede ejecutarlo.
+
+Principio de Responsabilidad Única (SRP): La interfaz Usuario intenta definir los comportamientos de todo el sistema (moderación, ventas, gestión de usuarios, compras). Esto viola el principio porque cualquier cambio en los permisos de "moderación" o "reportes" te obliga a modificar la interfaz base, afectando a todas las implementaciones.
+
+Propuesta de Refactoring
+La solución consiste en segregar la interfaz en piezas pequeñas y cohesivas (basadas en roles o capacidades) en lugar de una jerarquía de herencia rígida.
+
+1. Definir interfaces pequeñas (Capacidades)
+En lugar de una sola interfaz gigante, definimos contratos específicos:
+
+Java
+public interface Comprador {
+    void comprar(Libro libro);
+}
+
+public interface Vendedor {
+    void vender(Libro libro);
+}
+
+public interface Moderador {
+    void moderarComentario(Comentario comentario);
+}
+
+public interface Administrador extends Moderador {
+    void generarReporteVentas();
+    void gestionarUsuarios();
+}
+2. Implementar solo lo necesario
+Ahora, las clases solo implementan lo que realmente pueden hacer. No hay métodos que arrojen excepciones UnsupportedOperationException.
+
+Java
+// Un usuario común que solo compra
+public class Cliente implements Comprador {
+    public void comprar(Libro libro) { /* implementación */ }
+}
+
+// Un usuario con privilegios de vendedor
+public class VendedorImpl implements Vendedor {
+    public void vender(Libro libro) { /* implementación */ }
+}
+
+// Un Administrador puede tener múltiples capacidades
+public class AdministradorImpl implements Comprador, Vendedor, Administrador {
+    public void comprar(Libro libro) { /* ... */ }
+    public void vender(Libro libro) { /* ... */ }
+    public void moderarComentario(Comentario c) { /* ... */ }
+    public void generarReporteVentas() { /* ... */ }
+    public void gestionarUsuarios() { /* ... */ }
+}
+¿Por qué esta solución es superior?
+Eliminación de Excepciones: Ya no necesitas lanzar UnsupportedOperationException. El contrato de la interfaz es honesto: si implementas Vendedor, se garantiza que puedes vender.
+
+Composición sobre Herencia: En lugar de intentar forzar una relación de "es un" (donde un Administrador hereda de Vendedor), ahora usas composición de interfaces. Un objeto puede ser muchas cosas a la vez si así lo requiere el negocio.
+
+Cumplimiento de ISP: Los clientes de tu código solo verán los métodos que realmente necesitan. Por ejemplo, si tienes una clase ProcesoDeCompra, esta solo pedirá un objeto de tipo Comprador, y no le importará si ese objeto es un cliente simple o un administrador.
+
+¿Te queda claro cómo esta segregación hace que el código sea más seguro y fácil de extender, o te gustaría ver cómo manejaríamos los roles si fueran dinámicos (cambiables en tiempo de ejecución)?
+
+# respuesta analisis
+el llm identifica sin problema los Principios violados y detecta que hay mas de lo necesario implementado, lo que hace es reducir la complejidad del codigo, el diseño es correcto usando las clases necesarias para funcionar
+
+
+# punto 4
+# prompt
+Basándote en lo anterior identifica que patrón de diseño de la gof es el más adecuado y propone una implementación en Java con clases, interfaces y ejemplos de uso. Debes justificar porqué elegiste ese patrón y descartar al menos 2 patrones que no sean compatibles 
+
+# respuesta llm
+Para este escenario, el patrón de diseño más adecuado es el Patrón Decorator (Decorador).
+
+¿Por qué elegir el Patrón Decorator?
+A diferencia de la Estrategia (Strategy), que normalmente se usa para intercambiar algoritmos (uno u otro), el Decorator permite envolver un objeto base con comportamientos adicionales de manera acumulativa. Como tu requerimiento indica que los descuentos pueden combinarse (ej: Temporada + Fidelidad), este patrón es ideal porque permite "envolver" el precio original con tantas capas de descuento como sea necesario de forma dinámica en tiempo de ejecución.
+
+Implementación en Java
+1. Definir la interfaz base
+Java
+public interface CalculadorPrecio {
+    double calcular(double precioBase);
+}
+2. Componente concreto (Precio base)
+Java
+public class PrecioBase implements CalculadorPrecio {
+    @Override
+    public double calcular(double precioBase) {
+        return precioBase;
+    }
+}
+3. Decoradores base y concretos
+Java
+public abstract class DescuentoDecorator implements CalculadorPrecio {
+    protected CalculadorPrecio componente;
+
+    public DescuentoDecorator(CalculadorPrecio componente) {
+        this.componente = componente;
+    }
+}
+
+public class DescuentoFidelidad extends DescuentoDecorator {
+    public DescuentoFidelidad(CalculadorPrecio c) { super(c); }
+    public double calcular(double p) { return componente.calcular(p) * 0.90; }
+}
+
+public class DescuentoTemporada extends DescuentoDecorator {
+    public DescuentoTemporada(CalculadorPrecio c) { super(c); }
+    public double calcular(double p) { return componente.calcular(p) * 0.85; }
+}
+
+public class DescuentoVolumen extends DescuentoDecorator {
+    public DescuentoVolumen(CalculadorPrecio c) { super(c); }
+    public double calcular(double p) { return componente.calcular(p) * 0.95; }
+}
+4. Ejemplo de uso
+Java
+double precioOriginal = 300000;
+CalculadorPrecio carrito = new PrecioBase();
+
+// Aplicar combinación dinámica
+if (usuario.isFiel()) carrito = new DescuentoFidelidad(carrito);
+if (esSemanaDelLibro()) carrito = new DescuentoTemporada(carrito);
+if (precioOriginal > 200000) carrito = new DescuentoVolumen(carrito);
+
+double totalFinal = carrito.calcular(precioOriginal);
+Justificación de descarte de otros patrones
+Strategy (Estrategia): Se descartó porque el patrón Strategy está diseñado para seleccionar un solo algoritmo a la vez. Si intentas usarlo para combinar descuentos, terminarías escribiendo clases como DescuentoFidelidadYTemporada, DescuentoTemporadaYVolumen, etc., lo cual genera una explosión combinatoria inmanejable.
+
+Chain of Responsibility (Cadena de Responsabilidad): Aunque parece una opción, este patrón está pensado para pasar una petición a través de una cadena hasta que un objeto la procese o la detenga. Los descuentos no "detienen" el cálculo, sino que deben aplicarse todos secuencialmente sobre el mismo valor. Intentar forzarlo aquí haría que la lógica de cálculo del precio estuviera acoplada a la estructura de la cadena, haciendo el código más difícil de leer que con el patrón Decorator.
+
+¿Te gustaría explorar cómo integrar esta lógica con un Service que evalúe las reglas de negocio antes de aplicar los decoradores?
+
+# respuesta analisis
+el llm identifica el patron decorator, el cual considero personalmente el adecuado; descartó el patron de strategy y la cadena de responsabilidad. Y la implementacion es correcta usando precio base como componente concreto y dio correctos los ejemplos de uso
+
+
+# punto 5
+# prompt
+
+Podrías diseñar e implementar este sistema de notificaciones usando dos patrones de diseños de la gof combinados. Una vez lo hayas hecho, por favor haz un diagrama de clases (puede ser en texto), código en Java de las clases principales y explícame por qué elegiste esos 2 patrones 
+
+
+# respuesta llm
+
+Para resolver este requerimiento donde un evento (libro disponible) debe desencadenar múltiples acciones independientes sin que el objeto "Libro" necesite conocer a cada uno de sus suscriptores, la combinación ideal es Observer y Strategy.
+
+1. Los patrones elegidos
+Observer (Observador): Es el patrón principal. Permite que el objeto Libro (el Sujeto) mantenga una lista de objetos interesados y les notifique automáticamente cuando cambie su estado (vuelva a estar disponible). Esto desacopla el evento de las acciones.
+
+Strategy (Estrategia): Lo utilizaremos dentro de los observadores. Como cada acción (correo, push, caché, log) tiene una lógica interna distinta, cada observador encapsulará su propia estrategia de ejecución para cumplir con el principio de responsabilidad única.
+
+2. Diagrama de Clases (Representación en texto)
+Plaintext
++-----------------+          +-----------------------+
+|    LibroSujeto  |<>------->|    Notificador (I)    |
++-----------------+          +-----------------------+
+| - observadores  |          | + ejecutar(Libro)     |
+| + notificar()   |          +-----------^-----------+
++-----------------+                      |
+                                         |
+         ________________________________|_______________________________
+        |                |               |               |               |
++----------------+ +--------------+ +--------------+ +--------------+
+| EmailObserver  | | PushObserver | | CacheObserver| | AuditObserver|
++----------------+ +--------------+ +--------------+ +--------------+
+3. Implementación en Java
+Java
+import java.util.ArrayList;
+import java.util.List;
+
+// Interfaz del Observador (Strategy)
+interface Notificador {
+    void ejecutar(String nombreLibro);
+}
+
+// Sujeto (Subject)
+class Libro {
+    private List<Notificador> suscriptores = new ArrayList<>();
+    private String nombre;
+
+    public Libro(String nombre) { this.nombre = nombre; }
+
+    public void agregarSuscriptor(Notificador n) { suscriptores.add(n); }
+
+    public void setDisponible() {
+        System.out.println("El libro '" + nombre + "' ahora está disponible.");
+        notificar();
+    }
+
+    private void notificar() {
+        for (Notificador n : suscriptores) {
+            n.ejecutar(nombre);
+        }
+    }
+}
+
+// Estrategias Concretas (Observadores)
+class EmailObserver implements Notificador {
+    public void ejecutar(String libro) { System.out.println("Enviando email de disponibilidad para: " + libro); }
+}
+
+class PushObserver implements Notificador {
+    public void ejecutar(String libro) { System.out.println("Enviando Push Notification para: " + libro); }
+}
+
+class CacheObserver implements Notificador {
+    public void ejecutar(String libro) { System.out.println("Actualizando caché de Redis para: " + libro); }
+}
+4. ¿Por qué esta combinación?
+Desacoplamiento (Observer): Si mañana necesitas agregar un nuevo sistema (por ejemplo, enviar un mensaje a Slack), simplemente creas una clase nueva que implemente Notificador y la registras. No necesitas tocar el código de la clase Libro.
+
+Encapsulamiento (Strategy): Cada clase Observer es un "estrategia" que contiene su propia lógica especializada. Esto evita que Libro se llene de sentencias if-else o de dependencias de infraestructura (como el cliente de Redis o el servidor SMTP), cumpliendo así con el principio de responsabilidad única.
+
+Esta arquitectura es la base de sistemas dirigidos por eventos (event-driven). ¿Te resulta claro cómo esta combinación facilita la escalabilidad del sistema cuando el equipo decida agregar nuevos canales de notificación en el futuro?
+
+# respuesta analisis
+
+se eligio el patron de observer y el strategy, con su respectivo diagrama de clases; sin embargo, el diagrama quedó incompleto, pues se ve la ausensia de un observer, la implementacion es correcta y la justificacion de la combinacion también, diceindo que en observer podemos añadir funciones nuevas sin tener que modificar el codigo y que cada clase de observer es una estrategia que contiene su propia logica, esto hace que no tengamos condicionales tan largos dentro de las clases 
+
+
+# pregunta 6
+# prompt 
+Podrías de clean arquitectura: sus capas, la regla de dependencia, el principio de inversión de dependencia aplicado en los límites entre capas y como se compara con una arquitectura en capas tradicional (presentación -> lógica -> datos). Dame ejemplos concretos de cada capa basándote en el contexto de libmarket 
+
+# respuesta llm
+La Clean Architecture de Robert C. Martin (Uncle Bob) no es solo una convención de carpetas; es una filosofía de diseño que busca la independencia: de los frameworks, de la base de datos, de la interfaz de usuario y, en general, de cualquier agente externo.1. Las Capas Concéntricas y la Regla de DependenciaEl corazón de la arquitectura es su Regla de Dependencia: El código fuente debe depender solo de niveles de abstracción superiores (hacia adentro). Nada en un círculo interno puede saber nada de algo en un círculo externo.Ejemplo en LibMarket:Entities (Capa Interna): Objetos de negocio puros.Ejemplo: Libro, Usuario, Carrito. (No saben nada de SQL o de cómo se imprimen en pantalla).Use Cases: Orquestan el flujo de datos hacia y desde las entidades.Ejemplo: PublicarLibroUseCase, CalcularDescuentoUseCase. (Solo ejecutan reglas de negocio).Interface Adapters: Convierten los datos del formato más conveniente para los casos de uso al formato necesario para la DB o la Web.Ejemplo: ControladorLibro, RepositorioLibroSQL (implementación), DTOs.Frameworks & Drivers (Capa Externa): Herramientas.Ejemplo: Spring Boot, PostgreSQL, MongoDB, clientes de correo (SMTP), frameworks de UI.2. Inversión de Dependencia en los LímitesLa regla de dependencia a menudo requiere que las capas internas necesiten llamar a las externas (por ejemplo, un caso de uso necesita guardar en la BD). Aquí entra el Principio de Inversión de Dependencia (DIP):El Problema: El caso de uso necesita persistir datos, pero no puede depender de la BD.La Solución: El caso de uso define una Interfaz (Puerto) en su capa interna (ej. LibroRepository interfaz). La capa externa de "Adaptadores" implementa esa interfaz (ej. SqlLibroRepository).Resultado: El caso de uso apunta hacia adentro (a la interfaz), y la implementación apunta hacia adentro (hacia el caso de uso). La dependencia se invierte.3. Comparativa: Arquitectura Tradicional vs. Clean ArchitectureCaracterísticaArquitectura Tradicional (3 Capas)Clean ArchitectureFlujoUI → Lógica → Datos (Lineal)Centralizado en el negocio (Céntrico)DependenciaLa capa de Lógica suele depender de la de Datos.La capa de Negocio (Use Cases) no sabe que existe una BD.CambiosCambiar de SQL a NoSQL implica romper la capa de lógica.Cambiar de base de datos es solo reemplazar un adaptador.TesteoDifícil sin mocks pesados de la BD.Muy fácil; las entidades y casos de uso son POJOs puros.4. ¿Por qué Clean Architecture es superior para LibMarket?Imagina que después de 2 años, LibMarket decide dejar de usar Spring Boot porque salió un framework mucho más rápido, o quiere cambiar PostgreSQL por una base de datos distribuida.En arquitectura tradicional: Tendrías que reescribir gran parte de tu lógica de negocio porque está "pegada" a las anotaciones del framework y a la lógica de acceso a datos.En Clean Architecture: Solo cambiarías la capa más externa (Frameworks y Drivers). Los Use Cases y Entities permanecerían intactos, ya que no saben qué framework ni qué base de datos están usando.¿Te gustaría que diseñáramos la estructura de paquetes (carpetas) para un proyecto siguiendo esta jerarquía, o prefieres profundizar en cómo se comunican las capas mediante los "Puertos y Adaptadores"?
+
+
+# respuesta analisis
+todo estuvo bien, solo un pequeño detalle al momento de hacer la comparasion y es que no fue demasiado preciso al momento de comparar, solo fue un cuadro bastante comprimido y los ejemplos de libmarket no son muy precisos, da ejemp,os muy generales en cuanto al contexto
+
+# pregunta 7

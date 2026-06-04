@@ -1,69 +1,59 @@
-# Plantilla de entrega — Parcial 2
 
-> **Instrucción**: Copia esta plantilla para cada pregunta del parcial. Reemplaza `[Pregunta XX]` por el identificador correcto (ej: `P01_solid_srp`) y completa todas las secciones. Haz al menos 2 commits por pregunta: uno con el prompt + respuesta del LLM, y otro con el análisis.
-
----
-
-## Pregunta [XX]: [Título resumido]
+## Pregunta [12]: [Ciclo de vida defectos]
 
 ### Estudiante
-- **Nombre completo**: [Tu nombre y apellido]
+- **Nombre completo**: [Marlon Garcia]
 
 ---
 
-### LLM utilizado
+### Respuesta sin IA
 
-| Campo | Valor |
-|---|---|
-| **Nombre del LLM** | [Claude / ChatGPT / Gemini / Copilot / DeepSeek / Qwen / Mistral / Otro / **Sin IA — respuesta propia**] |
-| **Modelo específico** | [Ej: Claude Opus 4.5, GPT-4o, Gemini 2.5 Pro, etc. Si respondes sin IA, escribe "N/A"] |
-| **¿Por qué elegiste este LLM?** | [Justifica en 1-3 oraciones. Si respondes sin IA, explica por qué decidiste no usar LLM para esta pregunta.] |
+# P.12 — Ciclo de vida de defecto aplicado a OpenLib Market
 
----
+El defecto reportado indica que el botón “Agregar al carrito” no responde cuando el usuario ya tiene 5 ítems en el carrito e intenta agregar un sexto libro. Según las reglas del sistema, el carrito puede tener hasta 10 ítems diferentes, por lo tanto el sexto libro debería agregarse correctamente. El comportamiento actual es incorrecto porque no se agrega el producto y tampoco se muestra un mensaje de error.
 
-### Prompt utilizado
+| Fase         | Responsable                                        | Acción tomada                                                                                                                                                                                                                                   | Herramienta usada                                             | Estado en Jira            |
+| ------------ | -------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- | ------------------------- |
+| Detección    | Tester / QA                                        | El tester encuentra el error al ejecutar pruebas funcionales del carrito. Detecta que al tener 5 libros diferentes, el botón no responde al intentar agregar el sexto.                                                                          | Navegador, ambiente de pruebas, checklist o casos de prueba   | Detectado                 |
+| Reporte      | Tester / QA                                        | Se crea el defecto en Jira con resumen, pasos para reproducir, resultado esperado, resultado obtenido, severidad y evidencia si aplica.                                                                                                         | Jira                                                          | Reportado / Open          |
+| Asignación   | Líder técnico, Scrum Master o encargado del equipo | Se revisa el defecto, se valida que sea reproducible y se asigna al desarrollador responsable del módulo de carrito o frontend.                                                                                                                 | Jira, tablero del sprint                                      | Asignado                  |
+| Diagnóstico  | Desarrollador                                      | El desarrollador reproduce el error y revisa si el problema está en frontend, backend o validación de reglas. Puede encontrar, por ejemplo, una condición incorrecta que bloquea el botón después de 5 ítems, aunque el máximo real sea 10.     | IDE, logs, consola del navegador, debugger, pruebas unitarias | En análisis / In Progress |
+| Corrección   | Desarrollador                                      | Se corrige la lógica del botón o del servicio de carrito para permitir agregar hasta 10 ítems diferentes. También se puede agregar retroalimentación visual en caso de error. Se actualizan o crean pruebas para cubrir el caso del sexto ítem. | IDE, Git, pruebas unitarias, pruebas de integración           | Corregido / Ready for QA  |
+| Verificación | Tester / QA                                        | El tester vuelve a ejecutar los pasos originales. Verifica que al tener 5 libros, el sexto se agregue correctamente y el contador se actualice. También prueba casos borde: carrito con 10 ítems e intento de agregar el ítem 11.               | Jira, navegador, ambiente QA, casos de prueba                 | Verificado                |
+| Cierre       | Tester / QA o líder del equipo                     | Si el defecto fue corregido correctamente y no aparecen errores relacionados, se cierra el ticket. Si el error persiste, se devuelve al desarrollador.                                                                                          | Jira                                                          | Cerrado                   |
 
-> **Si respondiste sin IA, omite esta sección y ve directamente a Análisis crítico.**
+## Aplicación concreta del defecto
 
-```
-[Pega aquí el prompt exacto que enviaste al LLM. 
-Incluye TODO el texto, sin editar ni resumir.
+El defecto inicia cuando QA detecta que el botón no responde al intentar agregar el sexto libro. Como la regla permite hasta 10 ítems diferentes, el comportamiento esperado es que el sexto libro se agregue normalmente.
 
-Un buen prompt incluye:
-- Contexto del proyecto OpenLib Market
-- El código o situación específica
-- Lo que esperas que el LLM haga
-- Restricciones (ej: "usa Java 21", "aplica SOLID")
-- Formato de salida esperado (ej: "respuesta en markdown con código Java")]
-```
+Durante el diagnóstico, el desarrollador debería revisar principalmente:
 
----
+* La validación del límite de ítems en el frontend.
+* La validación del límite de ítems en el backend.
+* La comunicación entre el botón y el servicio de carrito.
+* La consola del navegador para ver si hay errores JavaScript.
+* La respuesta de la API al intentar agregar el sexto libro.
 
-### Respuesta del LLM
+Una causa probable podría ser que en algún punto del código se haya dejado una condición incorrecta como:
 
-> **Si respondiste sin IA, omite esta sección y ve directamente a Análisis crítico.**
-[Pega aquí la respuesta COMPLETA del LLM, sin editar, sin resumir.
-Incluye TODO el texto, código, explicaciones que generó el LLM.
-
-Si el LLM generó código, asegúrate de que esté correctamente formateado.
-Si tuviste que hacer varias iteraciones, pega la MEJOR respuesta obtenida,
-pero menciona cuántas iteraciones hiciste.]
+```java
+if (items.size() >= 5) {
+    bloquearBoton();
+}
 ```
 
----
+cuando realmente debería respetarse el máximo de 10 ítems diferentes.
 
-### Análisis crítico de la respuesta
+La corrección debe asegurar que:
 
-#### 1. ¿Qué hizo bien el prompt?
+* El sexto libro se pueda agregar.
+* El contador del carrito se actualice.
+* El botón siga funcionando mientras haya menos de 10 ítems diferentes.
+* Al llegar a 10 ítems, el sistema bloquee correctamente el ítem 11 o muestre un mensaje claro.
+* No se deje al usuario sin retroalimentación visual.
 
-[Evalúa tu propio prompt, no la respuesta del LLM. ¿El contexto fue suficiente? ¿Las restricciones fueron claras? ¿El formato de salida que pediste ayudó a obtener una buena respuesta? ¿Qué parte de tu prompt fue más efectiva? Sé específico: menciona fragmentos concretos de tu prompt que funcionaron bien.]
+## Conclusión
 
+El ciclo de vida del defecto permite gestionar el error de forma ordenada desde que se detecta hasta que se cierra. En este caso, el defecto debe pasar por detección, reporte, asignación, diagnóstico, corrección, verificación y cierre.
 
-#### 2. ¿Qué se puede mejorar?
-
-[¿Qué le faltó a tu prompt? ¿Qué harías diferente si pudieras reformularlo? ¿El LLM entendió mal algo por falta de claridad en tu prompt? ¿La respuesta tiene errores u omisiones? ¿Qué no cubrió el LLM que tú sí sabes por lo visto en clase?]
-
-
-#### 3. Respuesta final
-
-[Escribe tu respuesta definitiva a la pregunta del parcial, integrando lo que aprendiste del LLM pero yendo más allá. Corrige errores, llena omisiones, conecta con conceptos vistos en clase. Esta es tu respuesta: demuestra que tú dominas el tema.]
+La solución no solo debe corregir que el sexto libro se pueda agregar, sino también garantizar que la regla real del negocio se cumpla: mínimo 1 ítem para checkout y máximo 10 ítems diferentes por carrito.

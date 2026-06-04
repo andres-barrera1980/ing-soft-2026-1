@@ -1,10 +1,11 @@
 # Plantilla de entrega — Parcial 2
 
-## Pregunta P_clean_architecture: Clean Architecture aplicada a OpenLib Market
+## Pregunta [06]: [clean architecture]
+
 
 ### Estudiante
 
-* **Nombre completo**: Marlon Garcia
+* **Nombre completo**: [Marlon Garcia]
 
 ---
 

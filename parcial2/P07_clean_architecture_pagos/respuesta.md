@@ -1,10 +1,9 @@
 # Plantilla de entrega — Parcial 2
 
-## Pregunta P_clean_architecture_pagos: Rediseño del módulo de pagos con Clean Architecture
+## Pregunta [07]: [pruebas clean architecture pagos]
 
 ### Estudiante
-
-* **Nombre completo**: Marlon Garcia
+- **Nombre completo**: [Marlon Garcia]
 
 ---
 

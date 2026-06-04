@@ -68,4 +68,59 @@ pero menciona cuántas iteraciones hiciste.]
 
 #### 3. Respuesta final
 
-[Escribe tu respuesta definitiva a la pregunta del parcial, integrando lo que aprendiste del LLM pero yendo más allá. Corrige errores, llena omisiones, conecta con conceptos vistos en clase. Esta es tu respuesta: demuestra que tú dominas el tema.]
+[El patrón correcto: Decorator
+La razón es simple — los descuentos se combinan. Strategy no sirve porque elige uno solo. Decorator te permite apilar varios encima del precio original.
+javapublic interface EstrategiaDescuento {
+    double aplicar(double precio);
+}
+
+public class SinDescuento implements EstrategiaDescuento {
+    public double aplicar(double precio) {
+        return precio;
+    }
+}
+
+public abstract class DescuentoDecorator implements EstrategiaDescuento {
+    protected EstrategiaDescuento descuento;
+    public DescuentoDecorator(EstrategiaDescuento descuento) {
+        this.descuento = descuento;
+    }
+}
+
+public class DescuentoFidelidad extends DescuentoDecorator {
+    public DescuentoFidelidad(EstrategiaDescuento descuento) {
+        super(descuento);
+    }
+    public double aplicar(double precio) {
+        return descuento.aplicar(precio) * 0.90;
+    }
+}
+
+public class DescuentoTemporada extends DescuentoDecorator {
+    public DescuentoTemporada(EstrategiaDescuento descuento) {
+        super(descuento);
+    }
+    public double aplicar(double precio) {
+        return descuento.aplicar(precio) * 0.85;
+    }
+}
+
+public class DescuentoVolumen extends DescuentoDecorator {
+    public DescuentoVolumen(EstrategiaDescuento descuento) {
+        super(descuento);
+    }
+    public double aplicar(double precio) {
+        return descuento.aplicar(precio) * 0.95;
+    }
+}
+Analisi Critico:
+¿El LLM identificó el patrón adecuado?
+si identifico el patron correcto  y descarto el de strategy y expico porque
+¿Consideró la posibilidad de composición de estrategias?
+si la descarto proque elige una sola estrategia y ejecuta esa.
+¿Qué alternativas mencionó y fueron correctamente descartadas?
+Se descartó correctamente Strategy porque no permite combinar descuentos, y descartó if/else 
+¿La implementación es correcta y funcional? ¿Qué le faltó?
+Sí, porque la interfaz EstrategiaDescuento, los decorators y el ejemplo de uso combinado funcionan correctamente y permiten agregar descuentos nuevos sin tocar código existente.
+
+]

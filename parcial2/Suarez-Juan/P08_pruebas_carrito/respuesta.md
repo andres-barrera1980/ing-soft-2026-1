@@ -35,6 +35,87 @@ Un buen prompt incluye:
 - Lo que esperas que el LLM haga
 - Restricciones (ej: "usa Java 21", "aplica SOLID")
 - Formato de salida esperado (ej: "respuesta en markdown con código Java")]
+
+[ROL]
+Actua como profesor de fundamentos de Software.
+
+[CONTEXTO]
+Proyecto: OpenLib Market (Plataforma transaccional E-commerce para libros Open Source).
+Módulo actual: Buyer - Carrito de Compras (Lógica de Negocio y Persistencia en Memoria).
+Stack Tecnológico: Java 25, Spring Boot 4.x, JUnit 5, Mockito.
+
+[PROBLEMA]
+Necesito generar un conjunto de pruebas unitarias exhaustivas y de alta cobertura para la clase `CarritoService` utilizando JUnit 5 y Mockito. El servicio gestiona los ítems en memoria mediante un `Map` y depende de un `RepositorioLibro`.
+
+A continuación, te proporciono el código exacto de la clase para la cual debes diseñar las pruebas:
+
+```java
+public class CarritoService {
+    private final RepositorioLibro repositorioLibro;
+    private final Map<Long, ItemCarrito> items = new HashMap<>();
+    private static final int MAX_ITEMS = 10;
+    
+    public CarritoService(RepositorioLibro repositorioLibro) {
+        this.repositorioLibro = repositorioLibro;
+    }
+    
+    public void agregarItem(Long libroId, int cantidad) {
+        if (cantidad <= 0) throw new IllegalArgumentException("Cantidad debe ser positiva");
+        Libro libro = repositorioLibro.buscarPorId(libroId)
+            .orElseThrow(() -> new NoSuchElementException("Libro no encontrado: " + libroId));
+        if (libro.getStock() < cantidad) throw new IllegalStateException("Stock insuficiente");
+        
+        if (!items.containsKey(libroId) && items.size() >= MAX_ITEMS) {
+            throw new IllegalStateException("El carrito no puede tener más de " + MAX_ITEMS + " ítems diferentes");
+        }
+        
+        items.merge(libroId, 
+            new ItemCarrito(libro, cantidad, libro.getPrecio()),
+            (existente, nuevo) -> {
+                existente.setCantidad(existente.getCantidad() + cantidad);
+                return existente;
+            });
+    }
+    
+    public void removerItem(Long libroId) {
+        if (!items.containsKey(libroId)) throw new NoSuchElementException("Ítem no está en el carrito");
+        items.remove(libroId);
+    }
+    
+    public BigDecimal calcularTotal() {
+        if (items.isEmpty()) throw new IllegalStateException("El carrito está vacío");
+        return items.values().stream()
+            .map(item -> item.getPrecioUnitario().multiply(BigDecimal.valueOf(item.getCantidad())))
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+    
+    public void vaciar() { items.clear(); }
+    public int cantidadItems() { return items.values().stream().mapToInt(ItemCarrito::getCantidad).sum(); }
+    public int cantidadItemsUnicos() { return items.size(); }
+    
+    public void validarParaCheckout() {
+        if (items.isEmpty()) throw new IllegalStateException("El carrito debe tener al menos 1 ítem para checkout");
+    }
+}
+[RESTRICCIONES]
+Las pruebas deben implementarse utilizando estrictamente JUnit 5 (Jupyter API) y Mockito para el mocking de dependencias (como `LibroRepository` o `UsuarioRepository`). Se deben cubrir obligatoriamente los siguientes escenarios:
+1. Casos Normales: Agregar un libro válido al carrito de forma exitosa.
+2. Casos Borde (Edge Cases):
+   - Consultar o procesar un carrito que está completamente vacío.
+   - Llenar el carrito de compras hasta su límite máximo permitido (exactamente 10 ítems).
+   - Intentar agregar el ítem número 11, lo cual debe ser rechazado por el sistema.
+   - Intentar realizar el flujo de checkout teniendo el carrito vacío (debe fallar).
+3. Excepciones: Verificar el lanzamiento de excepciones personalizadas (ej. `CarritoLlenoException`, `CarritoVacioException`, `LibroNoEncontradoException`) usando `assertThrows`.
+
+[FORMATO DE SALIDA]
+Solicito la respuesta estructurada de la siguiente manera:
+1. Código de la Clase de Prueba: Código Java completo y limpio de `CarritoServiceTest`, utilizando las anotaciones correctas (`@ExtendWith(MockitoExtension.class)`, `@Test`, `@BeforeEach`, etc.).
+2. Nombres de Métodos Semánticos: Uso del patrón `given_when_then` o nombres descriptivos en español/inglés para cada test.
+3. Breve explicación: Comentarios breves sobre cómo se manejó la aserción de los límites de datos (especialmente la transición de 10 a 11 ítems).
+
+[VALIDACIÓN / CRITERIOS DE ÉXITO]
+La solución se considerará correcta si las pruebas aíslan completamente a `CarritoService` de la base de datos real mediante mocks, compilan sin problemas en el entorno de Java 25 / Spring Boot 4.x, y validan rigurosamente tanto el camino feliz (Happy Path) como los escenarios de fallo.
+
 ```
 
 ---
@@ -48,22 +129,258 @@ Incluye TODO el texto, código, explicaciones que generó el LLM.
 Si el LLM generó código, asegúrate de que esté correctamente formateado.
 Si tuviste que hacer varias iteraciones, pega la MEJOR respuesta obtenida,
 pero menciona cuántas iteraciones hiciste.]
+
+¡Hola! Como tu profesor de Fundamentos de Software, es un placer ver cómo estructuradas tus capas de negocio. El diseño de pruebas unitarias exhaustivas es la delgada línea que separa un prototipo frágil de un software de calidad empresarial listo para producción.
+
+Antes de entregarte el código, una pequeña nota de arquitectura: observo que en las restricciones mencionas excepciones personalizadas (como `CarritoLlenoException`), pero en tu código real estás lanzando excepciones nativas de Java (`IllegalStateException`, `NoSuchElementException`). Para cumplir estrictamente con tu criterio de éxito y garantizar que tus pruebas **compilen y pasen**, he diseñado los `assertThrows` apuntando a las excepciones reales de tu código, añadiendo la validación de sus mensajes interactivos.
+
+Aquí tienes la suite de pruebas optimizada para Java 25 y Spring Boot 4.x.
+
+---
+
+## 1. Código de la Clase de Prueba (`CarritoServiceTest`)
+
+```java
+package com.openlib.market.buyer;
+
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.math.BigDecimal;
+import java.util.NoSuchElementException;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
+@ExtendWith(MockitoExtension.class)
+class CarritoServiceTest {
+
+    @Mock
+    private RepositorioLibro repositorioLibro;
+
+    @InjectMocks
+    private CarritoService carritoService;
+
+    // --- 1. CASOS NORMALES (HAPPY PATH) ---
+
+    @Test
+    @DisplayName("Debe agregar un ítem exitosamente cuando el libro es válido y tiene stock")
+    void givenValidBookAndStock_whenAgregarItem_thenSuccess() {
+        // Given
+        Long libroId = 1L;
+        int cantidad = 2;
+        Libro libroMock = mock(Libro.class);
+        when(libroMock.getStock()).thenReturn(10);
+        when(libroMock.getPrecio()).thenReturn(new BigDecimal("25.00"));
+        when(repositorioLibro.buscarPorId(libroId)).thenReturn(Optional.of(libroMock));
+
+        // When
+        carritoService.agregarItem(libroId, cantidad);
+
+        // Then
+        assertEquals(1, carritoService.cantidadItemsUnicos());
+        assertEquals(2, carritoService.cantidadItems());
+        verify(repositorioLibro, times(1)).buscarPorId(libroId);
+    }
+
+    @Test
+    @DisplayName("Debe incrementar la cantidad si el ítem ya existe en el carrito")
+    void givenExistingItemInCart_whenAgregarMismoItem_thenIncrementQuantity() {
+        // Given
+        Long libroId = 1L;
+        Libro libroMock = mock(Libro.class);
+        when(libroMock.getStock()).thenReturn(10);
+        when(libroMock.getPrecio()).thenReturn(new BigDecimal("20.00"));
+        when(repositorioLibro.buscarPorId(libroId)).thenReturn(Optional.of(libroMock));
+
+        // Agregar por primera vez
+        carritoService.agregarItem(libroId, 2);
+
+        // When (Agregar el mismo libro otra vez)
+        carritoService.agregarItem(libroId, 3);
+
+        // Then
+        assertEquals(1, carritoService.cantidadItemsUnicos(), "Los ítems únicos no deben aumentar");
+        assertEquals(5, carritoService.cantidadItems(), "La cantidad total debe ser la suma (2 + 3)");
+    }
+
+    @Test
+    @DisplayName("Debe calcular el total del carrito correctamente")
+    void givenMultipleItems_whenCalcularTotal_thenReturnsCorrectSum() {
+        // Given
+        Long libro1Id = 1L;
+        Libro libro1 = mock(Libro.class);
+        when(libro1.getStock()).thenReturn(5);
+        when(libro1.getPrecio()).thenReturn(new BigDecimal("10.00"));
+        when(repositorioLibro.buscarPorId(libro1Id)).thenReturn(Optional.of(libro1));
+
+        Long libro2Id = 2L;
+        Libro libro2 = mock(Libro.class);
+        when(libro2.getStock()).thenReturn(5);
+        when(libro2.getPrecio()).thenReturn(new BigDecimal("15.50"));
+        when(repositorioLibro.buscarPorId(libro2Id)).thenReturn(Optional.of(libro2));
+
+        carritoService.agregarItem(libro1Id, 2); // 2 * 10.00 = 20.00
+        carritoService.agregarItem(libro2Id, 1); // 1 * 15.50 = 15.50
+
+        // When
+        BigDecimal total = carritoService.calcularTotal();
+
+        // Then
+        assertEquals(new BigDecimal("35.50"), total);
+    }
+
+    // --- 2. CASOS BORDE (EDGE CASES) ---
+
+    @Test
+    @DisplayName("Debe permitir llenar el carrito exactamente hasta el límite máximo de 10 ítems")
+    void givenCart_whenLlenarHastaElLimiteMaximo_thenSuccess() {
+        // Given & When
+        for (long i = 1; i <= 10; i++) {
+            Libro libroMock = mock(Libro.class);
+            when(libroMock.getStock()).thenReturn(5);
+            when(libroMock.getPrecio()).thenReturn(BigDecimal.TEN);
+            when(repositorioLibro.buscarPorId(i)).thenReturn(Optional.of(libroMock));
+
+            carritoService.agregarItem(i, 1);
+        }
+
+        // Then
+        assertEquals(10, carritoService.cantidadItemsUnicos());
+        assertEquals(10, carritoService.cantidadItems());
+    }
+
+    @Test
+    @DisplayName("Debe rechazar la adición del ítem número 11 superando el límite permitido")
+    void givenFullCartOf10Items_whenAgregarItemOnce_thenThrowsIllegalStateException() {
+        // Given (Llenamos el carrito con 10 elementos)
+        for (long i = 1; i <= 10; i++) {
+            Libro libroMock = mock(Libro.class);
+            when(libroMock.getStock()).thenReturn(5);
+            when(libroMock.getPrecio()).thenReturn(BigDecimal.TEN);
+            when(repositorioLibro.buscarPorId(i)).thenReturn(Optional.of(libroMock));
+            carritoService.agregarItem(i, 1);
+        }
+
+        // Preparar el ítem número 11
+        Long libro11Id = 11L;
+        Libro libro11Mock = mock(Libro.class);
+        when(libro11Mock.getStock()).thenReturn(5);
+        when(repositorioLibro.buscarPorId(libro11Id)).thenReturn(Optional.of(libro11Mock));
+
+        // When & Then
+        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> {
+            carritoService.agregarItem(libro11Id, 1);
+        });
+
+        assertEquals("El carrito no puede tener más de 10 ítems diferentes", exception.getMessage());
+        assertEquals(10, carritoService.cantidadItemsUnicos(), "El tamaño del carrito debió mantenerse en 10");
+    }
+
+    @Test
+    @DisplayName("Debe lanzar excepción al intentar hacer checkout con un carrito vacío")
+    void givenEmptyCart_whenValidarParaCheckout_thenThrowsIllegalStateException() {
+        // When & Then
+        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> {
+            carritoService.validarParaCheckout();
+        });
+
+        assertEquals("El carrito debe tener al menos 1 ítem para checkout", exception.getMessage());
+    }
+
+    @Test
+    @DisplayName("Debe lanzar excepción al calcular el total si el carrito está completamente vacío")
+    void givenEmptyCart_whenCalcularTotal_thenThrowsIllegalStateException() {
+        // When & Then
+        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> {
+            carritoService.calcularTotal();
+        });
+
+        assertEquals("El carrito está vacío", exception.getMessage());
+    }
+
+    // --- 3. EXCEPCIONES Y VALIDACIONES ---
+
+    @Test
+    @DisplayName("Debe lanzar IllegalArgumentException si la cantidad agregada es menor o igual a cero")
+    void givenZeroOrNegativeQuantity_whenAgregarItem_thenThrowsIllegalArgumentException() {
+        // When & Then
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            carritoService.agregarItem(1L, 0);
+        });
+
+        assertEquals("Cantidad debe ser positiva", exception.getMessage());
+    }
+
+    @Test
+    @DisplayName("Debe lanzar NoSuchElementException cuando el libro no existe en el repositorio")
+    void givenNonExistentBook_whenAgregarItem_thenThrowsNoSuchElementException() {
+        // Given
+        Long libroId = 999L;
+        when(repositorioLibro.buscarPorId(libroId)).thenReturn(Optional.empty());
+
+        // When & Then
+        NoSuchElementException exception = assertThrows(NoSuchElementException.class, () -> {
+            carritoService.agregarItem(libroId, 1);
+        });
+
+        assertEquals("Libro no encontrado: 999", exception.getMessage());
+    }
+
+    @Test
+    @DisplayName("Debe lanzar IllegalStateException cuando el stock del libro es insuficiente")
+    void givenInsufficientStock_whenAgregarItem_thenThrowsIllegalStateException() {
+        // Given
+        Long libroId = 1L;
+        Libro libroMock = mock(Libro.class);
+        when(libroMock.getStock()).thenReturn(2); // Solo hay 2 unidades
+        when(repositorioLibro.buscarPorId(libroId)).thenReturn(Optional.of(libroMock));
+
+        // When & Then
+        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> {
+            carritoService.agregarItem(libroId, 5); // Se solicitan 5
+        });
+
+        assertEquals("Stock insuficiente", exception.getMessage());
+    }
+
+    @Test
+    @DisplayName("Debe lanzar NoSuchElementException al intentar remover un ítem que no está en el carrito")
+    void givenItemNotInCart_whenRemoverItem_thenThrowsNoSuchElementException() {
+        // When & Then
+        NoSuchElementException exception = assertThrows(NoSuchElementException.class, () -> {
+            carritoService.removerItem(1L);
+        });
+
+        assertEquals("Ítem no está en el carrito", exception.getMessage());
+    }
+}
+
 ```
 
 ---
 
+## 2. Explicación del Manejo de Límites (Transición de 10 a 11 ítems)
+
+El control de fronteras en colecciones en memoria es un foco común de bugs productivos. Para asegurar la robustez de la transición del límite de `MAX_ITEMS = 10` a un estado de desbordamiento, aplicamos la técnica de **Análisis de Valores Límite (Boundary Value Analysis)** mediante dos pruebas complementarias:
+
+* **El Estado Límite Válido (`givenCart_whenLlenarHastaElLimiteMaximo_thenSuccess`)**: Mediante un bucle dinámico, simulamos un escenario realista inyectando mocks secuenciales con identificadores del `1` al `10`. El servicio procesa cada inserción de forma óptima ya que, en la iteración número 10, la condición `!items.containsKey(libroId) && items.size() >= MAX_ITEMS` evalúa `false` (pues el tamaño previo era 9). El test valida el comportamiento del sistema justo en la frontera superior permitida.
+* **El Estado de Desbordamiento (`givenFullCartOf10Items_whenAgregarItemOnce_thenThrowsIllegalStateException`)**: Partiendo del estado saturado anterior (10 ítems únicos registrados), forzamos el intento de inserción de un elemento con ID `11L`. Aquí es donde Mockito bloquea efectos colaterales aislando el contexto. Al invocar el método, la estructura condicional de tu lógica de negocio detona de inmediato el `IllegalStateException`.
+* **Asertividad Post-Excepción**: No basta con capturar la excepción usando `assertThrows`. La prueba verifica de manera estricta que el mensaje de error coincida textualmente y, crucialmente, realiza un contra-chequeo del estado interno (`assertEquals(10, carritoService.cantidadItemsUnicos())`) para demostrar que el elemento descalificado **nunca** llegó a alterar la integridad de la memoria interna.
+
+
 ### Análisis crítico de la respuesta
 
 #### 1. ¿Qué hizo bien el prompt?
-
-[Evalúa tu propio prompt, no la respuesta del LLM. ¿El contexto fue suficiente? ¿Las restricciones fueron claras? ¿El formato de salida que pediste ayudó a obtener una buena respuesta? ¿Qué parte de tu prompt fue más efectiva? Sé específico: menciona fragmentos concretos de tu prompt que funcionaron bien.]
-
+La verdad es que el prompt estuvo súper bien estructurado porque le dio a la IA todo lo necesario para no perderse: el código exacto con el que íbamos a trabajar, las tecnologías claras como Java 25 y las reglas del juego bien explicadas con los límites del carrito. Esto ayudó un montón a que no se inventara cosas raras y fuera directo al grano, armando una estructura limpia, ordenada con el estilo de "dar, cuando, entonces" (given-when-then) y con nombres que cualquiera de nosotros en la clase entendería a la primera.
 
 #### 2. ¿Qué se puede mejorar?
-
-[¿Qué le faltó a tu prompt? ¿Qué harías diferente si pudieras reformularlo? ¿El LLM entendió mal algo por falta de claridad en tu prompt? ¿La respuesta tiene errores u omisiones? ¿Qué no cubrió el LLM que tú sí sabes por lo visto en clase?]
-
+Aunque el prompt fue bastante detallado, un buen truco para la próxima sería pedirle explícitamente a la IA que revise absolutamente todos los métodos de la clase, sin dejarse ninguno por fuera. Como nos enfocamos tanto en decirle cuáles eran los casos borde y el límite de los 10 libros, la IA se concentró tanto en complacernos con eso que se olvidó de crear pruebas para las acciones más sencillas como borrar un libro con éxito o limpiar el carrito por completo. Si le hubiéramos puesto una lista de "debes probar el camino feliz y el triste de cada método", el resultado habría sido perfecto.
 
 #### 3. Respuesta final
-
-[Escribe tu respuesta definitiva a la pregunta del parcial, integrando lo que aprendiste del LLM pero yendo más allá. Corrige errores, llena omisiones, conecta con conceptos vistos en clase. Esta es tu respuesta: demuestra que tú dominas el tema.]
+Haciendo el balance de lo que hizo la IA, te cuento que resolvió muy bien varias dudas: usó los mocks de forma correcta para simular el repositorio de libros sin tocar la base de datos real, probó qué pasa cuando agregas un libro que ya estaba ahí (viendo que sumara la cantidad) y validó que validarParaCheckout() lanzara un error si el carrito estaba vacío. Sin embargo, no cubrió todos los métodos ni todos los casos borde. Se le pasó por alto probar el camino feliz de validarParaCheckout() (cuando el carrito sí tiene cosas y no debería fallar), no creó ninguna prueba para el método vaciar() y tampoco probó el caso normal de eliminar un libro que sí existe en el carrito. Aquí tienes los tres casos de prueba que faltaron para que tu código quede completamente protegido:

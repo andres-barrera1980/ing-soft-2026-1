@@ -197,6 +197,10 @@ notificador.enviar("EMAIL", "user@mail.com", "Tu pedido fue confirmado");
 
 
 #### 3. Respuesta final
+[¿El LLM identificó correctamente los principios SOLID violados? Sí. El código original violaba el Principio de Responsabilidad Única (SRP) porque la clase Notificador se encargaba de la lógica de envío de tres tecnologías distintas (SMTP, Twilio, Firebase)
+ ¿Qué patrón aplicó y fue el más adecuado? Aplicó el Patrón Strategy (Estrategia) combinado con un mapa de canales inyectado en el constructor
+  ¿La solución con pruebas es completa y testeable? La solución es altamente testeable gracias a la Inyección de Dependencias. Al pasar la lista de canales y el registro por el constructor del Notificador
+   ¿El logging quedó correctamente separado de la lógica de notificación? Sí. Se creó la interfaz RegistroNotificacion y su implementación RegistroEnArchivo.]
 
 
   

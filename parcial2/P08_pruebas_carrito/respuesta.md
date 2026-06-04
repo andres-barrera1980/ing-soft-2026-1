@@ -193,14 +193,49 @@ Con esto tienes una base 100% aislada de base de datos usando `when().thenReturn
 
 #### 1. ¿Que hizo bien el prompt?
 
-[Evalua tu propio prompt, no la respuesta del LLM. ¿El contexto fue suficiente? ¿Las restricciones fueron claras? ¿El formato de salida que pediste ayudo a obtener una buena respuesta? ¿Que parte de tu prompt fue mas efectiva? Se especifico: menciona fragmentos concretos de tu prompt que funcionaron bien.]
+El prompt fue muy especifico al listarle los casos borde (carrito vacio, el limite de 10 items, el intento de meter el item 11). Esto funciono muy bien porque evito que el LLM me diera pruebas genericas y lo obligo a concentrarse en la logica dificil del negocio. Pedir explicitamente el patron Arrange-Act-Assert hizo que el codigo de las pruebas generado fuera super facil de leer y entender, con cada bloque bien definido.
 
 
 #### 2. ¿Que se puede mejorar?
 
-[¿Que le falto a tu prompt? ¿Que harias diferente si pudieras reformularlo? ¿El LLM entendio mal algo por falta de claridad en tu prompt? ¿La respuesta tiene errores u omisiones? ¿Que no cubrio el LLM que tu si sabes por lo visto en clase?]
+Me falto pedirle que probara *absolutamente todos* los metodos publicos de la clase. Al concentrar el prompt tanto en los casos borde de errores, el LLM se olvido de hacer pruebas para metodos sencillos como `vaciar()` o un caso exitoso normal del metodo `validarParaCheckout()`. El LLM fue obediente pero le falto vision panoramica para lograr un 100% de cobertura.
 
 
 #### 3. Respuesta final
 
-[Escribe tu respuesta definitiva a la pregunta del parcial, integrando lo que aprendiste del LLM pero yendo mas alla. Corrige errores, llena omisiones, conecta con conceptos vistos en clase. Esta es tu respuesta: demuestra que tu dominas el tema.]
+El LLM hizo un buen trabajo aislando la prueba con Mockito usando las anotaciones `@Mock` e `@InjectMocks`, y aplico correctamente `when().thenReturn()` garantizando que la base de datos no intervenga en el test. Cubrio muy bien el caso mas confuso: agregar un item repetido cuando ya hay 10 items unicos (probando que las cantidades adicionales no rompen el limite maximo).
+
+Sin embargo, a la respuesta del LLM le faltaron pruebas importantes. Por ejemplo, probo que el checkout falla si esta vacio, pero jamas probo que pasaba si tenia items. Aca escribo yo mismo los casos unitarios que el LLM omitio para dejar la clase completa:
+
+```java
+    // Prueba que el LLM olvido: Checkout exitoso (Happy Path)
+    @Test
+    void validarParaCheckout_ConItems_NoDebeLanzarExcepcion() {
+        // Arrange
+        when(repositorioLibro.buscarPorId(1L)).thenReturn(Optional.of(libroPrueba));
+        carritoService.agregarItem(1L, 1);
+
+        // Act & Assert
+        // Simplemente ejecutamos y verificamos que NO tire excepcion
+        assertDoesNotThrow(() -> {
+            carritoService.validarParaCheckout();
+        });
+    }
+
+    // Prueba que el LLM olvido: Vaciar el carrito
+    @Test
+    void vaciar_DebeDejarElCarritoVacio() {
+        // Arrange
+        when(repositorioLibro.buscarPorId(1L)).thenReturn(Optional.of(libroPrueba));
+        carritoService.agregarItem(1L, 2);
+        
+        // Act
+        carritoService.vaciar();
+        
+        // Assert
+        assertEquals(0, carritoService.cantidadItems());
+        assertEquals(0, carritoService.cantidadItemsUnicos());
+    }
+```
+
+*Como ingeniero, es vital recordar que probar que algo falla (excepciones) es igual de importante que probar que algo funciona correctamente (happy path). Las pruebas unitarias no son solo para romper el codigo, sino para documentar su comportamiento esperado*.

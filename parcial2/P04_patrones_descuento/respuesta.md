@@ -185,14 +185,18 @@ De esta forma, puedes apilar infinitos descuentos dinámicamente como capas de u
 
 #### 1. ¿Que hizo bien el prompt?
 
-[Evalua tu propio prompt, no la respuesta del LLM. ¿El contexto fue suficiente? ¿Las restricciones fueron claras? ¿El formato de salida que pediste ayudo a obtener una buena respuesta? ¿Que parte de tu prompt fue mas efectiva? Se especifico: menciona fragmentos concretos de tu prompt que funcionaron bien.]
+El prompt funciono muy bien porque al aplicar la estructura de contexto, problema y restricciones, el LLM no divago. En particular, fue muy clave la parte donde le aclare "*Ojo que estas se pueden combinar*" y la restriccion de "*no crear clases mezcladas como 'DescuentoFidelidadYTemporada'*". Esto obligo a la IA a descartar soluciones simples y buscar directamente el patron de diseño que sirve para apilar cosas de manera elegante.
 
 
 #### 2. ¿Que se puede mejorar?
 
-[¿Que le falto a tu prompt? ¿Que harias diferente si pudieras reformularlo? ¿El LLM entendio mal algo por falta de claridad en tu prompt? ¿La respuesta tiene errores u omisiones? ¿Que no cubrio el LLM que tu si sabes por lo visto en clase?]
+A mi prompt le falto pedirle que me explicara como este patron interactua con una base de datos real, ya que los descuentos de OpenLib Market no se van a instanciar a mano en codigo duro *como hizo en su ejemplo del metodo main*. Por parte de la respuesta del LLM, aunque el codigo es correcto, omitio por completo mencionar el problema del orden de ejecucion. *Como sabemos, en el patron Decorator el orden en que apilas los objetos altera el resultado final cuando aplicas operaciones matematicas como porcentajes de descuento consecutivos*.
 
 
 #### 3. Respuesta final
 
-[Escribe tu respuesta definitiva a la pregunta del parcial, integrando lo que aprendiste del LLM pero yendo mas alla. Corrige errores, llena omisiones, conecta con conceptos vistos en clase. Esta es tu respuesta: demuestra que tu dominas el tema.]
+El LLM identifico correctamente que el patron Decorator es el indicado para este escenario porque permite añadir comportamientos adicionales (descuentos extras) de manera dinamica a un objeto base en tiempo de ejecucion. Tambien acerto en descartar el patron Strategy porque, *como discutimos en clase, las estrategias suelen ser mutuamente excluyentes (es decir, eliges un solo camino) y el enunciado requiere claramente componer comportamientos simultaneos*.
+
+Para ir mas alla de la respuesta generada, en una implementacion en produccion habria que resolver el problema de la priorizacion. *Yo le agregaria al Decorator una propiedad de prioridad (por ejemplo, un Integer) o aplicaria un patron Builder para ordenar los descuentos siempre de mayor a menor porcentaje antes de empezar a decorar el objeto*. 
+
+Aun con ese detalle, esta arquitectura usando Decorator es la mas robusta ya que cumple a la perfeccion con el Open/Closed Principle (OCP): si el dia de mañana se nos pide incluir un "Descuento Black Friday", solo tenemos que programar una nueva clase `DescuentoBlackFriday extends DescuentoDecorator` y no tocamos ni una sola linea de codigo de los demas descuentos ni de la clase base.

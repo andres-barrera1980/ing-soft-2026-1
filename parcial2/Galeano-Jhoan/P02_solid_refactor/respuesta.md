@@ -4,10 +4,10 @@
 
 ---
 
-## Pregunta [XX]: [Título resumido]
+## Pregunta [2: [P02_solid_refactor]
 
 ### Estudiante
-- **Nombre completo**: [Tu nombre y apellido]
+- **Nombre completo**: [Jhoan Galeano]
 
 ---
 
@@ -15,29 +15,19 @@
 
 | Campo | Valor |
 |---|---|
-| **Nombre del LLM** | [Claude / ChatGPT / Gemini / Copilot / DeepSeek / Qwen / Mistral / Otro / **Sin IA — respuesta propia**] |
-| **Modelo específico** | [Ej: Claude Opus 4.5, GPT-4o, Gemini 2.5 Pro, etc. Si respondes sin IA, escribe "N/A"] |
-| **¿Por qué elegiste este LLM?** | [Justifica en 1-3 oraciones. Si respondes sin IA, explica por qué decidiste no usar LLM para esta pregunta.] |
+| **Nombre del LLM** | [Gemini] |
+| **Modelo específico** | [Gemini 1.5 Pro] |
+| **¿Por qué elegiste este LLM?** | [Lo elegí porque maneja muy bien el análisis de código en Java y estructura las refactorizaciones de software utilizando patrones de diseño de manera clara] |
 
 ---
 
 ### Prompt utilizado
 
-> **Si respondiste sin IA, omite esta sección y ve directamente a Análisis crítico.**
+Actúa como un ingeniero de software senior y experto en arquitectura de software. Analiza el siguiente método `procesar` de la clase `ProcesadorPago` perteneciente al módulo de compras de OpenLib Market. 
 
-```
-[Pega aquí el prompt exacto que enviaste al LLM. 
-Incluye TODO el texto, sin editar ni resumir.
+Identifica de forma detallada al menos dos principios SOLID que el equipo junior está violando en este diseño y justifica técnicamente tu respuesta. 
 
-Un buen prompt incluye:
-- Contexto del proyecto OpenLib Market
-- El código o situación específica
-- Lo que esperas que el LLM haga
-- Restricciones (ej: "usa Java 21", "aplica SOLID")
-- Formato de salida esperado (ej: "respuesta en markdown con código Java")]
-```
-
----
+Posteriormente, propón una refactorización completa en Java aplicando el patrón de diseño que consideres más adecuado para resolver el problema de extensibilidad (OpenLib Market necesita soportar múltiples métodos de pago y permitir agregar nuevos en el futuro sin modificar el código existente). Entrega la solución utilizando interfaces y buenas prácticas de Clean Code.
 
 ### Respuesta del LLM
 
@@ -56,12 +46,12 @@ pero menciona cuántas iteraciones hiciste.]
 
 #### 1. ¿Qué hizo bien el prompt?
 
-[Evalúa tu propio prompt, no la respuesta del LLM. ¿El contexto fue suficiente? ¿Las restricciones fueron claras? ¿El formato de salida que pediste ayudó a obtener una buena respuesta? ¿Qué parte de tu prompt fue más efectiva? Sé específico: menciona fragmentos concretos de tu prompt que funcionaron bien.]
+[El prompt fue directo al grano al pedirle explícitamente identificar "al menos dos principios SOLID", lo que obligó al modelo a no quedarse solo con el error más obvio. También, al exigirle una "refactorización completa usando un patrón de diseño", el formato de salida del código fue limpio y estructurado desde el primer intento]
 
 
 #### 2. ¿Qué se puede mejorar?
 
-[¿Qué le faltó a tu prompt? ¿Qué harías diferente si pudieras reformularlo? ¿El LLM entendió mal algo por falta de claridad en tu prompt? ¿La respuesta tiene errores u omisiones? ¿Qué no cubrió el LLM que tú sí sabes por lo visto en clase?]
+[digamos que se puede mejorar que le falto exigir restricciones de arquitectura para hacer un manejo correcto de la creacion de los objetos, ya que omitio diferentes cosas del dodigo. tambien le daria mas contexto de openlibmarket para que el sepa mas y pueda darme una respuesta mas acertada.]
 
 
 #### 3. Respuesta final

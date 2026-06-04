@@ -1,9 +1,7 @@
-# Plantilla de entrega — Parcial 2
-
 ## P01_solid_principio  
 
 ### Estudiante
-- **Nombre completo**: [Nicolás Silva García]
+- **Nombre completo**: Nicolás Silva García
 
 ---
 

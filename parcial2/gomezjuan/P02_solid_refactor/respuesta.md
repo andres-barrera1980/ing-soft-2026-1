@@ -216,14 +216,27 @@ public class EjemploUso {
 
 #### 1. ¿Qué hizo bien el prompt?
 
-[Evalúa tu propio prompt, no la respuesta del LLM. ¿El contexto fue suficiente? ¿Las restricciones fueron claras? ¿El formato de salida que pediste ayudó a obtener una buena respuesta? ¿Qué parte de tu prompt fue más efectiva? Sé específico: menciona fragmentos concretos de tu prompt que funcionaron bien.]
+El prompt fue bueno. Pedir "minimo dos principios SOLID violados" evito que el LLM se quedara solo con el más obvio. La restriccion de "demuestra que el diseño permite agregar criptomonedas sin modificar código existente" sirvio porque hizo que la LLM valide su propio diseño con un caso concreto.
 
 
 #### 2. ¿Qué se puede mejorar?
 
-[¿Qué le faltó a tu prompt? ¿Qué harías diferente si pudieras reformularlo? ¿El LLM entendió mal algo por falta de claridad en tu prompt? ¿La respuesta tiene errores u omisiones? ¿Qué no cubrió el LLM que tú sí sabes por lo visto en clase?]
+El prompt no pidio que el LLM considerara el caso donde el mismo pago podria usar multiples metodos y tampoco se pidio que pensara en como se selecciona la estrategia en tiempo de ejecucion
 
 
 #### 3. Respuesta final
 
-[Escribe tu respuesta definitiva a la pregunta del parcial, integrando lo que aprendiste del LLM pero yendo más allá. Corrige errores, llena omisiones, conecta con conceptos vistos en clase. Esta es tu respuesta: demuestra que tú dominas el tema.]
+El codigo original viola principalmente el OCP ya que cada nuevo metodo de pago requiere modificar la clase existente. También viola SRP debido a multiples logicas de pago en una clase
+
+Tambien el patrón Strategy es correcto y suficiente para este caso. Sin embargo la solución del LLM está incompleta porque no resuelve como se elige la estrategia. En un sistema real se necesita un registro de estrategias asi como este:
+
+public void registrar(EstrategiaPago estrategia) {
+        estrategias.put(estrategia.getTipo(), estrategia);
+    }
+
+    public EstrategiaPago obtener(String tipo) {
+        EstrategiaPago estrategia = estrategias.get(tipo);
+        if (estrategia == null) throw new IllegalArgumentException("Método de pago no soportado: " + tipo);
+        return estrategia;
+    }
+

@@ -17,7 +17,7 @@
 |---|---|
 | **Nombre del LLM** | [Claude] |
 | **Modelo específico** | [Claude 3.1 pro] |
-| **¿Por qué elegiste este LLM?** | Esta IA razona de una buena manera y es neceesario para obtener una respuesta mas acertada de lo que s epide] |
+| **¿Por qué elegiste este LLM?** | Esta IA razona de una buena manera y es necesario para obtener una respuesta mas acertada de lo que s epide] |
 
 ---
 

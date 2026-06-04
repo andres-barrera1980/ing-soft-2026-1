@@ -1,13 +1,7 @@
-# Plantilla de entrega — Parcial 2
-
-> **Instrucción**: Copia esta plantilla para cada pregunta del parcial. Reemplaza `[Pregunta XX]` por el identificador correcto (ej: `P01_solid_srp`) y completa todas las secciones. Haz al menos 2 commits por pregunta: uno con el prompt + respuesta del LLM, y otro con el análisis.
-
----
-
-## Pregunta [XX]: [Título resumido]
+# Pregunta P13: Integración — Refactoring Notificador
 
 ### Estudiante
-- **Nombre completo**: [Tu nombre y apellido]
+- **Nombre completo**: Mateo Traslaviña Moreno
 
 ---
 
@@ -15,55 +9,75 @@
 
 | Campo | Valor |
 |---|---|
-| **Nombre del LLM** | [Claude / ChatGPT / Gemini / Copilot / DeepSeek / Qwen / Mistral / Otro / **Sin IA — respuesta propia**] |
-| **Modelo específico** | [Ej: Claude Opus 4.5, GPT-4o, Gemini 2.5 Pro, etc. Si respondes sin IA, escribe "N/A"] |
-| **¿Por qué elegiste este LLM?** | [Justifica en 1-3 oraciones. Si respondes sin IA, explica por qué decidiste no usar LLM para esta pregunta.] |
+| **Nombre del LLM** | Claude |
+| **Modelo específico** | Claude Sonnet 4.6 |
+| **¿Por qué elegiste este LLM?** | Claude tiene excelente razonamiento para identificar problemas de integración y acoplamiento en código Java. Para refactorings que involucran patrones de diseño (Observer, Strategy, Facade), Claude propone soluciones estructuradas y genera código Spring Boot idiomático con inyección de dependencias correcta. |
 
 ---
 
 ### Prompt utilizado
 
-> **Si respondiste sin IA, omite esta sección y ve directamente a Análisis crítico.**
-
 ```
-[Pega aquí el prompt exacto que enviaste al LLM. 
-Incluye TODO el texto, sin editar ni resumir.
+Eres un ingeniero de software senior revisando código del proyecto OpenLib Market, plataforma de compra-venta de libros en Java 21 con Spring Boot 3.x.
 
-Un buen prompt incluye:
-- Contexto del proyecto OpenLib Market
-- El código o situación específica
-- Lo que esperas que el LLM haga
-- Restricciones (ej: "usa Java 21", "aplica SOLID")
-- Formato de salida esperado (ej: "respuesta en markdown con código Java")]
+Analiza el siguiente servicio de notificaciones del módulo de integración:
+
+```java
+@Service
+public class NotificadorPedido {
+    
+    public void notificarPedidoCreado(Pedido pedido) {
+        // Notificar por email
+        Properties props = new Properties();
+        props.put("mail.smtp.host", "smtp.openlib.com");
+        props.put("mail.smtp.port", "587");
+        Session session = Session.getInstance(props);
+        MimeMessage message = new MimeMessage(session);
+        message.setFrom(new InternetAddress("noreply@openlib.com"));
+        message.addRecipient(Message.RecipientType.TO, new InternetAddress(pedido.getComprador().getEmail()));
+        message.setSubject("Tu pedido #" + pedido.getId() + " fue creado");
+        message.setText("Hola " + pedido.getComprador().getNombre() + ", tu pedido está en camino.");
+        Transport.send(message);
+        
+        // Notificar por SMS
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder()
+            .uri(URI.create("https://api.smsprovider.com/send"))
+            .POST(HttpRequest.BodyPublishers.ofString(
+                "{\"to\":\"" + pedido.getComprador().getTelefono() + "\",\"text\":\"Pedido #" + pedido.getId() + " creado\"}"))
+            .header("Authorization", "Bearer hardcoded_sms_token_12345")
+            .build();
+        client.send(request, HttpResponse.BodyHandlers.ofString());
+        
+        // Notificar al vendedor por email
+        MimeMessage vendedorMsg = new MimeMessage(session);
+        vendedorMsg.setFrom(new InternetAddress("noreply@openlib.com"));
+        vendedorMsg.addRecipient(Message.RecipientType.TO, new InternetAddress(pedido.getVendedor().getEmail()));
+        vendedorMsg.setSubject("Nuevo pedido de tu libro");
+        vendedorMsg.setText("Tienes un nuevo pedido #" + pedido.getId());
+        Transport.send(vendedorMsg);
+        
+        // Registrar en sistema externo de analytics
+        HttpClient analyticsClient = HttpClient.newHttpClient();
+        HttpRequest analyticsRequest = HttpRequest.newBuilder()
+            .uri(URI.create("https://analytics.openlib.com/events"))
+            .POST(HttpRequest.BodyPublishers.ofString("{\"event\":\"order_created\",\"orderId\":\"" + pedido.getId() + "\"}"))
+            .build();
+        analyticsClient.send(analyticsRequest, HttpResponse.BodyHandlers.ofString());
+    }
+}
+```
+
+Necesito que:
+1. Identifiques todos los problemas de este código (no solo SOLID — incluye problemas de integración, seguridad, testabilidad)
+2. Propongas un refactoring usando el patrón Observer/Event-Driven apropiado para Spring Boot
+3. Generes el código refactorizado completo con: eventos de dominio, listeners, interfaces para cada canal de notificación
+4. Expliques cómo este refactoring mejora la testabilidad (incluye ejemplo de test con mocks)
+
+Restricciones: Java 21, Spring Boot 3.x, @EventListener de Spring, inyección de dependencias. No uses frameworks externos de mensajería (sin Kafka/RabbitMQ para este ejemplo).
+
+Formato: markdown con secciones "Diagnóstico", "Problemas identificados", "Refactoring propuesto", "Código final", "Tests".
 ```
 
 ---
 
-### Respuesta del LLM
-
-> **Si respondiste sin IA, omite esta sección y ve directamente a Análisis crítico.**
-[Pega aquí la respuesta COMPLETA del LLM, sin editar, sin resumir.
-Incluye TODO el texto, código, explicaciones que generó el LLM.
-
-Si el LLM generó código, asegúrate de que esté correctamente formateado.
-Si tuviste que hacer varias iteraciones, pega la MEJOR respuesta obtenida,
-pero menciona cuántas iteraciones hiciste.]
-```
-
----
-
-### Análisis crítico de la respuesta
-
-#### 1. ¿Qué hizo bien el prompt?
-
-[Evalúa tu propio prompt, no la respuesta del LLM. ¿El contexto fue suficiente? ¿Las restricciones fueron claras? ¿El formato de salida que pediste ayudó a obtener una buena respuesta? ¿Qué parte de tu prompt fue más efectiva? Sé específico: menciona fragmentos concretos de tu prompt que funcionaron bien.]
-
-
-#### 2. ¿Qué se puede mejorar?
-
-[¿Qué le faltó a tu prompt? ¿Qué harías diferente si pudieras reformularlo? ¿El LLM entendió mal algo por falta de claridad en tu prompt? ¿La respuesta tiene errores u omisiones? ¿Qué no cubrió el LLM que tú sí sabes por lo visto en clase?]
-
-
-#### 3. Respuesta final
-
-[Escribe tu respuesta definitiva a la pregunta del parcial, integrando lo que aprendiste del LLM pero yendo más allá. Corrige errores, llena omisiones, conecta con conceptos vistos en clase. Esta es tu respuesta: demuestra que tú dominas el tema.]

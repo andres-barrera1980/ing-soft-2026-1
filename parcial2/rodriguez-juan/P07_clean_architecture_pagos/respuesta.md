@@ -1,53 +1,118 @@
 # Plantilla de entrega — Parcial 2
 
-> **Instrucción**: Copia esta plantilla para cada pregunta del parcial. Reemplaza `[Pregunta XX]` por el identificador correcto (ej: `P01_solid_srp`) y completa todas las secciones. Haz al menos 2 commits por pregunta: uno con el prompt + respuesta del LLM, y otro con el análisis.
-
 ---
 
-## Pregunta [XX]: [Título resumido]
+## Pregunta P07: P.7
 
 ### Estudiante
-- **Nombre completo**: [Tu nombre y apellido]
+
+- **Nombre completo**: Juan David Rodriguez Franco
 
 ---
 
 ### LLM utilizado
 
-| Campo | Valor |
-|---|---|
-| **Nombre del LLM** | [Claude / ChatGPT / Gemini / Copilot / DeepSeek / Qwen / Mistral / Otro / **Sin IA — respuesta propia**] |
-| **Modelo específico** | [Ej: Claude Opus 4.5, GPT-4o, Gemini 2.5 Pro, etc. Si respondes sin IA, escribe "N/A"] |
-| **¿Por qué elegiste este LLM?** | [Justifica en 1-3 oraciones. Si respondes sin IA, explica por qué decidiste no usar LLM para esta pregunta.] |
+| Campo                                   | Valor                                                                                                                                                                              |
+| --------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Nombre del LLM**                | Gemini                                                                                                                                                                             |
+| **Modelo específico**            | Gemini 3.1 Pro                                                                                                                                                                     |
+| **¿Por qué elegiste este LLM?** | Gemini 3.1 Pro tiene excelente capacidad para diseñar diagramas arquitectónicos y explicar conceptos estructurales complejos como la Regla de Dependencia en Clean Architecture. |
 
 ---
 
 ### Prompt utilizado
 
-> **Si respondiste sin IA, omite esta sección y ve directamente a Análisis crítico.**
+```text
+Actúa como un arquitecto de software experto en Clean Architecture.
 
-```
-[Pega aquí el prompt exacto que enviaste al LLM. 
-Incluye TODO el texto, sin editar ni resumir.
+En el proyecto OpenLib Market, tenemos el módulo de "Gestión de Pagos". Actualmente está todo acoplado en una clase `PaymentService` (API REST, reglas de pago con tarjeta/PSE/PayPal, persistencia en PostgreSQL y notificaciones por correo). 
 
-Un buen prompt incluye:
-- Contexto del proyecto OpenLib Market
-- El código o situación específica
-- Lo que esperas que el LLM haga
-- Restricciones (ej: "usa Java 21", "aplica SOLID")
-- Formato de salida esperado (ej: "respuesta en markdown con código Java")]
+Necesito que rediseñes este módulo aplicando estrictamente **Clean Architecture**. Por favor incluye:
+1. Una descripción clara de qué responsabilidades van en cada capa (Entities, Use Cases, Interface Adapters, Frameworks & Drivers) específicamente para este módulo de pagos.
+2. Un diagrama en formato Mermaid que ilustre la estructura de estas capas y demuestre visualmente que se respeta la "Regla de Dependencia".
+3. Una explicación breve de cómo se inyectan las dependencias externas (Base de datos, Correos, Pasarelas) usando el Principio de Inversión de Dependencias sin violar la arquitectura.
 ```
 
 ---
 
 ### Respuesta del LLM
 
-> **Si respondiste sin IA, omite esta sección y ve directamente a Análisis crítico.**
-[Pega aquí la respuesta COMPLETA del LLM, sin editar, sin resumir.
-Incluye TODO el texto, código, explicaciones que generó el LLM.
+```markdown
+Para desacoplar el monolito `PaymentService`, aplicaremos **Clean Architecture**, dividiendo el sistema en anillos concéntricos. La regla principal aquí es la **Regla de Dependencia**: el código fuente solo puede apuntar hacia adentro (las capas internas no saben nada de las capas externas).
 
-Si el LLM generó código, asegúrate de que esté correctamente formateado.
-Si tuviste que hacer varias iteraciones, pega la MEJOR respuesta obtenida,
-pero menciona cuántas iteraciones hiciste.]
+### 1. Responsabilidades por Capa en el Módulo de Pagos
+
+* **Entities (Entidades / Reglas de Negocio Enterprise):**
+  * `Pago`, `Orden`, `MetodoPago` (Enums o clases de valor).
+  * Contienen la lógica fundamental independiente de la aplicación (ej: validaciones de que un pago no puede procesarse si el monto es cero o negativo).
+* **Use Cases (Casos de Uso / Reglas de Negocio de Aplicación):**
+  * `ProcesarPagoUseCase`. 
+  * Orquesta el flujo: recibe la orden, invoca al procesador de la pasarela, cambia el estado de la orden, llama al repositorio para guardar, e invoca al servicio de notificación. *No importa si es REST o CLI, el flujo es el mismo.*
+* **Interface Adapters (Adaptadores de Interfaz):**
+  * `PagoController` (Controlador REST que recibe el JSON de JavaFX y lo convierte a DTOs/Input boundaries).
+  * `PagoPresenter` (Para formatear la respuesta).
+  * Implementaciones de las interfaces de los adaptadores (`PostgresPagoRepository`, `SmtpEmailSender`, `StripePaymentGateway`). 
+* **Frameworks & Drivers (Infraestructura):**
+  * La base de datos PostgreSQL real, el servidor web (Spring Boot / Javalin), la API de SendGrid/SMTP, y las librerías de Stripe o PayPal.
+
+### 2. Diagrama de la Estructura (Regla de Dependencia)
+
+```mermaid
+classDiagram
+    namespace Frameworks_And_Drivers {
+        class SpringBootApp
+        class PostgreSQL
+        class SMTP_Server
+        class PasarelasExternas
+    }
+
+    namespace Interface_Adapters {
+        class PagoControllerREST
+        class PostgresPagoRepository
+        class SmtpEmailService
+        class PayPalGateway
+    }
+
+    namespace Use_Cases {
+        class ProcesarPagoUseCase
+        class PagoRepository { <<interface>> }
+        class EmailService { <<interface>> }
+        class PaymentGateway { <<interface>> }
+    }
+
+    namespace Entities {
+        class Pago
+        class Orden
+    }
+
+    %% Regla de dependencia (Hacia adentro)
+    PagoControllerREST --> ProcesarPagoUseCase : invoca
+    ProcesarPagoUseCase --> Pago : usa
+    ProcesarPagoUseCase --> Orden : usa
+
+    %% Principio de Inversión de Dependencia (DIP)
+    PostgresPagoRepository ..|> PagoRepository : implementa
+    SmtpEmailService ..|> EmailService : implementa
+    PayPalGateway ..|> PaymentGateway : implementa
+
+    ProcesarPagoUseCase --> PagoRepository : usa interface
+    ProcesarPagoUseCase --> EmailService : usa interface
+    ProcesarPagoUseCase --> PaymentGateway : usa interface
+```
+
+### 3. Inyección de Dependencias Externas (Principio DIP)
+
+Si el `ProcesarPagoUseCase` necesita guardar un pago o enviar un correo (acciones de infraestructura), estaríamos tentados a hacerle un `import` a `PostgresPagoRepository`. Pero esto violaría la arquitectura porque el "Use Case" (capa interna) dependería de un "Interface Adapter" (capa externa).
+
+Para solucionarlo, aplicamos el **Principio de Inversión de Dependencia (DIP)**:
+
+1. Definimos las interfaces (`PagoRepository`, `EmailService`) **dentro** de la capa de Casos de Uso.
+2. El `ProcesarPagoUseCase` solo conoce estas interfaces.
+3. Las clases concretas (`PostgresPagoRepository`) en la capa de Adaptadores implementan esas interfaces.
+4. Un inyector de dependencias (como el framework de IoC en la capa más externa) se encarga de instanciar las clases concretas y pasárselas al constructor del `ProcesarPagoUseCase` al iniciar la aplicación.
+
+De esta forma, el flujo de control sale hacia la base de datos, pero la dependencia del código fuente apunta hacia adentro.
+
 ```
 
 ---
@@ -56,14 +121,13 @@ pero menciona cuántas iteraciones hiciste.]
 
 #### 1. ¿Qué hizo bien el prompt?
 
-[Evalúa tu propio prompt, no la respuesta del LLM. ¿El contexto fue suficiente? ¿Las restricciones fueron claras? ¿El formato de salida que pediste ayudó a obtener una buena respuesta? ¿Qué parte de tu prompt fue más efectiva? Sé específico: menciona fragmentos concretos de tu prompt que funcionaron bien.]
-
+[Pendiente de análisis]
 
 #### 2. ¿Qué se puede mejorar?
 
-[¿Qué le faltó a tu prompt? ¿Qué harías diferente si pudieras reformularlo? ¿El LLM entendió mal algo por falta de claridad en tu prompt? ¿La respuesta tiene errores u omisiones? ¿Qué no cubrió el LLM que tú sí sabes por lo visto en clase?]
-
+[Pendiente de análisis]
 
 #### 3. Respuesta final
 
-[Escribe tu respuesta definitiva a la pregunta del parcial, integrando lo que aprendiste del LLM pero yendo más allá. Corrige errores, llena omisiones, conecta con conceptos vistos en clase. Esta es tu respuesta: demuestra que tú dominas el tema.]
+[Pendiente de análisis]
+```

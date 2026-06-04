@@ -441,14 +441,22 @@ void publicarLibro_deberiaOrquestarTodosLosPasos() {
 
 #### 1. ¿Qué hizo bien el prompt?
 
-[Evalúa tu propio prompt, no la respuesta del LLM. ¿El contexto fue suficiente? ¿Las restricciones fueron claras? ¿El formato de salida que pediste ayudó a obtener una buena respuesta? ¿Qué parte de tu prompt fue más efectiva? Sé específico: menciona fragmentos concretos de tu prompt que funcionaron bien.]
-
+Asignarle a Claude el rol de arquitecto de software senior y exigir inyección de dependencias por constructor fue un acierto. El modelo entendió las reglas del juego. Estructuró la solución sin inflarla con frameworks pesados y sin acoplar las clases. 
+Pedir un formato rígido en tres secciones (Diagnóstico, Estrategia de Refactoring y Código Final) salvó la respuesta. Evitó que el LLM mezclara teoría con código. El resultado es un texto que puedes evaluar rápido, sin perderte en explicaciones de relleno.
 
 #### 2. ¿Qué se puede mejorar?
 
-[¿Qué le faltó a tu prompt? ¿Qué harías diferente si pudieras reformularlo? ¿El LLM entendió mal algo por falta de claridad en tu prompt? ¿La respuesta tiene errores u omisiones? ¿Qué no cubrió el LLM que tú sí sabes por lo visto en clase?]
+Aquí es donde el modelo resbala. Claude cometió fallos sutiles, de esos que rompen producción si los dejas pasar.
 
+Encontré un error crítico de lógica en el refactoring de `GestorLibro.java`. Extrajo la generación del slug con `String slug = slugGenerator.generar(libro.getTitle());` pero olvidó asignárselo al libro. Para empeorar las cosas, inventó una línea `libro.setStatus("APROBADO");` que no existía en el código base. Perdió la funcionalidad original.
+
+También cayó en la clásica alucinación del traductor. Sin que nadie lo pidiera, cambió las clases `Libro` y `Usuario` a `Book` y `User`. Pasó `getTitulo()` a `getTitle()`. Cambiar los contratos de las entidades de dominio sin una razón técnica sólida arruina el refactoring.
+
+Tengo un problema con su decisión arquitectónica. Claude creó `LibroValidator` y `SlugGenerator` como dependencias inyectables. Sí, cumple el Principio de Responsabilidad Única. Pero también crea un Modelo de Dominio Anémico. En programación orientada a objetos pura, validar un ISBN o generar un slug son comportamientos propios de la clase `Libro`. No necesitas inyectar clases externas para eso. Deben vivir dentro de la entidad.
 
 #### 3. Respuesta final
 
-[Escribe tu respuesta definitiva a la pregunta del parcial, integrando lo que aprendiste del LLM pero yendo más allá. Corrige errores, llena omisiones, conecta con conceptos vistos en clase. Esta es tu respuesta: demuestra que tú dominas el tema.]
+El diagnóstico de Claude es correcto. El código original viola el SRP (Principio de Responsabilidad Única). Es una clase que hace de todo: valida, guarda en base de datos, genera slugs, envía correos, registra logs e indexa. 
+También rompe el DIP (Principio de Inversión de Dependencias) al usar conexiones rígidas y abusar de `new`.
+
+Mi refactoring ideal tomaría lo bueno de esta respuesta. Adoptaría las interfaces sugeridas por Claude (`LibroRepository`, `NotificadorVendedor` e `IndiceLibros`) inyectadas por constructor. Pero arreglaría el desastre que hizo con el dominio. Mantendría los nombres en español y me aseguraría de ejecutar el `libro.setSlug(slug)` perdido.

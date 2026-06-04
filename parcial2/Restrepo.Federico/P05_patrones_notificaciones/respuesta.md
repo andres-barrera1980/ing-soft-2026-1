@@ -4,10 +4,10 @@
 
 ---
 
-## Pregunta [XX]: [Título resumido]
+## Pregunta 05: Patrones de diseño — Sistema de notificaciones
 
 ### Estudiante
-- **Nombre completo**: [Tu nombre y apellido]
+- **Nombre completo**: Federico Restrepo
 
 ---
 
@@ -15,9 +15,9 @@
 
 | Campo | Valor |
 |---|---|
-| **Nombre del LLM** | [Claude / ChatGPT / Gemini / Copilot / DeepSeek / Qwen / Mistral / Otro / **Sin IA — respuesta propia**] |
-| **Modelo específico** | [Ej: Claude Opus 4.5, GPT-4o, Gemini 2.5 Pro, etc. Si respondes sin IA, escribe "N/A"] |
-| **¿Por qué elegiste este LLM?** | [Justifica en 1-3 oraciones. Si respondes sin IA, explica por qué decidiste no usar LLM para esta pregunta.] |
+| **Nombre del LLM** | Claude |
+| **Modelo específico** | Claude Sonnet 4.5 |
+| **¿Por qué elegiste este LLM?** | Elegí Claude Sonnet 4.5 porque maneja bien la combinación de múltiples patrones de diseño y produce diagramas Mermaid correctos junto con código Java limpio. |
 
 ---
 
@@ -25,16 +25,25 @@
 
 > **Si respondiste sin IA, omite esta sección y ve directamente a Análisis crítico.**
 
-```
-[Pega aquí el prompt exacto que enviaste al LLM. 
-Incluye TODO el texto, sin editar ni resumir.
+```text
+Actúa como un Arquitecto de Software Senior experto en patrones de diseño GoF.
 
-Un buen prompt incluye:
-- Contexto del proyecto OpenLib Market
-- El código o situación específica
-- Lo que esperas que el LLM haga
-- Restricciones (ej: "usa Java 21", "aplica SOLID")
-- Formato de salida esperado (ej: "respuesta en markdown con código Java")]
+Contexto: En OpenLib Market, cuando un libro agotado vuelve a estar disponible, varios componentes deben reaccionar automáticamente:
+- Enviar notificación por correo a usuarios que lo tienen en su wishlist.
+- Enviar notificación push a usuarios que lo marcaron como favorito en la app móvil.
+- Actualizar la caché de Redis para que aparezca en búsquedas.
+- Registrar el evento en un log de auditoría.
+
+Tarea: Diseña e implementa este sistema de notificaciones usando DOS patrones de diseño GoF de los siguientes vistos en clase: Observer, Strategy, Decorator, Factory, Singleton, Command.
+
+Requisitos:
+1. Justifica por qué elegiste esos dos patrones y cómo se complementan.
+2. Incluye un diagrama de clases en formato Mermaid.
+3. Implementa en Java 21 las clases principales (no esqueletos — código real funcional).
+4. Muestra cómo se registran y desregistran dinámicamente los componentes interesados.
+5. Indica brevemente cómo manejarías el caso de que una notificación falle sin que afecte al resto.
+
+Formato de salida: markdown con bloques de código Java y diagrama Mermaid.
 ```
 
 ---
@@ -42,28 +51,226 @@ Un buen prompt incluye:
 ### Respuesta del LLM
 
 > **Si respondiste sin IA, omite esta sección y ve directamente a Análisis crítico.**
-[Pega aquí la respuesta COMPLETA del LLM, sin editar, sin resumir.
-Incluye TODO el texto, código, explicaciones que generó el LLM.
 
-Si el LLM generó código, asegúrate de que esté correctamente formateado.
-Si tuviste que hacer varias iteraciones, pega la MEJOR respuesta obtenida,
-pero menciona cuántas iteraciones hiciste.]
+*(1 iteración)*
+
+---
+
+#### Patrones elegidos: **Observer + Strategy**
+
+**Observer** es el patrón natural cuando múltiples componentes deben reaccionar ante un evento sin que el emisor conozca a los receptores. El libro que vuelve a estar disponible es el **Subject**; los componentes (email, push, Redis, log) son los **Observers**.
+
+**Strategy** complementa al Observer porque cada observer tiene una estrategia diferente de notificación. Encapsular esa lógica en una estrategia hace que sea fácil agregar nuevos canales sin modificar el Subject ni los observers ya existentes.
+
+---
+
+#### Diagrama de clases (Mermaid)
+
+```mermaid
+classDiagram
+    class LibroSubject {
+        -List~ObservadorDisponibilidad~ observadores
+        +registrar(ObservadorDisponibilidad)
+        +desregistrar(ObservadorDisponibilidad)
+        +notificarDisponibilidad(Libro)
+    }
+
+    class ObservadorDisponibilidad {
+        <<interface>>
+        +onLibroDisponible(Libro)
+    }
+
+    class NotificadorEmail implements ObservadorDisponibilidad {
+        -EstrategiaEnvio estrategia
+        +onLibroDisponible(Libro)
+    }
+
+    class NotificadorPush implements ObservadorDisponibilidad {
+        -EstrategiaEnvio estrategia
+        +onLibroDisponible(Libro)
+    }
+
+    class ActualizadorCache implements ObservadorDisponibilidad {
+        +onLibroDisponible(Libro)
+    }
+
+    class RegistradorAuditoria implements ObservadorDisponibilidad {
+        +onLibroDisponible(Libro)
+    }
+
+    class EstrategiaEnvio {
+        <<interface>>
+        +enviar(String destinatario, String mensaje)
+    }
+
+    class EnvioSMTP implements EstrategiaEnvio {
+        +enviar(String destinatario, String mensaje)
+    }
+
+    class EnvioFirebase implements EstrategiaEnvio {
+        +enviar(String destinatario, String mensaje)
+    }
+
+    LibroSubject --> ObservadorDisponibilidad
+    NotificadorEmail --> EstrategiaEnvio
+    NotificadorPush --> EstrategiaEnvio
 ```
+
+---
+
+#### Implementación Java 21
+
+```java
+// Modelo
+public record Libro(String isbn, String titulo, List<String> wishlistEmails, List<String> favoritosTokens) {}
+
+// Interfaz Observer
+public interface ObservadorDisponibilidad {
+    void onLibroDisponible(Libro libro);
+}
+
+// Subject
+public class LibroSubject {
+    private final List<ObservadorDisponibilidad> observadores = new ArrayList<>();
+
+    public void registrar(ObservadorDisponibilidad o) {
+        observadores.add(o);
+    }
+
+    public void desregistrar(ObservadorDisponibilidad o) {
+        observadores.remove(o);
+    }
+
+    public void notificarDisponibilidad(Libro libro) {
+        for (ObservadorDisponibilidad o : observadores) {
+            try {
+                o.onLibroDisponible(libro);
+            } catch (Exception e) {
+                // fallo aislado: el observer falló pero los demás continúan
+                System.err.println("Error en observer " + o.getClass().getSimpleName() + ": " + e.getMessage());
+            }
+        }
+    }
+}
+
+// Interfaz Strategy
+public interface EstrategiaEnvio {
+    void enviar(String destinatario, String mensaje);
+}
+
+// Estrategias concretas
+public class EnvioSMTP implements EstrategiaEnvio {
+    @Override
+    public void enviar(String destinatario, String mensaje) {
+        System.out.println("[SMTP] Correo a " + destinatario + ": " + mensaje);
+        // conectar a smtp.openlib.com y enviar
+    }
+}
+
+public class EnvioFirebase implements EstrategiaEnvio {
+    @Override
+    public void enviar(String destinatario, String mensaje) {
+        System.out.println("[Firebase] Push a token " + destinatario + ": " + mensaje);
+        // llamar a Firebase Cloud Messaging API
+    }
+}
+
+// Observers concretos
+public class NotificadorEmail implements ObservadorDisponibilidad {
+    private final EstrategiaEnvio estrategia;
+
+    public NotificadorEmail(EstrategiaEnvio estrategia) {
+        this.estrategia = estrategia;
+    }
+
+    @Override
+    public void onLibroDisponible(Libro libro) {
+        String msg = "El libro '" + libro.titulo() + "' ya está disponible en OpenLib Market.";
+        for (String email : libro.wishlistEmails()) {
+            estrategia.enviar(email, msg);
+        }
+    }
+}
+
+public class NotificadorPush implements ObservadorDisponibilidad {
+    private final EstrategiaEnvio estrategia;
+
+    public NotificadorPush(EstrategiaEnvio estrategia) {
+        this.estrategia = estrategia;
+    }
+
+    @Override
+    public void onLibroDisponible(Libro libro) {
+        String msg = "¡" + libro.titulo() + " volvió al catálogo!";
+        for (String token : libro.favoritosTokens()) {
+            estrategia.enviar(token, msg);
+        }
+    }
+}
+
+public class ActualizadorCache implements ObservadorDisponibilidad {
+    @Override
+    public void onLibroDisponible(Libro libro) {
+        System.out.println("[Redis] Actualizando caché para ISBN: " + libro.isbn());
+        // redisClient.set("libro:" + libro.isbn(), "DISPONIBLE");
+    }
+}
+
+public class RegistradorAuditoria implements ObservadorDisponibilidad {
+    @Override
+    public void onLibroDisponible(Libro libro) {
+        System.out.println("[Auditoría] " + java.time.Instant.now() + " - Libro disponible: " + libro.isbn());
+        // escribir en tabla de auditoría
+    }
+}
+```
+
+---
+
+#### Ejemplo de uso: registro, notificación y desregistro dinámico
+
+```java
+public class EjemploNotificaciones {
+    public static void main(String[] args) {
+        Libro libro = new Libro(
+            "978-3-16-148410-0",
+            "Clean Code",
+            List.of("ana@mail.com", "luis@mail.com"),
+            List.of("token-abc123", "token-xyz456")
+        );
+
+        LibroSubject subject = new LibroSubject();
+
+        // Registrar observers
+        ObservadorDisponibilidad email = new NotificadorEmail(new EnvioSMTP());
+        ObservadorDisponibilidad push  = new NotificadorPush(new EnvioFirebase());
+        ObservadorDisponibilidad cache = new ActualizadorCache();
+        ObservadorDisponibilidad audit = new RegistradorAuditoria();
+
+        subject.registrar(email);
+        subject.registrar(push);
+        subject.registrar(cache);
+        subject.registrar(audit);
+
+        // El libro vuelve a estar disponible
+        subject.notificarDisponibilidad(libro);
+
+        // Desregistrar push dinámicamente (ej. feature flag desactivado)
+        subject.desregistrar(push);
+
+        System.out.println("\n--- Segunda notificación sin push ---");
+        subject.notificarDisponibilidad(libro);
+    }
+}
+```
+
+---
+
+#### Manejo de fallos
+
+El `try/catch` dentro del loop en `notificarDisponibilidad` aísla los fallos: si el servidor SMTP cae, el observer de email lanza una excepción que se captura, se loguea, y los demás observers (Redis, auditoría, push) continúan ejecutándose con normalidad. Para producción se podría agregar un mecanismo de reintentos o una cola de mensajes fallidos por observer.
 
 ---
 
 ### Análisis crítico de la respuesta
 
-#### 1. ¿Qué hizo bien el prompt?
-
-[Evalúa tu propio prompt, no la respuesta del LLM. ¿El contexto fue suficiente? ¿Las restricciones fueron claras? ¿El formato de salida que pediste ayudó a obtener una buena respuesta? ¿Qué parte de tu prompt fue más efectiva? Sé específico: menciona fragmentos concretos de tu prompt que funcionaron bien.]
-
-
-#### 2. ¿Qué se puede mejorar?
-
-[¿Qué le faltó a tu prompt? ¿Qué harías diferente si pudieras reformularlo? ¿El LLM entendió mal algo por falta de claridad en tu prompt? ¿La respuesta tiene errores u omisiones? ¿Qué no cubrió el LLM que tú sí sabes por lo visto en clase?]
-
-
-#### 3. Respuesta final
-
-[Escribe tu respuesta definitiva a la pregunta del parcial, integrando lo que aprendiste del LLM pero yendo más allá. Corrige errores, llena omisiones, conecta con conceptos vistos en clase. Esta es tu respuesta: demuestra que tú dominas el tema.]

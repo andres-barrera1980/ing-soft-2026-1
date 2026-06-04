@@ -169,14 +169,35 @@ public class ControlInventarioService {
 
 #### 1. ¿Que hizo bien el prompt?
 
-[Evalua tu propio prompt, no la respuesta del LLM. ¿El contexto fue suficiente? ¿Las restricciones fueron claras? ¿El formato de salida que pediste ayudo a obtener una buena respuesta? ¿Que parte de tu prompt fue mas efectiva? Se especifico: menciona fragmentos concretos de tu prompt que funcionaron bien.]
+El prompt fue directo al pedirle que mostrara las fases divididas (Red, Green, Refactor). Exigirle que me diera el codigo en tres bloques de markdown separados fue una muy buena idea porque me permitio analizar que es lo que la IA considera realmente "TDD". Tambien pedirle explicitamente que usara JUnit 5 y Mockito garantizo que el codigo generado estuviera listo para ejecutarse sin dependencias obsoletas.
 
 
 #### 2. ¿Que se puede mejorar?
 
-[¿Que le falto a tu prompt? ¿Que harias diferente si pudieras reformularlo? ¿El LLM entendio mal algo por falta de claridad en tu prompt? ¿La respuesta tiene errores u omisiones? ¿Que no cubrio el LLM que tu si sabes por lo visto en clase?]
+El LLM entendio mal el concepto de la fase Green. *Como sabemos por lo discutido en clase, la fase Green de TDD consiste en escribir el codigo mas tonto y minimo posible (como un valor quemado) solo para que la barra pase a verde*. El LLM no hizo eso, sino que de inmediato escribio toda la logica final en la fase Green. Ademas, omitio por completo probar el segundo escenario que le pedi en el prompt: que pasaba cuando el vendedor reponia el stock y debia volver a estado DISPONIBLE.
 
 
 #### 3. Respuesta final
 
-[Escribe tu respuesta definitiva a la pregunta del parcial, integrando lo que aprendiste del LLM pero yendo mas alla. Corrige errores, llena omisiones, conecta con conceptos vistos en clase. Esta es tu respuesta: demuestra que tu dominas el tema.]
+Analizando a fondo, el LLM no esta aplicando TDD genuinamente, sino que esta simulando TDD. Escribio una prueba, y luego de inmediato salto a escribir la implementacion final completa con la logica de base de datos y correos. *Para verificar que alguien o algo aplica TDD genuinamente, uno debe ver pasos intermedios diminutos (baby steps) donde la implementacion apenas hace lo minimo necesario para pasar la prueba actual antes de siquiera pensar en la logica final*.
+
+Adicionalmente, las pruebas generadas por la IA no cubren todos los escenarios relevantes. Solo hizo la parte de agotar inventario, pero falto la parte de reponer. Aca incluyo la prueba unitaria que el LLM omitio para lograr la cobertura completa:
+
+```java
+    @Test
+    void reponerStock_CuandoLlegaInventario_DebeMarcarDisponible() {
+        // Arrange
+        Libro libro = new Libro(1L, "Java TDD", 0, "AGOTADO"); 
+        when(repository.findById(1L)).thenReturn(libro);
+
+        // Act
+        service.reponerStock(1L, 10);
+
+        // Assert
+        assertEquals("DISPONIBLE", libro.getEstado());
+        assertEquals(10, libro.getStock());
+        verify(repository, times(1)).save(libro); // Verifica que se guarda el nuevo estado
+    }
+```
+
+En cuanto al refactoring propuesto (fase 3), la extraccion de la logica al metodo privado `procesarEstadoInventario` que hizo la IA fue bastante acertada. Cumplio con el objetivo principal del ciclo TDD: mejorar la legibilidad y encapsulamiento del codigo existente sin alterar ni romper el comportamiento que ya garantizaban las pruebas.

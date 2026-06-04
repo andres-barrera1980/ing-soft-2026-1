@@ -4,16 +4,16 @@
 
 | Campo | Valor |
 |---|---|
-| **Nombre completo** | [Tu nombre y apellido] |
-| **Fecha de entrega** | [FECHA] |
+| **Nombre completo** | [Danna Gabriela Rojas Bernal] |
+| **Fecha de entrega** | [3/06/2026] |
 
 ## LLM principal utilizado
 
 | Campo | Valor |
 |---|---|
-| **Nombre del LLM** | [Claude / ChatGPT / Gemini / Copilot / DeepSeek / Qwen / Mistral / Otro / Sin IA] |
-| **Modelo específico** | [Ej: Claude Opus 4.5, GPT-4o. Si respondes sin IA, escribe "N/A"] |
-| **¿Por qué elegiste este LLM?** | [Justifica en 2-4 oraciones. Si respondes sin IA, explica tu decisión.] |
+| **claude, chat gpt gemini** | [Claude / ChatGPT / Gemini / Copilot / DeepSeek / Qwen / Mistral / Otro / Sin IA] |
+| **gemini flash,sonnet 64.6, 4.7 ** | [Ej: Claude Opus 4.5, GPT-4o. Si respondes sin IA, escribe "N/A"] |
+| **Avcees utilizaba ai para relaizar las respuestas mas rapido, y luego compara mis respuestas, o a veces las hacia sin AI proque no lo veia necesario** | [Justifica en 2-4 oraciones. Si respondes sin IA, explica tu decisión.] |
 
 ## Estructura de la entrega
 

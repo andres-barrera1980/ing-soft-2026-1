@@ -255,7 +255,7 @@ Para evitar esto sin contaminar la lógica de negocio de los servicios base o de
 1. **Composición:** El decorador actúa como un intermediario (un *proxy* estructural) que implementa la misma interfaz `IObservadorRestock`.
 2. **Aislamiento (`try-catch` por componente):** Al registrar los componentes en el `GestorInventario`, no registramos el `NotificadorEmail` original, sino su versión decorada. Cuando el Sujeto llama a `reaccionarRestock`, el decorador intercepta el llamado. Si ocurre un fallo (como la excepción simulada de SMTP en el código), el decorador lo atrapa (`catch`), lo registra en la consola de errores estandarizada, y finaliza su ejecución normalmente.
 3. **Flujo Ininterrumpido:** Debido a que el decorador "silencia" la excepción a nivel estructural, el Sujeto desconoce el fallo y continúa iterando con total seguridad hacia el `SincronizadorRedis` y el `AuditorLog`, garantizando la resiliencia del sistema distribuido.
-```
+
 
 ---
 
@@ -263,22 +263,115 @@ Para evitar esto sin contaminar la lógica de negocio de los servicios base o de
 
 #### 1. ¿Qué hizo bien el prompt?
 
-Acotamiento del universo (El mayor acierto): Al incluir la restricción explícita de elegir de una lista cerrada ([Observer, Command, Facade, Strategy, Factory, Decorator]), evitamos la alucinación de la IA. Si no hubiéramos puesto esta lista, el LLM probablemente habría sugerido herramientas de infraestructura (como RabbitMQ, Kafka o Spring Events) en lugar de ceñirse a resolverlo procedimentalmente con Patrones GoF, que era el objetivo académico.
+- Delimitar los patrones de diseño a unicamente los de GoF vistos en clase me permite entender facilmente el codigo que fue generado, como tambien que el LLM  evite utilizar herramientas de infraestructura en lugar de patrones de diseño
 
-Inyección del Escenario de Fallo: El fragmento "Explica e implementa en el código cómo evitarías que, si el envío de correo falla, se interrumpa la actualización de Redis o el log" fue la clave del éxito. En lugar de preguntar "¿Cómo manejas errores?", le dimos la consecuencia exacta del error (interrupción de Redis). Esto forzó al LLM a no usar un simple try-catch genérico, sino a integrar el Decorator como un patrón de resiliencia estructural.
+- La linea "Explica e implementa en el código cómo evitarías que, si el envío de correo falla, se interrumpa la actualización de Redis o el log" obliga al LLM a no utilizar soluciones superficiales como un simple try-catch genérico, en lugar de eso implementa un decorator para el manejo de excepciones
 
-Formato de Salida Estricto: Exigir un diagrama Mermaid obligó al modelo a pensar en la topología de clases antes de escribir una sola línea de código, garantizando que la combinación de los dos patrones tuviera coherencia visual y lógica.
+- Le di un formato de salida estricto y le pedi un diagrama Mermaid, esto obligó al modelo a pensar en la topología de clases antes de escribir una sola línea de código, garantizando que la combinación de los dos patrones tuviera coherencia visual y lógica.Ademas, demostro ser una gran ayuda para entender a fondo el codigo planteado por el LLM, ya que con solo observarlo puedo ver la interaccion entre las diferentes partes del codigo.
 
 
 #### 2. ¿Qué se puede mejorar?
 
-Faltó imponer restricciones de concurrencia (El problema del bloqueo): El prompt omitió por completo mencionar el rendimiento o el tiempo de respuesta. Como resultado, el LLM entregó una solución síncrona. Aunque el Decorator atrapa el error, el hilo principal de ejecución se queda bloqueado esperando a que el servidor SMTP (correo) responda antes de poder actualizar Redis. En la vida real, operaciones de I/O (red, correos) jamás deben bloquear el hilo de dominio.
+- Me doy cuenta que no le puse ninguna restriccion de tiempo al LLM, por lo que genero una solución síncrona. Aunque el Decorator atrapa el error, el hilo principal de ejecución se queda bloqueado esperando a que el servidor SMTP (correo) responda antes de poder actualizar Redis. En la vida real, operaciones de I/O (red, correos) jamás deben bloquear el hilo de dominio. Debí haber añadido la restricción como "Asegurate de que el envio de notificaciones no bloquee el hilo principal de ejecucion". Esto habría forzado al LLM a integrar concurrencia hilos dentro de su diseño y evitar el bloqueo del hilo principal.
 
-    ¿Qué haría diferente? Añadiría esta restricción: "Condición de rendimiento: La notificación por correo y push son procesos lentos (I/O bound). Tu diseño debe garantizar que el Gestor de Inventario no se quede bloqueado esperando estas respuestas". Esto habría forzado al LLM a integrar hilos (ExecutorService o concurrencia asíncrona) dentro de su diseño.
-
-Faltó exigir separación de capas (Clean Architecture): El prompt pidió usar dos patrones, pero no prohibió mezclar lógica de dominio con infraestructura. El LLM lo hizo bastante bien por intuición, poniendo System.out.println simulando los servicios externos, pero un prompt perfecto habría exigido explícitamente: "Asegúrate de que la clase GestorInventario no tenga ninguna dependencia de librerías de red o bases de datos".
 
 
 #### 3. Respuesta final
 
+el siguietnte codigo implementa el cambio del uso de hilos, para que nunca se bloquee el hilo del main
 
+```java
+
+package com.openlib.notifications;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+record Libro(String isbn, String titulo) {}
+
+interface IObservadorRestock {
+    void reaccionarRestock(Libro libro);
+}
+
+interface IRestockSubject {
+    void registrarObservador(IObservadorRestock observador);
+    void notificarRestock(Libro libro);
+}
+
+class GestorInventario implements IRestockSubject {
+    private final List<IObservadorRestock> observadores = new ArrayList<>();
+
+    @Override
+    public void registrarObservador(IObservadorRestock observador) {
+        observadores.add(observador);
+    }
+
+    @Override
+    public void notificarRestock(Libro libro) {
+        System.out.println("[Dominio - Thread: " + Thread.currentThread().getName() + "] Emitiendo evento Restock...");
+        for (IObservadorRestock observador : observadores) {
+            observador.reaccionarRestock(libro);
+        }
+        System.out.println("[Dominio] Broadcast finalizado en milisegundos. El hilo principal queda libre.\n");
+    }
+
+    public void marcarComoDisponible(Libro libro) {
+        notificarRestock(libro);
+    }
+}
+
+class NotificadorEmail implements IObservadorRestock {
+    @Override
+    public void reaccionarRestock(Libro libro) {
+        System.out.println("[Email - Thread: " + Thread.currentThread().getName() + "] Enviando correos...");
+        try { Thread.sleep(2000); } catch (InterruptedException e) {}
+        throw new RuntimeException("Timeout de conexión SMTP");
+    }
+}
+
+class SincronizadorRedis implements IObservadorRestock {
+    @Override
+    public void reaccionarRestock(Libro libro) {
+        System.out.println("[Redis - Thread: " + Thread.currentThread().getName() + "] Caché actualizada para: " + libro.isbn());
+    }
+}
+
+class AsyncResilienciaDecorator implements IObservadorRestock {
+    private final IObservadorRestock observadorBase;
+    private final ExecutorService executor;
+    private final String nombreComponente;
+
+    public AsyncResilienciaDecorator(IObservadorRestock observadorBase, ExecutorService executor) {
+        this.observadorBase = observadorBase;
+        this.executor = executor;
+        this.nombreComponente = observadorBase.getClass().getSimpleName();
+    }
+
+    @Override
+    public void reaccionarRestock(Libro libro) {
+        CompletableFuture.runAsync(() -> {
+            try {
+                observadorBase.reaccionarRestock(libro);
+            } catch (Exception e) {
+                System.err.println("[Resiliencia] Fallo contenido en " + nombreComponente + ": " + e.getMessage());
+            }
+        }, executor);
+    }
+}
+
+public class OpenLibRestockApp {
+    public static void main(String[] args) {
+        GestorInventario inventario = new GestorInventario();
+        ExecutorService ioThreadPool = Executors.newFixedThreadPool(4);
+
+        inventario.registrarObservador(new AsyncResilienciaDecorator(new NotificadorEmail(), ioThreadPool));
+        inventario.registrarObservador(new AsyncResilienciaDecorator(new SincronizadorRedis(), ioThreadPool));
+
+        Libro libroAgotado = new Libro("123-A", "Patrones Arquitectónicos");
+        inventario.marcarComoDisponible(libroAgotado);
+        
+        ioThreadPool.shutdown();
+    }
+}

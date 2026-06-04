@@ -403,14 +403,26 @@ Al compilar y levantar la aplicación, Spring Boot detectará este nuevo `@Compo
 
 #### 1. ¿Qué hizo bien el prompt?
 
-[Evalúa tu propio prompt, no la respuesta del LLM. ¿El contexto fue suficiente? ¿Las restricciones fueron claras? ¿El formato de salida que pediste ayudó a obtener una buena respuesta? ¿Qué parte de tu prompt fue más efectiva? Sé específico: menciona fragmentos concretos de tu prompt que funcionaron bien.]
-
+El prompt describe muy bien el escenario y las restricciones mas importantes que debemos cumplir. Ademas, exige usar dos patrones combinados, justificar la eleccion y tener en cuenta temas clave como la extensibilidad, el desacoplamiento, el manejo de fallos y el registro dinamico de componentes. Tambien me parece muy bueno que pida evaluar alternativas, porque eso nos obliga a analizar mas a fondo y no solo tirar la primera solucion que se nos ocurra.
 
 #### 2. ¿Qué se puede mejorar?
 
-[¿Qué le faltó a tu prompt? ¿Qué harías diferente si pudieras reformularlo? ¿El LLM entendió mal algo por falta de claridad en tu prompt? ¿La respuesta tiene errores u omisiones? ¿Qué no cubrió el LLM que tú sí sabes por lo visto en clase?]
+La respuesta elige bien el patron Observer, ya que el problema es avisar a varios componentes cuando pasa un evento.
 
+Sin embargo, usar Strategy se siente un poco forzado aca. Los observadores ya tienen comportamientos diferentes de por si (correo, push, Redis, auditoria), asi que en verdad todo funciona sobre todo por el Observer. Una combinacion mas natural habria sido usar Observer mas un Factory, donde la fabrica cree los diferentes manejadores de notificacion.
+
+Tambien falto meterle mas detalle a mecanismos mas robustos para el manejo de fallos, como reintentos, colas de mensajes o procesamiento asincrono.
 
 #### 3. Respuesta final
 
-[Escribe tu respuesta definitiva a la pregunta del parcial, integrando lo que aprendiste del LLM pero yendo más allá. Corrige errores, llena omisiones, conecta con conceptos vistos en clase. Esta es tu respuesta: demuestra que tú dominas el tema.]
+El LLM identifico bien que Observer es de los mejores patrones para este caso. Cuando un libro vuelve a estar disponible, varios componentes tienen que reaccionar de forma independiente, lo que encaja muy bien con la relacion uno a muchos de Observer.
+
+La implementacion que armo nos deja registrar y quitar observadores dinamicamente con los metodos `attach()` and `detach()`, asi que cumple con uno de los puntos clave del parcial.
+
+La combinacion con Strategy es valida, pero no es tan fuerte como el Observer. Cada observador hace cosas diferentes para reaccionar al evento (correo, push, Redis o auditoria), pero el corazon del diseño sigue siendo el Observer.
+
+El diseño tambien maneja bien los fallos. Gracias al bloque `try-catch` dentro del proceso de notificacion, si falla la notificacion push, los otros observadores siguen corriendo. Esto hace que un error no dañe todo el flujo.
+
+En cuanto al acoplamiento, la solucion es buena porque `LibroService` no sabe nada de correo, Redis o auditoria. Solo manda el evento y ya cada observador hace lo suyo por separado.
+
+Como una mejora que yo haria, meteria procesamiento asincrono o una cola de eventos para que una notificacion lenta no tranque el tiempo de respuesta del sistema. En general, la solucion es extensible, mantiene bajo acoplamiento y deja agregar nuevos observadores, como SMS, sin tocar nada del codigo existente.

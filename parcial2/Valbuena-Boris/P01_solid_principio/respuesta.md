@@ -7,7 +7,7 @@
 ## Pregunta [1]: [solid_principio]
 
 ### Estudiante
-- **Nombre completo**: [Boris Nicolas Valbuena Gueirsman ]
+- **Nombre completo**: Boris Nicolas Valbuena Gueirsman
 
 ---
 

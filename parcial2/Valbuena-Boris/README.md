@@ -4,16 +4,16 @@
 
 | Campo | Valor |
 |---|---|
-| **Nombre completo** | [Tu nombre y apellido] |
+| **Nombre completo** | Boris Nicolas Valbuena Gueirsman |
 | **Fecha de entrega** | [FECHA] |
 
 ## LLM principal utilizado
 
 | Campo | Valor |
 |---|---|
-| **Nombre del LLM** | [Claude / ChatGPT / Gemini / Copilot / DeepSeek / Qwen / Mistral / Otro / Sin IA] |
-| **Modelo específico** | [Ej: Claude Opus 4.5, GPT-4o. Si respondes sin IA, escribe "N/A"] |
-| **¿Por qué elegiste este LLM?** | [Justifica en 2-4 oraciones. Si respondes sin IA, explica tu decisión.] |
+| **Nombre del LLM** | Gemini |
+| **Modelo específico** | Gemini 3.5 Flash |
+| **¿Por qué elegiste este LLM?** | Es la que más usé durante el curso, por lo cual es la misma que usaré en el parcial. |
 
 ## Estructura de la entrega
 

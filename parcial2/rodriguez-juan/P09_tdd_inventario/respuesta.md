@@ -1,53 +1,231 @@
 # Plantilla de entrega — Parcial 2
 
-> **Instrucción**: Copia esta plantilla para cada pregunta del parcial. Reemplaza `[Pregunta XX]` por el identificador correcto (ej: `P01_solid_srp`) y completa todas las secciones. Haz al menos 2 commits por pregunta: uno con el prompt + respuesta del LLM, y otro con el análisis.
-
 ---
 
-## Pregunta [XX]: [Título resumido]
+## Pregunta P09: TDD — ControlInventario
 
 ### Estudiante
-- **Nombre completo**: [Tu nombre y apellido]
+
+- **Nombre completo**: Juan David Rodriguez Franco
 
 ---
 
 ### LLM utilizado
 
-| Campo | Valor |
-|---|---|
-| **Nombre del LLM** | [Claude / ChatGPT / Gemini / Copilot / DeepSeek / Qwen / Mistral / Otro / **Sin IA — respuesta propia**] |
-| **Modelo específico** | [Ej: Claude Opus 4.5, GPT-4o, Gemini 2.5 Pro, etc. Si respondes sin IA, escribe "N/A"] |
-| **¿Por qué elegiste este LLM?** | [Justifica en 1-3 oraciones. Si respondes sin IA, explica por qué decidiste no usar LLM para esta pregunta.] |
+| Campo                                   | Valor                                                                                                          |
+| --------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| **Nombre del LLM**                | Gemini |
+| **Modelo específico**            | Gemini 3.1 Pro |
+| **¿Por qué elegiste este LLM?** | Gemini 3.1 Pro es capaz de simular correctamente el ciclo TDD Red-Green-Refactor mostrando código en tres etapas progresivas y coherentes entre sí. |
 
 ---
 
 ### Prompt utilizado
 
-> **Si respondiste sin IA, omite esta sección y ve directamente a Análisis crítico.**
+```text
+Actúa como un ingeniero de software experto en TDD (Test-Driven Development) con Java.
 
-```
-[Pega aquí el prompt exacto que enviaste al LLM. 
-Incluye TODO el texto, sin editar ni resumir.
+En OpenLib Market necesitamos la clase `ControlInventarioService`. Sus reglas son:
+- Cuando el stock de un libro llega a 0, el sistema debe marcarlo como "AGOTADO" y notificar al vendedor.
+- Cuando el vendedor repone stock, el libro vuelve al estado "DISPONIBLE".
 
-Un buen prompt incluye:
-- Contexto del proyecto OpenLib Market
-- El código o situación específica
-- Lo que esperas que el LLM haga
-- Restricciones (ej: "usa Java 21", "aplica SOLID")
-- Formato de salida esperado (ej: "respuesta en markdown con código Java")]
+Por favor, demuestra el ciclo completo de TDD (Red → Green → Refactor) para implementar esta funcionalidad:
+
+**FASE RED**: Escribe primero las pruebas unitarias con JUnit 5 y Mockito que fallen porque la implementación aún no existe.
+**FASE GREEN**: Escribe la implementación MÍNIMA de `ControlInventarioService` para que las pruebas pasen.
+**FASE REFACTOR**: Mejora el diseño sin romper las pruebas.
+
+El código debe ser en Java. Usa interfaces para las dependencias externas (repositorio y notificador).
 ```
 
 ---
 
 ### Respuesta del LLM
 
-> **Si respondiste sin IA, omite esta sección y ve directamente a Análisis crítico.**
-[Pega aquí la respuesta COMPLETA del LLM, sin editar, sin resumir.
-Incluye TODO el texto, código, explicaciones que generó el LLM.
+```markdown
+## TDD para ControlInventarioService — Ciclo Completo
 
-Si el LLM generó código, asegúrate de que esté correctamente formateado.
-Si tuviste que hacer varias iteraciones, pega la MEJOR respuesta obtenida,
-pero menciona cuántas iteraciones hiciste.]
+---
+
+### 🔴 FASE RED — Las pruebas que deben FALLAR (aún no hay implementación)
+
+```java
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
+@ExtendWith(MockitoExtension.class)
+class ControlInventarioServiceTest {
+
+    @Mock
+    private LibroRepository libroRepository;
+
+    @Mock
+    private VendedorNotificador vendedorNotificador;
+
+    private ControlInventarioService service;
+
+    @BeforeEach
+    void setUp() {
+        // En esta fase, esta línea FALLA con ClassNotFoundException
+        service = new ControlInventarioService(libroRepository, vendedorNotificador);
+    }
+
+    @Test
+    void reducirStock_cuandoStockLlegaACero_debeMarcarComoAgotadoYNotificar() {
+        // Arrange
+        Libro libro = new Libro("ISBN-001", "Clean Code", 1, "DISPONIBLE");
+        when(libroRepository.buscarPorIsbn("ISBN-001")).thenReturn(libro);
+
+        // Act
+        service.reducirStock("ISBN-001", 1);
+
+        // Assert — FALLA porque la clase no existe
+        assertEquals("AGOTADO", libro.getEstado());
+        verify(vendedorNotificador, times(1)).notificarStockAgotado(libro);
+    }
+
+    @Test
+    void reponerStock_debeMarcarLibroComoDisponible() {
+        // Arrange
+        Libro libro = new Libro("ISBN-001", "Clean Code", 0, "AGOTADO");
+        when(libroRepository.buscarPorIsbn("ISBN-001")).thenReturn(libro);
+
+        // Act
+        service.reponerStock("ISBN-001", 10);
+
+        // Assert — FALLA porque la clase no existe
+        assertEquals("DISPONIBLE", libro.getEstado());
+        assertEquals(10, libro.getStock());
+    }
+
+    @Test
+    void reducirStock_cuandoStockQuedaPositivo_noDebeCambiarEstadoNiNotificar() {
+        // Arrange
+        Libro libro = new Libro("ISBN-002", "Refactoring", 5, "DISPONIBLE");
+        when(libroRepository.buscarPorIsbn("ISBN-002")).thenReturn(libro);
+
+        // Act
+        service.reducirStock("ISBN-002", 2);
+
+        // Assert — Stock queda en 3, sigue DISPONIBLE
+        assertEquals("DISPONIBLE", libro.getEstado());
+        assertEquals(3, libro.getStock());
+        verify(vendedorNotificador, never()).notificarStockAgotado(any());
+    }
+}
+```
+
+---
+
+### 🟢 FASE GREEN — Implementación MÍNIMA para pasar las pruebas
+
+Primero las interfaces (dependencias externas):
+
+```java
+public interface LibroRepository {
+    Libro buscarPorIsbn(String isbn);
+    void guardar(Libro libro);
+}
+
+public interface VendedorNotificador {
+    void notificarStockAgotado(Libro libro);
+}
+```
+
+La implementación mínima de `ControlInventarioService`:
+
+```java
+public class ControlInventarioService {
+
+    private final LibroRepository libroRepository;
+    private final VendedorNotificador vendedorNotificador;
+
+    public ControlInventarioService(LibroRepository libroRepository,
+                                    VendedorNotificador vendedorNotificador) {
+        this.libroRepository = libroRepository;
+        this.vendedorNotificador = vendedorNotificador;
+    }
+
+    public void reducirStock(String isbn, int cantidad) {
+        Libro libro = libroRepository.buscarPorIsbn(isbn);
+        libro.setStock(libro.getStock() - cantidad);
+
+        if (libro.getStock() <= 0) {
+            libro.setStock(0);
+            libro.setEstado("AGOTADO");
+            vendedorNotificador.notificarStockAgotado(libro);
+        }
+    }
+
+    public void reponerStock(String isbn, int cantidad) {
+        Libro libro = libroRepository.buscarPorIsbn(isbn);
+        libro.setStock(cantidad);
+        libro.setEstado("DISPONIBLE");
+    }
+}
+```
+✅ Con esta implementación, las 3 pruebas pasan (GREEN).
+
+---
+
+### 🔵 FASE REFACTOR — Mejorar el diseño sin romper las pruebas
+
+Problemas detectados en la fase GREEN:
+1. El método `reducirStock` no valida que la cantidad a reducir sea positiva.
+2. No se persiste el libro después de los cambios (falta llamar a `libroRepository.guardar()`).
+3. El estado "AGOTADO"/"DISPONIBLE" debería ser un `enum` para evitar strings mágicos.
+
+Versión refactorizada:
+
+```java
+public enum EstadoLibro {
+    DISPONIBLE, AGOTADO
+}
+
+public class ControlInventarioService {
+
+    private final LibroRepository libroRepository;
+    private final VendedorNotificador vendedorNotificador;
+
+    public ControlInventarioService(LibroRepository libroRepository,
+                                    VendedorNotificador vendedorNotificador) {
+        this.libroRepository = libroRepository;
+        this.vendedorNotificador = vendedorNotificador;
+    }
+
+    public void reducirStock(String isbn, int cantidad) {
+        if (cantidad <= 0) throw new IllegalArgumentException("La cantidad a reducir debe ser positiva");
+        
+        Libro libro = libroRepository.buscarPorIsbn(isbn);
+        int nuevoStock = Math.max(0, libro.getStock() - cantidad);
+        libro.setStock(nuevoStock);
+
+        if (nuevoStock == 0) {
+            libro.setEstado(EstadoLibro.AGOTADO.name());
+            vendedorNotificador.notificarStockAgotado(libro);
+        }
+
+        libroRepository.guardar(libro); // Persistir los cambios
+    }
+
+    public void reponerStock(String isbn, int cantidad) {
+        if (cantidad <= 0) throw new IllegalArgumentException("La cantidad a reponer debe ser positiva");
+
+        Libro libro = libroRepository.buscarPorIsbn(isbn);
+        libro.setStock(cantidad);
+        libro.setEstado(EstadoLibro.DISPONIBLE.name());
+
+        libroRepository.guardar(libro); // Persistir los cambios
+    }
+}
+```
+✅ Las 3 pruebas originales siguen pasando. El diseño mejoró sin cambiar el comportamiento.
 ```
 
 ---
@@ -56,14 +234,12 @@ pero menciona cuántas iteraciones hiciste.]
 
 #### 1. ¿Qué hizo bien el prompt?
 
-[Evalúa tu propio prompt, no la respuesta del LLM. ¿El contexto fue suficiente? ¿Las restricciones fueron claras? ¿El formato de salida que pediste ayudó a obtener una buena respuesta? ¿Qué parte de tu prompt fue más efectiva? Sé específico: menciona fragmentos concretos de tu prompt que funcionaron bien.]
-
+[Pendiente de análisis]
 
 #### 2. ¿Qué se puede mejorar?
 
-[¿Qué le faltó a tu prompt? ¿Qué harías diferente si pudieras reformularlo? ¿El LLM entendió mal algo por falta de claridad en tu prompt? ¿La respuesta tiene errores u omisiones? ¿Qué no cubrió el LLM que tú sí sabes por lo visto en clase?]
-
+[Pendiente de análisis]
 
 #### 3. Respuesta final
 
-[Escribe tu respuesta definitiva a la pregunta del parcial, integrando lo que aprendiste del LLM pero yendo más allá. Corrige errores, llena omisiones, conecta con conceptos vistos en clase. Esta es tu respuesta: demuestra que tú dominas el tema.]
+[Pendiente de análisis]

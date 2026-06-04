@@ -748,10 +748,11 @@ com.openlib/
 
 #### 1. ¿Qué hizo bien el prompt?
 
-
+El prompt dio en el clavo al pedir "consecuencias en tiempo de ejecución". En lugar de dar una clase teórica, la IA tuvo que explicar exactamente cómo saltan los UnsupportedOperationException en producción al usar polimorfismo. Al pedirle explícitamente que solucionara el "fat interface" y huyera de la herencia, la llevamos directo a usar composición y el Principio de Segregación de Interfaces (ISP).
 
 #### 2. ¿Qué se puede mejorar?
 
-
+Se pasó de rosca con la ingeniería y acopló cosas que no debía. Primero, mezcló dominio e infraestructura. Metió la clase User con anotaciones JPA (@Entity, @Table) directo en las clases de negocio como Comprador o Vendedor. Eso rompe Clean Architecture. Al dominio no le importa la base de datos; la IA debió usar IDs o interfaces. Segundo, la clase UsuarioDual es un parche. Usó delegación para la capacidad de compra y venta. Resuelve el problema ahora, pero crear clases combinadas como UsuarioDual o UsuarioTriple no escala. Un usuario debería tener una lista dinámica de roles en tiempo de ejecución. Tercero, metió código de relleno. Creó records como Comentario y UsuarioResumen que nadie pidió.
 
 #### 3. Respuesta final
+El diagnóstico es brutal. La jerarquía original es un manual sobre cómo violar ISP (obligando a implementar métodos inútiles), LSP (rompiendo contratos con excepciones) y SRP (mezclando identidad y comportamiento). Romper la interfaz gigante en capacidades pequeñas (PuedeComprar, PuedeVender) es la decisión correcta. Pero yo lo implementaría distinto. En lugar de crear clases rígidas que envuelven la entidad JPA y acoplan la persistencia al dominio, modelaría los roles como comportamientos puros. Le daría a la entidad una List<Capacidad>. Así, el usuario gana o pierde roles al vuelo, sin tener que instanciar clases estáticas como UsuarioDual.

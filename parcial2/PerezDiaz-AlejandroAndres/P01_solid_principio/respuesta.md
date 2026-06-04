@@ -4,10 +4,10 @@
 
 ---
 
-## Pregunta [XX]: [Título resumido]
+## Pregunta [P01_solid_principio]
 
 ### Estudiante
-- **Nombre completo**: [Tu nombre y apellido]
+- **Nombre completo**: [Alejandro Andres Perez Diaz]
 
 ---
 
@@ -65,5 +65,5 @@ pero menciona cuántas iteraciones hiciste.]
 
 
 #### 3. Respuesta final
-
-[Escribe tu respuesta definitiva a la pregunta del parcial, integrando lo que aprendiste del LLM pero yendo más allá. Corrige errores, llena omisiones, conecta con conceptos vistos en clase. Esta es tu respuesta: demuestra que tú dominas el tema.]
+(No use  IA)
+[De los princios SOLID se esta violado la s que es la responsabilidad unica que basicamente se viola ya que en este codigo se etan haciendo demaciadas cosas tiene mas de una responsabildiad ya que este guarda libro,valida el libro etc coclusion no cumple con loq ue ice su nombre unica resposabildiad  ademas de violar el patron de Single Responsability. ]

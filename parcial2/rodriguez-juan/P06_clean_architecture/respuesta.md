@@ -4,20 +4,21 @@
 
 ---
 
-## Pregunta [XX]: [Título resumido]
+## Pregunta 6_P.6
 
 ### Estudiante
-- **Nombre completo**: [Tu nombre y apellido]
+
+- **Nombre completo**: Juan David Rodriguez Franco
 
 ---
 
 ### LLM utilizado
 
-| Campo | Valor |
-|---|---|
-| **Nombre del LLM** | [Claude / ChatGPT / Gemini / Copilot / DeepSeek / Qwen / Mistral / Otro / **Sin IA — respuesta propia**] |
-| **Modelo específico** | [Ej: Claude Opus 4.5, GPT-4o, Gemini 2.5 Pro, etc. Si respondes sin IA, escribe "N/A"] |
-| **¿Por qué elegiste este LLM?** | [Justifica en 1-3 oraciones. Si respondes sin IA, explica por qué decidiste no usar LLM para esta pregunta.] |
+| Campo                                   | Valor  |
+| --------------------------------------- | ------ |
+| **Nombre del LLM**                | no IA  |
+| **Modelo específico**            | N/A    |
+| **¿Por qué elegiste este LLM?** | SIN IA |
 
 ---
 
@@ -42,12 +43,13 @@ Un buen prompt incluye:
 ### Respuesta del LLM
 
 > **Si respondiste sin IA, omite esta sección y ve directamente a Análisis crítico.**
-[Pega aquí la respuesta COMPLETA del LLM, sin editar, sin resumir.
-Incluye TODO el texto, código, explicaciones que generó el LLM.
+> [Pega aquí la respuesta COMPLETA del LLM, sin editar, sin resumir.
+> Incluye TODO el texto, código, explicaciones que generó el LLM.
 
 Si el LLM generó código, asegúrate de que esté correctamente formateado.
 Si tuviste que hacer varias iteraciones, pega la MEJOR respuesta obtenida,
 pero menciona cuántas iteraciones hiciste.]
+
 ```
 
 ---
@@ -67,3 +69,4 @@ pero menciona cuántas iteraciones hiciste.]
 #### 3. Respuesta final
 
 [Escribe tu respuesta definitiva a la pregunta del parcial, integrando lo que aprendiste del LLM pero yendo más allá. Corrige errores, llena omisiones, conecta con conceptos vistos en clase. Esta es tu respuesta: demuestra que tú dominas el tema.]
+```

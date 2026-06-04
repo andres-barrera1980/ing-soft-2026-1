@@ -1,8 +1,6 @@
 # Plantilla de entrega — Parcial 2
 
-> **Instrucción**: Copia esta plantilla para cada pregunta del parcial. Reemplaza `[Pregunta XX]` por el identificador correcto (ej: `P01_solid_srp`) y completa todas las secciones. Haz al menos 2 commits por pregunta: uno con el prompt + respuesta del LLM, y otro con el análisis.
 
----
 
 ## Pregunta [06]: [P06_clean_architecture]
 
@@ -573,13 +571,15 @@ no significa que el sistema siga Clean Architecture. Lo importante es respetar l
 #### 1. ¿Qué hizo bien el prompt?
 
 [Evalúa tu propio prompt, no la respuesta del LLM. ¿El contexto fue suficiente? ¿Las restricciones fueron claras? ¿El formato de salida que pediste ayudó a obtener una buena respuesta? ¿Qué parte de tu prompt fue más efectiva? Sé específico: menciona fragmentos concretos de tu prompt que funcionaron bien.]
-
+El prompt fue muy completo porque proporciono suficiente contexto sobre OpenLib Market y especifico exactamente los temas que debian explicarse. Ademas, organizo la respuesta en secciones claras, como las capas de Clean Architecture, la regla de dependencia, el principio de inversion de dependencias y la comparacion con una arquitectura tradicional. Considero que la parte mas efectiva fue pedir ejemplos concretos para cada capa dentro del contexto de OpenLib Market, ya que esto permitio relacionar la teoria con una aplicacion real. Tambien fue muy util solicitar un diagrama textual y una seccion de errores comunes, porque ayudaron a obtener una explicacion mas practica y facil de comprender.
 
 #### 2. ¿Qué se puede mejorar?
 
 [¿Qué le faltó a tu prompt? ¿Qué harías diferente si pudieras reformularlo? ¿El LLM entendió mal algo por falta de claridad en tu prompt? ¿La respuesta tiene errores u omisiones? ¿Qué no cubrió el LLM que tú sí sabes por lo visto en clase?]
-
+Aunque el prompt fue bastante claro, podria mejorarse pidiendo ejemplos mas detallados sobre como se comunican las capas entre si durante un flujo completo, por ejemplo desde que un usuario agrega un libro al carrito hasta que realiza una compra. Tambien se podria solicitar una explicacion mas profunda sobre las diferencias entre un caso de uso y un servicio tradicional, ya que suele ser una confusion frecuente. La respuesta fue correcta en general, pero algunos ejemplos mostraron codigo dentro de la explicacion cuando bastaba con describir los conceptos. Ademas, habria sido interesante que profundizara un poco mas en las desventajas y retos de implementar Clean Architecture en proyectos pequenos.
 
 #### 3. Respuesta final
 
 [Escribe tu respuesta definitiva a la pregunta del parcial, integrando lo que aprendiste del LLM pero yendo más allá. Corrige errores, llena omisiones, conecta con conceptos vistos en clase. Esta es tu respuesta: demuestra que tú dominas el tema.]
+
+Clean Architecture busca que las reglas de negocio no dependan de tecnologias especificas. Para ello organiza el sistema en capas: Entidades (Libro, Usuario, Carrito), Casos de Uso (ComprarLibro, ProcesarPago), Adaptadores (controladores y DTOs) y Frameworks (Spring Boot, PostgreSQL, Redis). Su regla principal es que las dependencias siempre apunten hacia adentro, de modo que la logica del negocio no conozca detalles externos. Esto se logra aplicando el principio de inversion de dependencias, usando interfaces en lugar de depender directamente de bases de datos o frameworks. Frente a una arquitectura tradicional, ofrece mayor mantenibilidad, facilidad para hacer pruebas y flexibilidad para cambiar tecnologias sin afectar el nucleo del sistema.

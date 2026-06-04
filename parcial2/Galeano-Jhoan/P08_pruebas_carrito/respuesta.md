@@ -566,5 +566,5 @@ class CarritoServiceTest {
 [¿El LLM generó pruebas para todos los métodos?Sí. Cubrió explícitamente todos los métodos expuestos en la clase de producción: agregarItem() entre otras.
  ¿Cubrió todos los casos borde de las reglas de negocio? Casi todos. Validó los límites de 10 ítems máximos, las cantidades negativas/cero, el carrito vacío, y el stock insuficiente.
  ¿Probó `validarParaCheckout()`? ¿Probó el caso de agregar un ítem que ya existe? Sí. Creó la clase anidada ValidarCheckoutNormal (para el caso feliz) y ValidarCheckoutExcepciones (para comprobar que lance IllegalStateException si está vacío o si se vacía tras remover ítems)
- ¿Usó correctamente mocks para `RepositorioLibro`? si, lo hizo en dos pruebas, en incrementaCantidadLibroExistente() y en permiteIncrementarCantidadConCarritoLleno()
+ ¿Usó correctamente mocks para `RepositorioLibro`? si, lo hiizo en dos pruebas, en incrementaCantidadLibroExistente() y en permiteIncrementarCantidadConCarritoLleno()
 ]

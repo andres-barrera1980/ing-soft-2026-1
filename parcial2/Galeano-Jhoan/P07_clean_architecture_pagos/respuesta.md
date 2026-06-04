@@ -285,4 +285,6 @@ public class Main {
 
 #### 3. Respuesta final
 
-[Escribe tu respuesta definitiva a la pregunta del parcial, integrando lo que aprendiste del LLM pero yendo más allá. Corrige errores, llena omisiones, conecta con conceptos vistos en clase. Esta es tu respuesta: demuestra que tú dominas el tema.]
+¿El LLM ubicó correctamente cada componente en su capa correspondiente?
+Si, El cambio clave fue sacar todo el desorden que había en PaymentService. Dejó la lógica pura de la transacción en la capa de Casos de Uso (como un caso de uso llamado ProcesarPagoUseCase)
+ ¿El controlador REST está bien aislado de la lógica de negocio? Sí, quedó completamente aislado.

@@ -376,11 +376,31 @@ El control de fronteras en colecciones en memoria es un foco común de bugs prod
 
 ### Análisis crítico de la respuesta
 
-#### 1. ¿Qué hizo bien el prompt?
-La verdad es que el prompt estuvo súper bien estructurado porque le dio a la IA todo lo necesario para no perderse: el código exacto con el que íbamos a trabajar, las tecnologías claras como Java 25 y las reglas del juego bien explicadas con los límites del carrito. Esto ayudó un montón a que no se inventara cosas raras y fuera directo al grano, armando una estructura limpia, ordenada con el estilo de "dar, cuando, entonces" (given-when-then) y con nombres que cualquiera de nosotros en la clase entendería a la primera.
+#### 1. ¿Que hizo bien el prompt?
+La verdad es que el prompt estuvo super bien estructurado porque le dio a la IA todo lo necesario para no perderse: el codigo exacto con el que ibamos a trabajar, las tecnologias claras como Java 25 y las reglas del juego bien explicadas con los limites del carrito. Esto ayudo un monton a que no se inventara cosas raras y fuera directo al grano, armando una estructura limpia, ordenada con el estilo de "dar, cuando, entonces" (given-when-then) y con nombres que cualquiera de nosotros en la clase entenderia a la primera.
 
-#### 2. ¿Qué se puede mejorar?
-Aunque el prompt fue bastante detallado, un buen truco para la próxima sería pedirle explícitamente a la IA que revise absolutamente todos los métodos de la clase, sin dejarse ninguno por fuera. Como nos enfocamos tanto en decirle cuáles eran los casos borde y el límite de los 10 libros, la IA se concentró tanto en complacernos con eso que se olvidó de crear pruebas para las acciones más sencillas como borrar un libro con éxito o limpiar el carrito por completo. Si le hubiéramos puesto una lista de "debes probar el camino feliz y el triste de cada método", el resultado habría sido perfecto.
+#### ¿Que se puede mejorar?
+
+Aunque el prompt fue bastante detallado, un buen truco para la proxima seria pedirle explicitamente a la IA que revise absolutamente todos los metodos de la clase, sin dejarse ninguno por fuera. Como nos enfocamos tanto en decirle cuales eran los casos borde y el limite de los 10 libros, la IA se concentro tanto en complacernos con eso que se olvido de crear pruebas para las acciones mas sencillas como borrar un libro con exito o limpiar el carrito por completo. Si le hubieramos puesto una lista de "debes probar el camino feliz y el triste de cada metodo", el resultado habria sido perfecto.
 
 #### 3. Respuesta final
-Haciendo el balance de lo que hizo la IA, te cuento que resolvió muy bien varias dudas: usó los mocks de forma correcta para simular el repositorio de libros sin tocar la base de datos real, probó qué pasa cuando agregas un libro que ya estaba ahí (viendo que sumara la cantidad) y validó que validarParaCheckout() lanzara un error si el carrito estaba vacío. Sin embargo, no cubrió todos los métodos ni todos los casos borde. Se le pasó por alto probar el camino feliz de validarParaCheckout() (cuando el carrito sí tiene cosas y no debería fallar), no creó ninguna prueba para el método vaciar() y tampoco probó el caso normal de eliminar un libro que sí existe en el carrito. Aquí tienes los tres casos de prueba que faltaron para que tu código quede completamente protegido:
+En balance, la IA simulo muy bien el repositorio con mocks, probo la suma de libros repetidos y la alerta de carrito vacio en validarParaCheckout(). Sin embargo, falto cubrir el camino feliz de ese checkout, el metodo vaciar() y la eliminacion normal de un libro.
+
+#### ¿El LLM genero pruebas para todos los metodos?
+No, la verdad es que se salto un par. Aunque armo una muy buena base para defender el proyecto, se enfoco tanto en las partes complejas que se olvido por completo de funciones clave pero mas sencillas, como el metodo para vaciar el carrito. Tampoco probo el caso normal en el que borras un libro que si esta en la lista de compras, asi que nos dejo el trabajo a medias en esa parte.
+
+#### ¿Cubrio todos los casos borde de las reglas de negocio?
+Estuvo muy cerca, pero le falto una esquina importante hizo un gran trabajo revisando los extremos mas peligrosos, como que pasa cuando el carrito esta en cero o controlando a la perfeccion el limite de pasar de 10 a 11 libros.
+
+#### ¿Probo validarParaCheckout()? 
+Si, pero solo vio un lado de la moneda. Se acordo perfectamente de probar el escenario triste: que el sistema salte y tire un error si intentas pagar con el carrito totalmente vacio. Lo malo es que se le paso por alto escribir la contraparte, que es asegurar con un test que el metodo no ponga problemas y nos deje continuar si ya metimos al menos un libro para comprar.
+
+#### ¿Probo el caso de agregar un item que ya existe?
+Si, creo una prueba especifica para verificar que si vuelves a meter un libro que ya tenias en el carrito, el codigo sea inteligente y no te cree un producto duplicado en la lista, sino que simplemente le sume las nuevas unidades a las que ya tenias guardadas en la memoria.
+
+
+#### ¿Uso correctamente mocks para RepositorioLibro?
+Sep. Logro aislar el servicio usando los mocks como si fueran "libros de mentira" o simulados. De esta forma, controlo perfectamente que respondia el buscador de libros y cuanta cantidad de stock simular, sin necesidad de enredarse con una base de datos real, que es justo el chiste de hacer estas pruebas de software.
+
+#### ¿Falto algun caso? Escribe tu los casos de prueba que el LLM no cubrio.
+Si, hicieron falta tres escenarios clave para que el escudo de pruebas tape todos los huecos: borrar un libro que si esta en el carrito, limpiar el carrito por completo con el metodo de vaciado, y dejar que el checkout pase libremente si todo esta en orden.

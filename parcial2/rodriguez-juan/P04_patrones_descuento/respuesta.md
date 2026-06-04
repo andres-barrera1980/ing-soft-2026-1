@@ -203,13 +203,19 @@ Con este enfoque, agregar un descuento nuevo de Black Friday solo requeriría cr
 
 #### 1. ¿Qué hizo bien el prompt?
 
-[Pendiente de análisis]
+El prompt fue muy efectivo al especificar explícitamente la **necesidad de combinar** los descuentos. Esta fue la clave para que el LLM no propusiera un `Strategy` simple excluyente (donde solo aplica uno), sino una **Composición de Estrategias** (iterando sobre una lista). Además, pedirle que descartara otras dos alternativas obligó a la IA a justificar por qué no usar `Decorator` (que suele ser la respuesta clásica de los libros para este problema) demostrando un análisis más profundo de las implicaciones en tiempo de ejecución.
 
 #### 2. ¿Qué se puede mejorar?
 
-[Pendiente de análisis]
+Al prompt le faltó definir una regla de negocio crucial: **¿Cómo se acumulan matemáticamente los descuentos?** Al no especificarlo, el LLM asumió que se aplican iterativamente sobre el saldo restante (descuento sobre descuento). En el comercio real, muchas tiendas prefieren sumar los porcentajes (ej: 10% + 15% = 25% directo sobre el precio base original). Si el prompt hubiera aclarado esta regla, la implementación de la interfaz `calcularDescuento` habría sido más fiel a la realidad del negocio.
 
 #### 3. Respuesta final
 
-[Pendiente de análisis]
+El LLM seleccionó acertadamente el patrón **Strategy** apoyado en una estructura de evaluación en cadena (una forma simplificada del patrón **Composite** o Pipeline). Esto es inmensamente superior a tener código espagueti con `if-else` o a usar herencia múltiple, asegurando que agregar nuevas reglas no modifique el motor de cálculo (cumpliendo a cabalidad **OCP**). 
+
+Adicionalmente, el análisis de los descartes fue impecable:
+* **Decorator** es útil para añadir comportamiento de forma dinámica, pero armar y desarmar el arnés de objetos en memoria según el perfil del usuario puede volverse un dolor de cabeza.
+* **Herencia** fue correctamente descartada porque generar clases por cada combinación produce una "explosión de clases" insostenible.
+
+La implementación entregada es robusta, compilable y lista para producción en "OpenLib Market". Es una gran demostración de cómo el patrón Strategy, al combinarse con inyección de listas en lugar de un único valor, permite que los algoritmos sean escalables y fácilmente testeables en aislamiento.
 ```

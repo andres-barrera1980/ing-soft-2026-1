@@ -1,7 +1,7 @@
 # Plantilla de entrega — Parcial 2
 ---
 
-## Pregunta [XX]: [Título resumido]
+## Pregunta [04]: [P04_patrones_descuento]
 
 ### Estudiante
 - **Nombre completo**: Samuel López Gómez
@@ -14,7 +14,7 @@
 |---|---|
 | **Nombre del LLM** | Claude |
 | **Modelo específico** |Sonnet 4.6 |
-| **¿Por qué elegiste este LLM?** |  |
+| **¿Por qué elegiste este LLM?** | la Ia sugiere usar GPT-4o o Claude 3.5 Sonnet. Ambos son muy buenos estructurando patrones de diseño complejos y explicando los "trade-offs" |
 
 ---
 
@@ -849,11 +849,12 @@ ResultadoPrecio(base=$300,000, final=$218,025, ahorro=$81,975 = 27.3%)
 ### Análisis crítico de la respuesta
 
 #### 1. ¿Qué hizo bien el prompt?
-
+Insistir en que "las estrategias pueden combinarse dinámicamente" salvó la respuesta. Sin ese detalle, la IA habría soltado un patrón Strategy básico e ignorado los descuentos acumulables. Obligarla a descartar dos alternativas la forzó a pensar en los trade-offs. Su explicación de por qué Chain of Responsibility no sirve para acumular operaciones matemáticas dio en el blanco.
 
 
 #### 2. ¿Qué se puede mejorar?
 
-
+ Vendió una idea, pero el código es rígido y está acoplado. Primero, el OCP en el Builder (CalculadorPrecio) es falso. Quemó métodos tipados para cada descuento (conDescuentoFidelidad(), conDescuentoTemporada()). Si mañana agregamos un descuento por cumpleaños, hay que abrir la clase y agregarle un método. La IA mintió al afirmar que "nada más cambia". Segundo, calculó los descuentos en cascada en lugar de sumarlos. El decorador multiplica sobre el precio ya rebajado. Un 10% y un 15% en cascada dan un 23.5% de descuento, no el 25% que el usuario espera. En un sistema real, tienes que poder configurar si el descuento va sobre el precio base o sobre el subtotal. Tercero, infló la memoria creando objetos inútiles. Si el cliente no califica para un descuento, el Decorator igual envuelve el componente base. El Builder debería evaluar la estrategia de elegibilidad primero; si da falso, no instancias el Decorator.
 
 #### 3. Respuesta final
+La teoría está perfecta. Combinar Decorator (para apilar descuentos sin que exploten las subclases) y Strategy (para validar reglas lógicas) es la respuesta correcta. Descartar Chain of Responsibility (porque interrumpe el flujo, no lo acumula) y Template Method (herencia estática) tiene todo el sentido. Pero el orquestador de la IA (CalculadorPrecio) arruina la ejecución. Yo no usaría métodos quemados. Pasaría una lista dinámica de descuentos por inyección de dependencias o base de datos, y los procesaría con un ciclo o un stream().reduce(). Si la estrategia dice true, aplicas el Decorator. Solo así logras un OCP real: agregas una nueva clase de descuento, la registras, y el código del calculador ni se entera.

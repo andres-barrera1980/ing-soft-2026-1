@@ -4,10 +4,10 @@
 
 ---
 
-## Pregunta [XX]: [Título resumido]
+## Pregunta [07]: [P07_clean_architecture_pagos]
 
 ### Estudiante
-- **Nombre completo**: [Tu nombre y apellido]
+- **Nombre completo**: [Danna Gabriela Rojas Bernal]
 
 ---
 
@@ -15,9 +15,9 @@
 
 | Campo | Valor |
 |---|---|
-| **Nombre del LLM** | [Claude / ChatGPT / Gemini / Copilot / DeepSeek / Qwen / Mistral / Otro / **Sin IA — respuesta propia**] |
-| **Modelo específico** | [Ej: Claude Opus 4.5, GPT-4o, Gemini 2.5 Pro, etc. Si respondes sin IA, escribe "N/A"] |
-| **¿Por qué elegiste este LLM?** | [Justifica en 1-3 oraciones. Si respondes sin IA, explica por qué decidiste no usar LLM para esta pregunta.] |
+| **Sin IA — respuesta propia** | [Claude / ChatGPT / Gemini / Copilot / DeepSeek / Qwen / Mistral / Otro / **Sin IA — respuesta propia**] |
+| **N/A** | [Ej: Claude Opus 4.5, GPT-4o, Gemini 2.5 Pro, etc. Si respondes sin IA, escribe "N/A"] |
+| **Porque estoy en la capacidad de hacerlo yo** | [Justifica en 1-3 oraciones. Si respondes sin IA, explica por qué decidiste no usar LLM para esta pregunta.] |
 
 ---
 
@@ -53,6 +53,9 @@ pero menciona cuántas iteraciones hiciste.]
 ---
 
 ### Análisis crítico de la respuesta
+**pregunta**: Rediseña este módulo aplicando Clean Architecture.
+para aplicar Clean Architecture, el sistema debe separarse en capas para que la logica de negocio no dependa de tecnologias externas como bases de datos, servicios de correo o APIs. En la capa de Entidades se ubicaran los objetos principales del negocio como pago, orden y transacción. En la capa de Casos de Uso se encontrara el proceso de pago, encargado de validar la transaccion, actualizar el estado de la orden y coordinar las operaciones necesarias y ste caso de uso dependera de abstracciones, como interfaces de repositorios y servicios de notificación. otra de las capas es de Adaptadores y  se implementan los controladores REST, los repositorios y los servicios de correo que permiten la comunicacion entre la logica de negocio y los sistemas externos. Finalmente, en la capa de Frameworks y Drivers se encuentrara las tecnologias utilizadas por la aplicacion como Spring Boot, PostgreSQL, SMTP y las diferentes pasarelas de pago.
+
 
 #### 1. ¿Qué hizo bien el prompt?
 

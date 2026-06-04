@@ -182,4 +182,149 @@ class CarritoServiceTest {
 
         assertThatNoException().isThrownBy(() -> carritoService.agregarItem(1L, 3));
         assertThat(carritoService.cantidadItemsUnicos()).isEqualTo(10);
-    
+    }
+
+    @Test
+    @DisplayName("agregarItem: cantidad cero lanza IllegalArgumentException")
+    void agregarItem_cantidadCero_lanzaIllegalArgumentException() {
+        assertThatThrownBy(() -> carritoService.agregarItem(1L, 0))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessageContaining("Cantidad debe ser positiva");
+    }
+
+    @Test
+    @DisplayName("agregarItem: cantidad negativa lanza IllegalArgumentException")
+    void agregarItem_cantidadNegativa_lanzaIllegalArgumentException() {
+        assertThatThrownBy(() -> carritoService.agregarItem(1L, -1))
+            .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    @DisplayName("agregarItem: libro no encontrado lanza NoSuchElementException")
+    void agregarItem_libroNoEncontrado_lanzaNoSuchElementException() {
+        when(repositorioLibro.buscarPorId(99L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> carritoService.agregarItem(99L, 1))
+            .isInstanceOf(NoSuchElementException.class)
+            .hasMessageContaining("99");
+    }
+
+    @Test
+    @DisplayName("agregarItem: stock insuficiente lanza IllegalStateException")
+    void agregarItem_stockInsuficiente_lanzaIllegalStateException() {
+        Libro libro = libroConStock(1L, 2, new BigDecimal("25000")); // stock = 2
+        when(repositorioLibro.buscarPorId(1L)).thenReturn(Optional.of(libro));
+
+        assertThatThrownBy(() -> carritoService.agregarItem(1L, 5)) // pide 5
+            .isInstanceOf(IllegalStateException.class)
+            .hasMessageContaining("Stock insuficiente");
+    }
+
+    // ===== removerItem() =====
+
+    @Test
+    @DisplayName("removerItem: ítem existente se remueve correctamente")
+    void removerItem_itemExistente_seRemueve() {
+        Libro libro = libroConStock(1L, 5, new BigDecimal("25000"));
+        when(repositorioLibro.buscarPorId(1L)).thenReturn(Optional.of(libro));
+        carritoService.agregarItem(1L, 2);
+
+        carritoService.removerItem(1L);
+
+        assertThat(carritoService.cantidadItemsUnicos()).isZero();
+    }
+
+    @Test
+    @DisplayName("removerItem: ítem no existente lanza NoSuchElementException")
+    void removerItem_itemNoExistente_lanzaNoSuchElementException() {
+        assertThatThrownBy(() -> carritoService.removerItem(99L))
+            .isInstanceOf(NoSuchElementException.class)
+            .hasMessageContaining("no está en el carrito");
+    }
+
+    // ===== calcularTotal() =====
+
+    @Test
+    @DisplayName("calcularTotal: calcula correctamente el total de múltiples ítems")
+    void calcularTotal_multiplesItems_calculaCorrectamente() {
+        Libro libro1 = libroConStock(1L, 10, new BigDecimal("25000"));
+        Libro libro2 = libroConStock(2L, 10, new BigDecimal("15000"));
+        when(repositorioLibro.buscarPorId(1L)).thenReturn(Optional.of(libro1));
+        when(repositorioLibro.buscarPorId(2L)).thenReturn(Optional.of(libro2));
+
+        carritoService.agregarItem(1L, 2); // 2 * 25000 = 50000
+        carritoService.agregarItem(2L, 3); // 3 * 15000 = 45000
+
+        assertThat(carritoService.calcularTotal()).isEqualByComparingTo(new BigDecimal("95000"));
+    }
+
+    @Test
+    @DisplayName("calcularTotal: carrito vacío lanza IllegalStateException")
+    void calcularTotal_carritoVacio_lanzaIllegalStateException() {
+        assertThatThrownBy(() -> carritoService.calcularTotal())
+            .isInstanceOf(IllegalStateException.class)
+            .hasMessageContaining("vacío");
+    }
+
+    // ===== validarParaCheckout() =====
+
+    @Test
+    @DisplayName("validarParaCheckout: carrito vacío lanza IllegalStateException")
+    void validarParaCheckout_carritoVacio_lanzaIllegalStateException() {
+        assertThatThrownBy(() -> carritoService.validarParaCheckout())
+            .isInstanceOf(IllegalStateException.class)
+            .hasMessageContaining("al menos 1 ítem");
+    }
+
+    @Test
+    @DisplayName("validarParaCheckout: carrito con ítems no lanza excepción")
+    void validarParaCheckout_carritoConItems_noLanzaExcepcion() {
+        Libro libro = libroConStock(1L, 5, new BigDecimal("25000"));
+        when(repositorioLibro.buscarPorId(1L)).thenReturn(Optional.of(libro));
+        carritoService.agregarItem(1L, 1);
+
+        assertThatNoException().isThrownBy(() -> carritoService.validarParaCheckout());
+    }
+
+    // ===== vaciar() =====
+
+    @Test
+    @DisplayName("vaciar: limpia todos los ítems del carrito")
+    void vaciar_carritoConItems_quedasVacio() {
+        Libro libro = libroConStock(1L, 5, new BigDecimal("25000"));
+        when(repositorioLibro.buscarPorId(1L)).thenReturn(Optional.of(libro));
+        carritoService.agregarItem(1L, 3);
+
+        carritoService.vaciar();
+
+        assertThat(carritoService.cantidadItemsUnicos()).isZero();
+        assertThat(carritoService.cantidadItems()).isZero();
+    }
+
+    // ===== Helper =====
+    private Libro libroConStock(Long id, int stock, BigDecimal precio) {
+        Libro libro = new Libro();
+        libro.setId(id);
+        libro.setStock(stock);
+        libro.setPrecio(precio);
+        return libro;
+    }
+}
+```
+
+---
+
+### Análisis crítico de la respuesta
+
+#### 1. ¿Qué hizo bien el prompt?
+
+El prompt fue muy específico al listar los casos a cubrir por número, lo que evito que el LLM olvidara alguno. En particular, el **"caso especial: mismo libro dos veces"** y el **"ítem 11 del mismo libro vs. ítem 11 diferente"** son los casos borde más sutiles — el LLM los cubrió correctamente con `agregarItem_item11MismoLibroExistente_incrementaCantidadSinExcepcion`.
+
+La exigencia de verificar el mensaje de la excepción con `hasMessageContaining` fue buena práctica — prueba no solo el tipo sino el contenido del error.
+
+#### 2. ¿Qué se puede mejorar?
+
+El LLM **no probó `cantidadItems()` vs `cantidadItemsUnicos()`** en profundidad. La distinción es importante: 1 libro con cantidad 5 debería dar `cantidadItems() = 5` y `cantidadItemsUnicos() = 1`. Sí lo toca implícitamente pero no hay un test dedicado a esta distinción.
+
+También faltó un test para **`calcularTotal()` después de remover un ítem**: agregar 3 libros, remover uno, verificar que el total es correcto solo con los dos restantes.
+

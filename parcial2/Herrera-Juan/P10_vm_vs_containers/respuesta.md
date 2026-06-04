@@ -4,10 +4,12 @@
 
 ---
 
-## Pregunta [XX]: [Título resumido]
+---
+
+## Pregunta [10]: [vm vs containers]
 
 ### Estudiante
-- **Nombre completo**: [Tu nombre y apellido]
+- **Nombre completo**: [Juan Fernando Herrera Patiño]
 
 ---
 
@@ -15,9 +17,9 @@
 
 | Campo | Valor |
 |---|---|
-| **Nombre del LLM** | [Claude / ChatGPT / Gemini / Copilot / DeepSeek / Qwen / Mistral / Otro / **Sin IA — respuesta propia**] |
-| **Modelo específico** | [Ej: Claude Opus 4.5, GPT-4o, Gemini 2.5 Pro, etc. Si respondes sin IA, escribe "N/A"] |
-| **¿Por qué elegiste este LLM?** | [Justifica en 1-3 oraciones. Si respondes sin IA, explica por qué decidiste no usar LLM para esta pregunta.] |
+| **Nombre del LLM** | [ChatGPT] |
+| **Modelo específico** | [GPT-4o ]|
+| **¿Por qué elegiste este LLM?** | [mas comodo para mi] |
 
 ---
 

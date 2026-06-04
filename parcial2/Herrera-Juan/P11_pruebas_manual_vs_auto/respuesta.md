@@ -4,10 +4,20 @@
 
 ---
 
-## Pregunta [XX]: [Título resumido]
+## Pregunta [11]: [pruebas manual vs auto]
 
 ### Estudiante
-- **Nombre completo**: [Tu nombre y apellido]
+- **Nombre completo**: [Juan Fernando Herrera Patiño]
+
+---
+
+### LLM utilizado
+
+| Campo | Valor |
+|---|---|
+| **Nombre del LLM** | [ChatGPT] |
+| **Modelo específico** | [GPT-4o ]|
+| **¿Por qué elegiste este LLM?** | [mas comodo para mi] |
 
 ---
 

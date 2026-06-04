@@ -4,10 +4,22 @@
 
 ---
 
-## Pregunta [XX]: [Título resumido]
+---
+
+## Pregunta [12]: [ciclo vida defectos]
 
 ### Estudiante
-- **Nombre completo**: [Tu nombre y apellido]
+- **Nombre completo**: [Juan Fernando Herrera Patiño]
+
+---
+
+### LLM utilizado
+
+| Campo | Valor |
+|---|---|
+| **Nombre del LLM** | [ChatGPT] |
+| **Modelo específico** | [GPT-4o ]|
+| **¿Por qué elegiste este LLM?** | [mas comodo para mi] |
 
 ---
 

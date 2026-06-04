@@ -599,3 +599,20 @@ Con estos casos adicionales se lograría una cobertura muy cercana al 100% de ra
 
 ### Análisis crítico de la respuesta
 
+
+#### 1. ¿Qué hizo bien el prompt?
+
+[Evalúa tu propio prompt, no la respuesta del LLM. ¿El contexto fue suficiente? ¿Las restricciones fueron claras? ¿El formato de salida que pediste ayudó a obtener una buena respuesta? ¿Qué parte de tu prompt fue más efectiva? Sé específico: menciona fragmentos concretos de tu prompt que funcionaron bien.]
+
+El prompt fue bastante completo porque proporcionó el código fuente, las reglas de negocio y los escenarios específicos que debían probarse. Además, indicó claramente el uso de JUnit 5, Mockito, @Mock, @InjectMocks y la estructura Given-When-Then, lo que ayudó a que la respuesta fuera organizada y cercana a las buenas prácticas de pruebas unitarias. La parte más efectiva fue enumerar explícitamente los casos que debían cubrirse, como el carrito vacío, el límite de 10 ítems y el intento de agregar el ítem número 11, ya que esto permitió obtener una suite de pruebas bastante completa.
+#### 2. ¿Qué se puede mejorar?
+
+[¿Qué le faltó a tu prompt? ¿Qué harías diferente si pudieras reformularlo? ¿El LLM entendió mal algo por falta de claridad en tu prompt? ¿La respuesta tiene errores u omisiones? ¿Qué no cubrió el LLM que tú sí sabes por lo visto en clase?]
+Aunque el prompt fue claro, podría haberse solicitado explícitamente la verificación de interacciones con Mockito mediante verify(), para comprobar que el repositorio se invoca correctamente. También habría sido útil pedir pruebas para algunos escenarios adicionales, como agregar más cantidad a un libro existente cuando el carrito ya tiene 10 ítems únicos, validar cuando el stock es exactamente igual a la cantidad solicitada o realizar checkout después de vaciar el carrito. La respuesta cubrió la mayoría de los casos importantes, pero dejó por fuera algunos escenarios límite que podrían generar errores en una situación real.
+
+#### 3. Respuesta final
+
+[Escribe tu respuesta definitiva a la pregunta del parcial, integrando lo que aprendiste del LLM pero yendo más allá. Corrige errores, llena omisiones, conecta con conceptos vistos en clase. Esta es tu respuesta: demuestra que tú dominas el tema.]
+El LLM generó pruebas para todos los métodos de CarritoService y utilizó correctamente Mockito para simular el comportamiento de RepositorioLibro. Además, cubrió las principales reglas de negocio, incluyendo agregar ítems válidos, validar cantidades incorrectas, manejar libros inexistentes, controlar el stock disponible, respetar el límite de 10 ítems únicos, calcular totales, validar el checkout y probar los métodos auxiliares.
+
+Sin embargo, aún agregaría algunos casos de prueba adicionales para fortalecer la cobertura. Por ejemplo, verificar que cuando el carrito ya tiene 10 ítems únicos sea posible aumentar la cantidad de un libro existente sin lanzar excepciones, ya que la restricción aplica únicamente a nuevos ítems. También probaría el escenario donde el stock disponible es exactamente igual a la cantidad solicitada, para confirmar que la compra es válida. Otro caso importante sería vaciar el carrito y luego intentar realizar el checkout, verificando que se genere la excepción correspondiente. Finalmente, incluiría verificaciones con verify() para asegurar que el repositorio es consultado correctamente durante las operaciones.

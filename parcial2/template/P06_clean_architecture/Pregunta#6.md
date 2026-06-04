@@ -91,10 +91,11 @@ PostgreSQL / Spring Data JPA: El motor de base de datos relacional físico donde
 
 #### 1. ¿Qué hizo bien el prompt?
 
-
+Decirle a la IA que actúe como un "arquitecto enseñando al equipo" salvó la respuesta. Eso hizo que no escupiera código a lo loco, sino que explicara todo con plastilina. Pedirle que metiera el Principio de Inversión de Dependencias (DIP) justo en los cruces de las capas obligó al modelo a explicar Ports and Adapters en serio, en lugar de tirarnos el típico copy-paste de Wikipedia. Y compararlo con la arquitectura en capas normalita (N-Tier) me sirvió un montón para entender por qué esta vuelta es mucho mejor a la hora de hacer pruebas unitarias.
 
 #### 2. ¿Qué se puede mejorar?
 
-
+La explicación general aguanta, pero comparando con lo que leímos de Uncle Bob en clase, la IA tomó un par de atajos feos: Primero, mezcló responsabilidades. El LLM dice que el BookController agarra la respuesta del Caso de Uso y arma el JSON. Falso. En la teoría estricta, el Caso de Uso no le devuelve nada directo al Controlador. Debería llamar a un Presenter (usando un Output Port) y es ese man el que moldea los datos para la vista o la API. Segundo, los datos entre capas. Menciona por ahí los "DTOs", pero no aclara la regla de oro: lo que cruza las fronteras tienen que ser objetos planos (POJOs), nada de librerías raras. Si le pasas un HttpServletRequest del framework o un ResultSet de SQL al caso de uso, ya arruinaste toda la arquitectura.
 
 #### 3. Respuesta final
+Para estudiar para el parcial, la explicación de las 4 capas y la Regla de Dependencia sirve perfecto. Cómo usa el DIP para que la capa interna ponga la interfaz (Puerto) y la externa la implemente (Adaptador) está súper claro. Lo que más me gustó fue el ejemplo de OpenLib Market, porque separó bien la entidad de dominio pura (Book) de la tabla de la base de datos (BookJpaEntity). Eso es justo lo que siempre terminamos espaguetizando en los proyectos de la universidad. Pero si quiero sacar un 5.0, a la respuesta le falta explicar el ciclo completo con Input y Output Ports. El Controlador solo debe empujar datos hacia adentro, y el Use Case debe escupir el resultado hacia el Presentador. Solo así garantizas que tu regla de negocio sobreviva si mañana cambias de framework web.

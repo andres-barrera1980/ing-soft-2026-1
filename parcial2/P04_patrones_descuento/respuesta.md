@@ -4,7 +4,7 @@
 
 ---
 
-## Pregunta [04]: [Patrones ]
+## Pregunta [04]: [Patrones descuento]
 
 ### Estudiante
 - **Marlon Garcia**: [Tu nombre y apellido]

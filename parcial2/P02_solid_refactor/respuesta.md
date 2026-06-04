@@ -24,7 +24,7 @@
 > **Si respondiste sin IA, omite esta sección y ve directamente a Análisis crítico.**
 
 ```text
-hola gemini, para el proyecto OpenLib Market que usa Java 21 y Spring Boot, necesito que analices este codigo de ProcesadorPago.
+necesito para el proyecto OpenLib Market que utiliza Java 21 y Spring Boot, necesito que analices este codigo de ProcesadorPago.
 
 Primeramente identifica cuales principios SOLID se estan violando en este codigo (deben ser al menos dos). Seguidamente propon un refactoring completo para arreglarlo usando el patron de diseño que consideres mas adecuado para manejar multiples metodos de pago.
 
@@ -198,14 +198,73 @@ public class ProcesadorPago {
 
 #### 1. ¿Que hizo bien el prompt?
 
-[Evalua tu propio prompt, no la respuesta del LLM. ¿El contexto fue suficiente? ¿Las restricciones fueron claras? ¿El formato de salida que pediste ayudo a obtener una buena respuesta? ¿Que parte de tu prompt fue mas efectiva? Se especifico: menciona fragmentos concretos de tu prompt que funcionaron bien.]
+El prompt fue efectivo porque le di el contexto exacto de las tecnologias las cuales en este caso eran Java21 y SpringBoot. Tambien sirvio mucho pedirle de forma explicita que identificara al menos dos principios SOLID violados y que el formato de salida fuera markdown con el codigo estructurado. Esto evito que el LLM diera respuestas genericas y se enfocara directo en el refactoring.
 
 
 #### 2. ¿Que se puede mejorar?
 
-[¿Que le falto a tu prompt? ¿Que harias diferente si pudieras reformularlo? ¿El LLM entendio mal algo por falta de claridad en tu prompt? ¿La respuesta tiene errores u omisiones? ¿Que no cubrio el LLM que tu si sabes por lo visto en clase?]
+A mi prompt le falto pedirle que generara pruebas unitarias para probar la nueva estructura. En cuanto a la respuesta del LLM, aunque identifico bien el SRP y el OCP y aplico bien el patron Strategy, en este caso se pasa por alto el detalle de manejar las exepciones de negocio de una mejor forma. El LLM lanzo un simple `IllegalArgumentException` cuando no encuentra un metodo de pago, lo cual *no es la mejor practica para la arquitectura limpia que queremos en OpenLib Market*. Deberia usar una excepcion personalizada del dominio.
 
 
 #### 3. Respuesta final
 
-[Escribe tu respuesta definitiva a la pregunta del parcial, integrando lo que aprendiste del LLM pero yendo mas alla. Corrige errores, llena omisiones, conecta con conceptos vistos en clase. Esta es tu respuesta: demuestra que tu dominas el tema.]
+El LLM acerto en identificar que la clase `ProcesadorPago` violaba el Single Responsibility Principle (SRP) al tener que conocer la logica interna de Visa, PSE y PayPal al mismo tiempo. Igualmente identifico correctamente la violacion al Open/Closed Principle (OCP) debido a la estructura de `if/else` que obligaba a modificar la clase cada vez que surgiera un nuevo medio de pago.
+
+El patron de diseño Strategy es definitivamente el adecuado para este escenario. Para ir mas alla de lo que propuso el LLM, implementare una excepcion personalizada `MetodoPagoNoSoportadoException` para manejar los errores de manera elegante en vez de lanzar excepciones genericas de Java. *Ademas, aplicar este patron Strategy nos facilitara muchisimo hacer pruebas unitarias con Mockito mas adelante, ya que podemos mockear cada estrategia de forma aislada*.
+
+**Implementacion final:**
+
+```java
+// 1. Excepcion personalizada
+public class MetodoPagoNoSoportadoException extends RuntimeException {
+    public MetodoPagoNoSoportadoException(String mensaje) {
+        super(mensaje);
+    }
+}
+
+// 2. Interfaz Estrategia
+public interface EstrategiaPago {
+    ResultadoPago procesar(Pago pago);
+    boolean soporta(String tipoPago);
+}
+
+// 3. Estrategias concretas (Ejemplo con Tarjeta)
+import org.springframework.stereotype.Component;
+
+@Component
+public class PagoTarjetaStrategy implements EstrategiaPago {
+    @Override
+    public boolean soporta(String tipoPago) {
+        return "TARJETA".equalsIgnoreCase(tipoPago);
+    }
+
+    @Override
+    public ResultadoPago procesar(Pago pago) {
+        // Validacion y logica especifica de tarjeta
+        return new ResultadoPago(true, "Pago con tarjeta procesado");
+    }
+}
+
+// 4. Contexto / Procesador de Pago
+import org.springframework.stereotype.Service;
+import java.util.List;
+
+@Service
+public class ProcesadorPago {
+    
+    private final List<EstrategiaPago> estrategiasPago;
+    
+    public ProcesadorPago(List<EstrategiaPago> estrategiasPago) {
+        this.estrategiasPago = estrategiasPago;
+    }
+    
+    public ResultadoPago procesar(String tipoPago, Pago pago) {
+        EstrategiaPago estrategia = estrategiasPago.stream()
+                .filter(e -> e.soporta(tipoPago))
+                .findFirst()
+                .orElseThrow(() -> new MetodoPagoNoSoportadoException("Metodo de pago no soportado: " + tipoPago));
+                
+        return estrategia.procesar(pago);
+    }
+}
+```

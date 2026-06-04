@@ -4,10 +4,10 @@
 
 ---
 
-## Pregunta [XX]: [Título resumido]
+## Pregunta [3]: [P03_solid_jerarquia]
 
 ### Estudiante
-- **Nombre completo**: [Tu nombre y apellido]
+- **Nombre completo**: [Jhoan Galeano]
 
 ---
 
@@ -15,9 +15,9 @@
 
 | Campo | Valor |
 |---|---|
-| **Nombre del LLM** | [Claude / ChatGPT / Gemini / Copilot / DeepSeek / Qwen / Mistral / Otro / **Sin IA — respuesta propia**] |
-| **Modelo específico** | [Ej: Claude Opus 4.5, GPT-4o, Gemini 2.5 Pro, etc. Si respondes sin IA, escribe "N/A"] |
-| **¿Por qué elegiste este LLM?** | [Justifica en 1-3 oraciones. Si respondes sin IA, explica por qué decidiste no usar LLM para esta pregunta.] |
+| **Nombre del LLM** |**Sin IA — respuesta propia**] |
+| **Modelo específico** |N/A" |
+| **¿Por qué elegiste este LLM?** | [No se uso debido a que la pregunta se basaba en el analisis, entonces luego de analizar la pregunta se puede llegar a una respuesta.] |
 
 ---
 
@@ -66,4 +66,4 @@ pero menciona cuántas iteraciones hiciste.]
 
 #### 3. Respuesta final
 
-[Escribe tu respuesta definitiva a la pregunta del parcial, integrando lo que aprendiste del LLM pero yendo más allá. Corrige errores, llena omisiones, conecta con conceptos vistos en clase. Esta es tu respuesta: demuestra que tú dominas el tema.]
+[La jerarquia implementada presenta diferentes errores de logica y de estructura, esto viendo que la interfaz usuario puede tener bastantes roles, algo que presenta un problema porque obliga a que cualquiera sea un usuario sin tener una identifiacion como tal, ademas, puedo observar que el codigo asume varias cosas que son falsas, se me hace que el sistema es confuso y puedo fallar si no se tienen los parametros adecuados. en esta pregunta no se hizo uso de la IA. ]

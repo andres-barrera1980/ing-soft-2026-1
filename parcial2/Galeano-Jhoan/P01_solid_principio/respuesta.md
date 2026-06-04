@@ -4,10 +4,10 @@
 
 ---
 
-## Pregunta [XX]: [Título resumido]
+## Pregunta [1]: [Título resumido]
 
 ### Estudiante
-- **Nombre completo**: [Tu nombre y apellido]
+- **Nombre completo**: [Jhoan Alberto Galeano Laya]
 
 ---
 
@@ -66,4 +66,5 @@ pero menciona cuántas iteraciones hiciste.]
 
 #### 3. Respuesta final
 
-[Escribe tu respuesta definitiva a la pregunta del parcial, integrando lo que aprendiste del LLM pero yendo más allá. Corrige errores, llena omisiones, conecta con conceptos vistos en clase. Esta es tu respuesta: demuestra que tú dominas el tema.]
+Para la solucion de la pregunta, de los principios solids que se violan y que se vieron en clase, el mas adecuado es el de responsabilidad unica, porque el metodo esta haciendo demasiadas cosas a la vez, hace una cosa como enviar correos y otra como guardar en la base de datos, lo ideal en este caso es que se haga una cosa y dejar que las otras clases hagan lo demas, no hacerlo todo.
+esta pregunta no contiene IA, la realice yo, las otras que no tienen la estrellita van con IA.

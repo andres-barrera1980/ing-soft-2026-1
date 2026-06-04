@@ -53,20 +53,12 @@ pero menciona cuántas iteraciones hiciste.]
 ```
 
 ---
+entidades: donde se tienen las relgas de negocio
+casos de uso: se explica el flujo de aplicacion del sistema
+adaptadores: se conecta logica con programas exteriores
+Frameworks: tipo REACT
 
-### Análisis crítico de la respuesta
+La regla principal es que las dependencias solo pueden apuntar hacia las capas internas. Para lograrlo, se utiliza inversión de dependencia. los casos de uso dependen de interfaces, mientras que las implementaciones concretas se encuentran en las capas externas.
 
-#### 1. ¿Qué hizo bien el prompt?
-
-[Evalúa tu propio prompt, no la respuesta del LLM. ¿El contexto fue suficiente? ¿Las restricciones fueron claras? ¿El formato de salida que pediste ayudó a obtener una buena respuesta? ¿Qué parte de tu prompt fue más efectiva? Sé específico: menciona fragmentos concretos de tu prompt que funcionaron bien.]
-
-
-#### 2. ¿Qué se puede mejorar?
-
-[¿Qué le faltó a tu prompt? ¿Qué harías diferente si pudieras reformularlo? ¿El LLM entendió mal algo por falta de claridad en tu prompt? ¿La respuesta tiene errores u omisiones? ¿Qué no cubrió el LLM que tú sí sabes por lo visto en clase?]
-
-
-#### 3. Respuesta final
-
-[Escribe tu respuesta definitiva a la pregunta del parcial, integrando lo que aprendiste del LLM pero yendo más allá. Corrige errores, llena omisiones, conecta con conceptos vistos en clase. Esta es tu respuesta: demuestra que tú dominas el tema.]
+en clean arquitcture, las reglas de negocio no dependen de frameworks para asi tener un mejor control y mantenimiento del codigo.
 ```

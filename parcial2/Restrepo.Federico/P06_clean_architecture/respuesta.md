@@ -244,8 +244,8 @@ En la arquitectura tradicional, la lógica de negocio depende de la base de dato
 
 ### Análisis crítico de la respuesta
 
-#### 1. ¿Qué hizo bien el prompt?
+El prompt funcionó bien porque el contexto de OpenLib Market hizo que usara clases concretas como Libro y Orden en vez de ejemplos genéricos. La parte de DIP fue la más útil, el diagrama de flechas dejó claro que flujo de control y dependencias van en direcciones opuestas.
 
-#### 2. ¿Qué se puede mejorar?
+Lo que faltó fue mostrar cómo se conecta todo en Spring Boot. Mencionó que "Frameworks inyecta" pero sin un ejemplo de @Bean eso queda en el aire. También hubiera ayudado un contraejemplo de código malo para entender por qué importa y no solo verlo como cuestión de estilo.
 
-#### 3. Respuesta final
+Para la próxima le pediría el cableado real en Spring Boot y un ejemplo de lo que no se debe hacer.

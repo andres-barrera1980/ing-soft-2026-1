@@ -56,4 +56,28 @@ pero menciona cuántas iteraciones hiciste.]
 
 #### 3. Respuesta final
 
-[Escribe tu respuesta definitiva a la pregunta del parcial, integrando lo que aprendiste del LLM pero yendo más allá. Corrige errores, llena omisiones, conecta con conceptos vistos en clase. Esta es tu respuesta: demuestra que tú dominas el tema.]
+¿Identificó correctamente los principios violados?
+Sí. SRP porque una sola clase concentraba lógicas de negocio completamente distintas, y OCP porque agregar cualquier método nuevo exigía modificar código existente y probado.
+¿El patrón elegido es adecuado?
+Sí. Strategy es el patrón correcto cuando el comportamiento varía según el contexto pero el contrato es siempre el mismo (procesar(Pago)). Cada algoritmo queda encapsulado e intercambiable.
+¿Qué interfaces o clases introdujo?
+Una interfaz EstrategiaPago como contrato central, y una clase concreta por cada método de pago que la implementa. ProcesadorPago pasa a ser el contexto que delega sin conocer los detalles.
+¿Permite agregar un nuevo método sin modificar código existente?
+Casi completamente. Agregar Nequi requiere solo crear PagoNequi implements EstrategiaPago y añadir un case en el switch del constructor — ninguna clase existente se modifica, ningún test existente se rompe.
+¿Qué mejoraría del diseño?
+El switch dentro del constructor de ProcesadorPago es el único punto que aún viola OCP estrictamente. La mejora sería extraerlo a un Map<String, Supplier<EstrategiaPago>> para que agregar un método nuevo sea registrar una entrada, sin tocar ninguna lógica:
+
+// Registro de estrategias sin switch
+private static final Map<String, Supplier<EstrategiaPago>> REGISTRO = Map.of(
+    "TARJETA", PagoTarjeta::new,
+    "PSE",     PagoPSE::new,
+    "PAYPAL",  PagoPayPal::new,
+    "CRIPTO",  PagoCripto::new
+);
+
+ProcesadorPago(String tipo) {
+    this.estrategia = Optional.ofNullable(REGISTRO.get(tipo.toUpperCase()))
+        .orElseThrow(() -> new IllegalArgumentException("Método no soportado: " + tipo))
+        .get();
+}
+

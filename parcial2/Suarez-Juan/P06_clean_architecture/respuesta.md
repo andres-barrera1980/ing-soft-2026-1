@@ -206,24 +206,24 @@ Si quedo claro y facil identificar la diferencia, especialmente gracias a que N-
 
 #### ¿Los ejemplos de OpenLib Market son correctos para cada capa?
 
-
+Si, los ejemplos practivos son coherentes con lo que me esta explicando en la arquitectura Clean. En entidades se encuentran los libros, categorias, etc. en los casos de uso se orquesta las reglas de negocio donde esta la DescargaLibroGratuito y los controladores REST y Spring Boot junto con Drivers en la infraestructra o en la parte expetiror msotrando las separacion de rsponsabilidades del proyecto.
 
 #### ¿El LLM cometió algún error conceptual?
 
-
+No cometio ningun error conceptual, aun que si le falto profundidad en el proyecto ya que a pesar de tener un buen prompt el contexto no es suficiente para que entienda el modelo de negocio a totalidad.
 
 ### Análisis crítico de la respuesta
 
 #### 1. ¿Qué hizo bien el prompt?
 
-[Evalúa tu propio prompt, no la respuesta del LLM. ¿El contexto fue suficiente? ¿Las restricciones fueron claras? ¿El formato de salida que pediste ayudó a obtener una buena respuesta? ¿Qué parte de tu prompt fue más efectiva? Sé específico: menciona fragmentos concretos de tu prompt que funcionaron bien.]
+Explico de manera clara edutiva con un lenguaje claro que es Clean Arquitecture, usando ejemplos generales desde un perfil profesional.
 
 
 #### 2. ¿Qué se puede mejorar?
 
-[¿Qué le faltó a tu prompt? ¿Qué harías diferente si pudieras reformularlo? ¿El LLM entendió mal algo por falta de claridad en tu prompt? ¿La respuesta tiene errores u omisiones? ¿Qué no cubrió el LLM que tú sí sabes por lo visto en clase?]
+Puede mejorar el entendimiento o mejor modelo del razonamiento ya que a pesar de tener un contexto bastante completo no entendio la idea y los ejemplos era muy generales.
 
 
 #### 3. Respuesta final
 
-[Escribe tu respuesta definitiva a la pregunta del parcial, integrando lo que aprendiste del LLM pero yendo más allá. Corrige errores, llena omisiones, conecta con conceptos vistos en clase. Esta es tu respuesta: demuestra que tú dominas el tema.]
+Clean Arquitecture es una chimba, es muy util y practica para hacer cambios sin afectar a todo el modelo o logica del negocio.

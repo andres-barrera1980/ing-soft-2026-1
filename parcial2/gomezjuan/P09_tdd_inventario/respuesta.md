@@ -1,13 +1,7 @@
-# Plantilla de entrega — Parcial 2
-
-> **Instrucción**: Copia esta plantilla para cada pregunta del parcial. Reemplaza `[Pregunta XX]` por el identificador correcto (ej: `P01_solid_srp`) y completa todas las secciones. Haz al menos 2 commits por pregunta: uno con el prompt + respuesta del LLM, y otro con el análisis.
-
----
-
-## Pregunta [XX]: [Título resumido]
+# Pregunta P09: TDD para control de inventario
 
 ### Estudiante
-- **Nombre completo**: [Tu nombre y apellido]
+- **Nombre completo**: Juan Camilo Gomez
 
 ---
 
@@ -15,55 +9,133 @@
 
 | Campo | Valor |
 |---|---|
-| **Nombre del LLM** | [Claude / ChatGPT / Gemini / Copilot / DeepSeek / Qwen / Mistral / Otro / **Sin IA — respuesta propia**] |
-| **Modelo específico** | [Ej: Claude Opus 4.5, GPT-4o, Gemini 2.5 Pro, etc. Si respondes sin IA, escribe "N/A"] |
-| **¿Por qué elegiste este LLM?** | [Justifica en 1-3 oraciones. Si respondes sin IA, explica por qué decidiste no usar LLM para esta pregunta.] |
-
----
-
-### Prompt utilizado
-
-> **Si respondiste sin IA, omite esta sección y ve directamente a Análisis crítico.**
-
-```
-[Pega aquí el prompt exacto que enviaste al LLM. 
-Incluye TODO el texto, sin editar ni resumir.
-
-Un buen prompt incluye:
-- Contexto del proyecto OpenLib Market
-- El código o situación específica
-- Lo que esperas que el LLM haga
-- Restricciones (ej: "usa Java 21", "aplica SOLID")
-- Formato de salida esperado (ej: "respuesta en markdown con código Java")]
-```
-
----
-
-### Respuesta del LLM
-
-> **Si respondiste sin IA, omite esta sección y ve directamente a Análisis crítico.**
-[Pega aquí la respuesta COMPLETA del LLM, sin editar, sin resumir.
-Incluye TODO el texto, código, explicaciones que generó el LLM.
-
-Si el LLM generó código, asegúrate de que esté correctamente formateado.
-Si tuviste que hacer varias iteraciones, pega la MEJOR respuesta obtenida,
-pero menciona cuántas iteraciones hiciste.]
-```
+| **Nombre del LLM** | Sin IA — respuesta propia |
+| **Modelo específico** | N/A |
+| **¿Por qué elegiste este LLM?** |para gaanarme el bono
 
 ---
 
 ### Análisis crítico de la respuesta
 
-#### 1. ¿Qué hizo bien el prompt?
-
-[Evalúa tu propio prompt, no la respuesta del LLM. ¿El contexto fue suficiente? ¿Las restricciones fueron claras? ¿El formato de salida que pediste ayudó a obtener una buena respuesta? ¿Qué parte de tu prompt fue más efectiva? Sé específico: menciona fragmentos concretos de tu prompt que funcionaron bien.]
-
-
-#### 2. ¿Qué se puede mejorar?
-
-[¿Qué le faltó a tu prompt? ¿Qué harías diferente si pudieras reformularlo? ¿El LLM entendió mal algo por falta de claridad en tu prompt? ¿La respuesta tiene errores u omisiones? ¿Qué no cubrió el LLM que tú sí sabes por lo visto en clase?]
-
-
 #### 3. Respuesta final
 
-[Escribe tu respuesta definitiva a la pregunta del parcial, integrando lo que aprendiste del LLM pero yendo más allá. Corrige errores, llena omisiones, conecta con conceptos vistos en clase. Esta es tu respuesta: demuestra que tú dominas el tema.]
+## TDD aplicado a ControlInventarioService
+
+TDD sigue un ciclo Red → Green → Refactor. Lo importante es que cada prueba se escribe antes de la implementación, y se verifica que falla antes de escribir el código que la hace pasar.
+
+---
+
+### FASE RED — Pruebas que fallan primero
+
+Escribimos las pruebas sin implementación. Todas deben compilar pero fallar al ejecutarse.
+
+
+    // RED 1: cuando stock llega a 0, debe marcar libro como AGOTADO
+    @Test
+    void cuandoStockLlegaACero_debeMarcarLibroComoAgotado() {
+        Libro libro = new Libro(1L, "ISBN-001", 0, EstadoLibro.DISPONIBLE);
+        when(repositorioLibro.buscarPorId(1L)).thenReturn(Optional.of(libro));
+
+        service.actualizarStock(1L, 0);
+
+        assertEquals(EstadoLibro.AGOTADO, libro.getEstado());
+        verify(repositorioLibro).guardar(libro);
+    }
+
+    // RED 2: cuando stock llega a 0, debe notificar al vendedor
+    @Test
+    void cuandoStockLlegaACero_debeNotificarAlVendedor() {
+        Libro libro = new Libro(1L, "ISBN-001", 0, EstadoLibro.DISPONIBLE);
+        when(repositorioLibro.buscarPorId(1L)).thenReturn(Optional.of(libro));
+
+        service.actualizarStock(1L, 0);
+
+        verify(notificador).notificarAgotado(libro);
+    }
+
+    // RED 3: cuando se repone stock, debe volver a DISPONIBLE
+    @Test
+    void cuandoSeReponStock_debeMarcarLibroComoDisponible() {
+        Libro libro = new Libro(1L, "ISBN-001", 0, EstadoLibro.AGOTADO);
+        when(repositorioLibro.buscarPorId(1L)).thenReturn(Optional.of(libro));
+
+        service.actualizarStock(1L, 5);
+
+        assertEquals(EstadoLibro.DISPONIBLE, libro.getEstado());
+        verify(repositorioLibro).guardar(libro);
+    }
+
+
+
+
+### FASE GREEN — Implementacion minima para hacer pasar las pruebas
+
+La implementación mas simple posible que haga pasar todas las pruebas:
+
+
+    public ControlInventarioService(RepositorioLibro repositorioLibro,
+                                     NotificadorVendedor notificador) {
+        this.repositorioLibro = repositorioLibro;
+        this.notificador = notificador;
+    }
+
+    public void actualizarStock(Long libroId, int nuevoStock) {
+        if (nuevoStock < 0) {
+            throw new IllegalArgumentException("El stock no puede ser negativo");
+        }
+
+        Libro libro = repositorioLibro.buscarPorId(libroId)
+            .orElseThrow(() -> new NoSuchElementException("Libro no encontrado: " + libroId));
+
+        if (nuevoStock == 0 && libro.getEstado() != EstadoLibro.AGOTADO) {
+            libro.setStock(0);
+            libro.setEstado(EstadoLibro.AGOTADO);
+            repositorioLibro.guardar(libro);
+            notificador.notificarAgotado(libro);
+        } else if (nuevoStock > 0 && libro.getEstado() == EstadoLibro.AGOTADO) {
+            libro.setStock(nuevoStock);
+            libro.setEstado(EstadoLibro.DISPONIBLE);
+            repositorioLibro.guardar(libro);
+        } else {
+            libro.setStock(nuevoStock);
+            repositorioLibro.guardar(libro);
+        }
+    }
+}
+```
+
+aca todas las pruebas deben pasar (GREEN).
+
+---
+
+### FASE REFACTOR — Mejorar el diseño sin romper las pruebas
+
+El `if-else` anidado en `actualizarStock` mezcla lógica de transición de estado con efectos secundarios. Lo mejoramos extrayendo la lógica de transición al propio objeto `Libro`:
+
+
+// Entidad Libro con lógica de estado encapsulada
+public class Libro {
+    private Long id;
+    private String isbn;
+    private int stock;
+    private EstadoLibro estado;
+
+    public void setStock(int nuevoStock) {
+        if (nuevoStock < 0) throw new IllegalArgumentException("Stock no puede ser negativo");
+        this.stock = nuevoStock;
+        // La entidad gestiona su propio estado
+        if (nuevoStock == 0) {
+            this.estado = EstadoLibro.AGOTADO;
+        } else {
+            this.estado = EstadoLibro.DISPONIBLE;
+        }
+    }
+
+    public boolean recienAgotado() { return stock == 0 && estado == EstadoLibro.AGOTADO; }
+    // getters y constructor...
+}
+
+```
+
+Las pruebas siguen pasando sin modificarse,eso confirma que el refactoring no rompió el comportamiento.
+

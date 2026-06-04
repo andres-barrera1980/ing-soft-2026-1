@@ -1030,3 +1030,232 @@ Se capturan correctamente las ventajas y desventajas; menciona precios, costos; 
 
 ```
 ```
+
+## Pregunta 12: Ciclo de vida de un defecto aplicado a OpenLib Market
+
+### Estudiante
+
+* **Nombre completo**: Juan Duarte
+
+---
+
+### LLM utilizado
+
+| Campo                           | Valor                                                                                              |
+| ------------------------------- | -------------------------------------------------------------------------------------------------- |
+| **Nombre del LLM**              | Gemini                                                                                             |
+| **Modelo específico**           | N/A                                                                                                |
+| **¿Por qué elegiste este LLM?** | Se utilizó para explicar el ciclo de vida de un defecto y aplicarlo al contexto de OpenLib Market. |
+
+---
+
+### Prompt utilizado
+
+```text
+podrias explciarme el cuclo de vida de un defecto (detección → reporte → asignación → diagnóstico → corrección → verificación → cierre) ; aplica este caso en concreto a openlibmarket para cada una de las fases, esto debe indicar: ¿quién es responsable?, ¿qué acción se toma?, ¿qué herramienta se usa?, ¿cuál sería el siguiente estado del defecto en Jira?
+```
+
+---
+
+### Respuesta del LLM
+
+```text
+Para gestionar este defecto en OpenLib Market, seguiremos el ciclo de vida estándar. Este proceso garantiza la trazabilidad y asegura que el problema no sea solo "arreglado", sino verificado y documentado para evitar su recurrencia.
+
+Ciclo de Vida de un Defecto (Workflow en Jira)
+
+| Fase | Acción | Responsable | Herramienta | Siguiente Estado |
+| --- | --- | --- | --- | --- |
+| Detección | Identificar que el botón no responde tras 5 ítems. | Tester | Frontend / App | Abierto |
+| Reporte | Crear ticket detallando pasos y entorno. | Tester | Jira | Abierto |
+| Asignación | Clasificar prioridad (Alta) y asignar a un desarrollador. | Lead Tester / Project Mgr | Jira | En Progreso |
+| Diagnóstico | Reproducir el error y encontrar la causa raíz (ej: un if mal configurado). | Desarrollador | IDE / Logs | En Progreso |
+| Corrección | Modificar el código, aplicar TDD y compilar. | Desarrollador | Git / IDE | Resuelto |
+| Verificación | Confirmar que el fix funciona y no rompe nada más. | Tester | Entorno QA | Cerrado |
+| Cierre | Finalizar el ticket y actualizar documentación. | Tester / Lead | Jira | Cerrado |
+
+Aplicación al Caso OpenLib Market
+
+1. Detección y Reporte
+
+El tester nota que, al intentar agregar el 6to libro, la UI permanece estática. Crea el ticket en Jira con los pasos de reproducción, capturas de pantalla y logs de la consola del navegador o terminal de la aplicación.
+
+Estado: Open.
+
+2. Asignación y Diagnóstico
+
+El Project Manager revisa el reporte, nota que es un bloqueo de flujo crítico, le asigna prioridad High y lo delega al equipo de Backend/Frontend. El desarrollador intenta replicar el error en su entorno local siguiendo exactamente los pasos reportados.
+
+Estado: In Progress.
+
+3. Corrección
+
+El desarrollador descubre una validación errónea. Aplica la corrección, ejecuta las pruebas unitarias existentes y añade una nueva prueba para el caso límite.
+
+Estado: Resolved.
+
+4. Verificación
+
+El equipo de QA realiza pruebas de humo, regresión y límites para comprobar que la solución es correcta.
+
+5. Cierre
+
+El ticket se cambia a Closed y se documenta la solución.
+
+Recomendación para OpenLib Market
+
+Se recomienda implementar pruebas automatizadas de regresión para verificar los límites del carrito y evitar que este tipo de errores llegue a producción.
+```
+
+---
+
+### Análisis crítico de la respuesta
+
+#### 1. ¿Qué hizo bien el prompt?
+
+El prompt permitió obtener una descripción completa del ciclo de vida del defecto y obligó a identificar responsables, herramientas y estados dentro de Jira. Además, permitió contextualizar cada fase dentro de OpenLib Market.
+
+#### 2. ¿Qué se puede mejorar?
+
+Se podría pedir una descripción más detallada del proceso de cierre y de la documentación asociada al defecto, ya que fue la parte menos desarrollada por el LLM.
+
+#### 3. Respuesta final
+
+El llm expolico correctamente las fases de ciclo de vida y asigno los responsables adecuados a cada fase; de hecho generó una imagen donde lo explica bien, hizo un cuadro comparativo, aplicacion verificacion y cierre, junto con unas recomendaciones para el openlibmarket, el cierre fue el mas superficial.
+
+
+
+## Pregunta 13: Refactorización aplicando SOLID, patrón GoF y pruebas unitarias
+
+### Estudiante
+
+* **Nombre completo**: Juan Duarte
+
+---
+
+### LLM utilizado
+
+| Campo                           | Valor                                                                                                                                    |
+| ------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| **Nombre del LLM**              | Gemini                                                                                                                                   |
+| **Modelo específico**           | N/A                                                                                                                                      |
+| **¿Por qué elegiste este LLM?** | Se utilizó para refactorizar una clase aplicando principios SOLID, un patrón de diseño de la GoF y generar pruebas unitarias en JUnit 5. |
+
+---
+
+### Prompt utilizado
+
+```text
+podrias refactorizar esta clase aplicando un principio SOLID (el que consideres adecuado), un patrón de diseño de la GoF y de paso incluye pruebas unitarias JUnit 5; todo esto en java con sus respectivas explicaciones
+```
+
+---
+
+### Respuesta del LLM
+
+```text
+Este código es un ejemplo claro de una clase que "sabe demasiado" y hace demasiado.
+
+1. Principios SOLID y Patrones aplicados
+
+SRP (Principio de Responsabilidad Única): La clase original gestiona la lógica de envío y la persistencia. Debemos separar estas responsabilidades.
+
+OCP (Principio de Abierto/Cerrado): La clase actual requiere modificación cada vez que añadimos un método de notificación. Usaremos el Patrón Strategy para permitir extensiones sin modificar el código existente.
+
+DIP (Principio de Inversión de Dependencias): El módulo de alto nivel dependerá de abstracciones y no de implementaciones concretas.
+
+2. Refactorización (Java)
+
+Interfaz de estrategia:
+
+public interface CanalNotificacion {
+    void enviar(String destinatario, String mensaje);
+}
+
+Implementaciones concretas:
+
+public class EmailCanal implements CanalNotificacion {
+    public void enviar(String d, String m) {
+        System.out.println("Enviando EMAIL a " + d + ": " + m);
+    }
+}
+
+public class SmsCanal implements CanalNotificacion {
+    public void enviar(String d, String m) {
+        System.out.println("Enviando SMS a " + d + ": " + m);
+    }
+}
+
+Clase Logger:
+
+public class LoggerNotificaciones {
+    public void registrar(String tipo, String dest, String msg) {
+        // lógica de logging
+    }
+}
+
+Clase orquestadora:
+
+public class Notificador {
+
+    private final LoggerNotificaciones logger;
+
+    public Notificador(LoggerNotificaciones logger) {
+        this.logger = logger;
+    }
+
+    public void enviar(CanalNotificacion canal, String dest, String msg) {
+        canal.enviar(dest, msg);
+        logger.registrar(canal.getClass().getSimpleName(), dest, msg);
+    }
+}
+
+3. Pruebas unitarias (JUnit 5 + Mockito)
+
+@ExtendWith(MockitoExtension.class)
+class NotificadorTest {
+
+    @Mock
+    private CanalNotificacion canalMock;
+
+    @Mock
+    private LoggerNotificaciones loggerMock;
+
+    @Test
+    void debeEnviarYRegistrarLog() {
+
+        Notificador notificador = new Notificador(loggerMock);
+
+        notificador.enviar(canalMock, "user@test.com", "Hola");
+
+        verify(canalMock).enviar("user@test.com", "Hola");
+
+        verify(loggerMock)
+            .registrar(anyString(), eq("user@test.com"), eq("Hola"));
+    }
+}
+
+¿Por qué esta solución es superior?
+
+Extensibilidad: Permite añadir nuevos canales sin modificar el código del notificador.
+
+Mantenibilidad: La lógica del log se encuentra centralizada.
+
+Testeabilidad: Gracias a las interfaces se pueden utilizar mocks en las pruebas.
+```
+
+---
+
+### Análisis crítico de la respuesta
+
+#### 1. ¿Qué hizo bien el prompt?
+
+El prompt fue claro al solicitar explícitamente la aplicación de principios SOLID, un patrón GoF y pruebas unitarias en Java. Esto permitió obtener una solución completa con diseño, implementación y pruebas.
+
+#### 2. ¿Qué se puede mejorar?
+
+Las pruebas unitarias generadas son bastante básicas y cubren únicamente el envío y el registro del log. Se podrían incluir más escenarios y pruebas más profundas para validar diferentes canales y posibles excepciones.
+
+#### 3. Respuesta final
+
+se rerfactorizo con una interfaz de estrategia (canalNotificacion), iomplementaciones concretas, la clase log que separa responsabilidades y el orquestador que es "gestor", junto con unas pruebas unitarias no muy extensas ni profundas, mide el enviar y registrar un log; lo que me pasó tiene una mantenibilidad alta por su logica centralizada y tiene mocks de testebilidad; esta nueva version en efecto permite agregar un canal de notificacion sin tocar el codigo de notificador, si tuviera que implementarla, la usaria simplemente cambiaria los atributos y los nombres, todo de acuerdo a nuestro proyecto

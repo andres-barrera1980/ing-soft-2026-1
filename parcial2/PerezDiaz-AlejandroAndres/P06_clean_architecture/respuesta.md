@@ -4,10 +4,10 @@
 
 ---
 
-## Pregunta [XX]: [Título resumido]
+## Pregunta [P06_clean_arquitecture]
 
 ### Estudiante
-- **Nombre completo**: [Tu nombre y apellido]
+- **Nombre completo**: [Alejandro Andres Perez DIaz]
 
 ---
 
@@ -15,9 +15,9 @@
 
 | Campo | Valor |
 |---|---|
-| **Nombre del LLM** | [Claude / ChatGPT / Gemini / Copilot / DeepSeek / Qwen / Mistral / Otro / **Sin IA — respuesta propia**] |
-| **Modelo específico** | [Ej: Claude Opus 4.5, GPT-4o, Gemini 2.5 Pro, etc. Si respondes sin IA, escribe "N/A"] |
-| **¿Por qué elegiste este LLM?** | [Justifica en 1-3 oraciones. Si respondes sin IA, explica por qué decidiste no usar LLM para esta pregunta.] |
+| **Nombre del LLM** | [/ **Sin IA — respuesta propia**] |
+| **Modelo específico** | [ "N/A"] |
+| **¿Por qué elegiste este LLM?** | [Porque me parecio sencillo ya que esta misma aquitectura es la que utilizamos nosotro en el proyecto.] |
 
 ---
 
@@ -66,4 +66,14 @@ pero menciona cuántas iteraciones hiciste.]
 
 #### 3. Respuesta final
 
-[Escribe tu respuesta definitiva a la pregunta del parcial, integrando lo que aprendiste del LLM pero yendo más allá. Corrige errores, llena omisiones, conecta con conceptos vistos en clase. Esta es tu respuesta: demuestra que tú dominas el tema.]
+[Clean Architecture organiza el código en capas  donde las dependencias solo apuntan hacia adentro, es decir las capas de afuera conocen a las de adentro pero nunca al revés.
+Las capas para OpenLib Market serían:
+
+Entidades — las clases del negocio puro como Libro, Usuario, Orden
+Casos de uso — lo que el sistema puede hacer como PublicarLibro, ProcesarPago, AgregarAWishlist
+Adaptadores — los controladores REST y repositorios que conectan todo
+Frameworks — Spring Boot, PostgreSQL, Redis, lo más externo
+
+La regla principal es que Libro no sabe que existe PostgreSQL ni Spring Boot. Si mañana  se quisiera cambiar la base de datos solo tocamos el adaptador, el resto del código no .
+La diferencia con la arquitectura tradicional es que en la tradicional todo está conectado de presentación a lógica a datos, entonces si cambias la base de datos tienes que tocar la lógica de negocio también.]
+

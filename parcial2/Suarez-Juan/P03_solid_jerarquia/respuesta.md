@@ -54,4 +54,4 @@ public class Admin implements UsuarioAdmin {
 }
 ```
 
-#### Considero que la refactorizacion puede mejorar ya que a pesar de solucionar los errores por llamadas a funciones sin logica del negocio esta refactorizacion cierra el comportamiento de las clases o usuarios de Market Lib unicamente a las interfaces, una posible solucion podria ser usar interfaces por responsabilidades aun que expandiria la creacion de estas.
+#### Considero que la refactorizacion puede mejorar ya que a pesar de solucionar los errores por llamadas a funciones sin logica del negocio y crear interfaces necesesarias para separar la logica del negocio esta refactorizacion cierra el comportamiento de las clases o usuarios de Market Lib unicamente a las interfaces, una posible solucion podria ser usar interfaces por responsabilidades aun que expandiria la creacion de estas.

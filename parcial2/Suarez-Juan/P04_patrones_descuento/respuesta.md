@@ -4,66 +4,20 @@
 
 ---
 
-## Pregunta [XX]: [Título resumido]
+## Pregunta [04]: Entontrar el Patron asociado
 
 ### Estudiante
-- **Nombre completo**: [Tu nombre y apellido]
-
----
-
-### LLM utilizado
-
-| Campo | Valor |
-|---|---|
-| **Nombre del LLM** | [Claude / ChatGPT / Gemini / Copilot / DeepSeek / Qwen / Mistral / Otro / **Sin IA — respuesta propia**] |
-| **Modelo específico** | [Ej: Claude Opus 4.5, GPT-4o, Gemini 2.5 Pro, etc. Si respondes sin IA, escribe "N/A"] |
-| **¿Por qué elegiste este LLM?** | [Justifica en 1-3 oraciones. Si respondes sin IA, explica por qué decidiste no usar LLM para esta pregunta.] |
-
----
-
-### Prompt utilizado
-
-> **Si respondiste sin IA, omite esta sección y ve directamente a Análisis crítico.**
-
-```
-[Pega aquí el prompt exacto que enviaste al LLM. 
-Incluye TODO el texto, sin editar ni resumir.
-
-Un buen prompt incluye:
-- Contexto del proyecto OpenLib Market
-- El código o situación específica
-- Lo que esperas que el LLM haga
-- Restricciones (ej: "usa Java 21", "aplica SOLID")
-- Formato de salida esperado (ej: "respuesta en markdown con código Java")]
-```
-
----
-
-### Respuesta del LLM
-
-> **Si respondiste sin IA, omite esta sección y ve directamente a Análisis crítico.**
-[Pega aquí la respuesta COMPLETA del LLM, sin editar, sin resumir.
-Incluye TODO el texto, código, explicaciones que generó el LLM.
-
-Si el LLM generó código, asegúrate de que esté correctamente formateado.
-Si tuviste que hacer varias iteraciones, pega la MEJOR respuesta obtenida,
-pero menciona cuántas iteraciones hiciste.]
-```
-
----
+- **Nombre completo**: Juan Pablo Suarez Moreno
 
 ### Análisis crítico de la respuesta
 
-#### 1. ¿Qué hizo bien el prompt?
+#### 1. Conclusion
 
-[Evalúa tu propio prompt, no la respuesta del LLM. ¿El contexto fue suficiente? ¿Las restricciones fueron claras? ¿El formato de salida que pediste ayudó a obtener una buena respuesta? ¿Qué parte de tu prompt fue más efectiva? Sé específico: menciona fragmentos concretos de tu prompt que funcionaron bien.]
-
-
-#### 2. ¿Qué se puede mejorar?
-
-[¿Qué le faltó a tu prompt? ¿Qué harías diferente si pudieras reformularlo? ¿El LLM entendió mal algo por falta de claridad en tu prompt? ¿La respuesta tiene errores u omisiones? ¿Qué no cubrió el LLM que tú sí sabes por lo visto en clase?]
+Es Decorator!!! me toco exponerlo jajaja.
+En este caso que necesitamos a una clase agregarle caracteristicas o responsabilidades sin cambiar la estructura, esto nos permite agregarle descuentos como una cebolla a nuestro querido cliente, teniendo en cuenta que el orden si afecta, eso hay que tenerlo en cuenta a la hora de asignar los descuentos.
+Este patron evita la creacion innecesaria especificas para cada caso de descuento
 
 
-#### 3. Respuesta final
+#### 2. Alternativas
 
-[Escribe tu respuesta definitiva a la pregunta del parcial, integrando lo que aprendiste del LLM pero yendo más allá. Corrige errores, llena omisiones, conecta con conceptos vistos en clase. Esta es tu respuesta: demuestra que tú dominas el tema.]
+Un alternativa puede ser el patron Strategy a pesar de que creo que es mejor Decorator, Strategy permite aislar  la regla de cada descuento en su propia clase, y poder modificar y eliminar los descuentos de manera mas sencialla.

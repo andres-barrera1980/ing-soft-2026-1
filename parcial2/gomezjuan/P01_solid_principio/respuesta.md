@@ -227,14 +227,24 @@ Con este diseño, cada clase tiene **una sola responsabilidad** y el `GestorLibr
 
 #### 1. ¿Qué hizo bien el prompt?
 
-[Evalúa tu propio prompt, no la respuesta del LLM. ¿El contexto fue suficiente? ¿Las restricciones fueron claras? ¿El formato de salida que pediste ayudó a obtener una buena respuesta? ¿Qué parte de tu prompt fue más efectiva? Sé específico: menciona fragmentos concretos de tu prompt que funcionaron bien.]
+El prompt fue efectivo porque incluia el codigo completo sin resumenes, establecía el contexto del proyecto, pedia analisis del principio violado con argumentos concretos sobre el código específico, y definía restricciones claras. 
 
 
 #### 2. ¿Qué se puede mejorar?
 
-[¿Qué le faltó a tu prompt? ¿Qué harías diferente si pudieras reformularlo? ¿El LLM entendió mal algo por falta de claridad en tu prompt? ¿La respuesta tiene errores u omisiones? ¿Qué no cubrió el LLM que tú sí sabes por lo visto en clase?]
-
+Podria haberse pedido que incluyera pruebas unitaria para demostrar que el refactoring es testeable. Tambien de pronto omitio el manejo de la conexion a base de datos.
 
 #### 3. Respuesta final
+parte sin LLM
+En la clase gestionar libro, se viola el principio de responsabilidad unica, ya que una clase siempre tiene una unica responsabilidad, en este ejemplo en especifico hay distintas razones, por ejemplo la de validacion o notificacion, esto hace que un cambio en cualquiera de esas areas obliga a modificar gestorlibro, aumentando el riesgo de bugs.
+
+parte con LLM
+
+El refactoring correcto es:
+- Extraer cada responsabilidad a su propia clase con una interfaz que la abstraiga.
+- Inyectar las dependencias a través del constructor (Constructor Injection).
+- `GestorLibro` pasa a ser un **coordinador** que solo orquesta el flujo, sin conocer los detalles de implementación.
+
+Un aspecto que el LLM no cubrió y es crítico: el **manejo de transaccionalidad**. Si `notificacion.notificarPublicacion()` falla después de que el libro ya se guardó en base de datos, el sistema queda en estado inconsistente. En producción se debería usar un patrón de **compensación** o manejar la transacción con `@Transactional` y notificación asíncrona (por ejemplo, via cola de mensajes).
 
 

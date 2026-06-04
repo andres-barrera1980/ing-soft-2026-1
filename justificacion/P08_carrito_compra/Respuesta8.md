@@ -434,14 +434,18 @@ class CarritoServiceTest {
 
 #### 1. ¿Qué hizo bien el prompt?
 
-[Evalúa tu propio prompt, no la respuesta del LLM. ¿El contexto fue suficiente? ¿Las restricciones fueron claras? ¿El formato de salida que pediste ayudó a obtener una buena respuesta? ¿Qué parte de tu prompt fue más efectiva? Sé específico: menciona fragmentos concretos de tu prompt que funcionaron bien.]
+El prompt es efectivo porque se alineó con las pautas de segmentación del archivo guia_prompting.md. El flujo de desarrollo contó con el diseño preliminar de un agente Gema (Gemini) y mi posterior intervención para corrección de detalles. Cuenta con rol, contexto y una estructura de salida directa que resuelve lo solicitado.
 
 
 #### 2. ¿Qué se puede mejorar?
 
-[¿Qué le faltó a tu prompt? ¿Qué harías diferente si pudieras reformularlo? ¿El LLM entendió mal algo por falta de claridad en tu prompt? ¿La respuesta tiene errores u omisiones? ¿Qué no cubrió el LLM que tú sí sabes por lo visto en clase?]
+El prompt ha alcanzado su estado estable tras la fase de co-diseño y edición por mi parte. No se detectan puntos de quiebre ni ambigüedades en las variables declaradas. Cualquier modificación en este punto sería redundante, ya que la lógica de la guía de prompting se aplicó sin fisuras.
 
 
 #### 3. Respuesta final
 
-[Escribe tu respuesta definitiva a la pregunta del parcial, integrando lo que aprendiste del LLM pero yendo más allá. Corrige errores, llena omisiones, conecta con conceptos vistos en clase. Esta es tu respuesta: demuestra que tú dominas el tema.]
+el análisis de la inteligencia artificial diseñó una base muy sólida usando las herramientas de junit y simuló bien el repositorio con mockito, pues cubrió casi todas las operaciones básicas como el cálculo del total y el borrado de elementos. también estuvo fina al probar las reglas de las cantidades malas, el libro perdido y hasta validó el checkout con la cesta vacía. probó de forma exitosa el caso de acumulación cuando sumas el mismo libro dos veces y metió las pruebas límite para los diez artículos únicos, deteniendo el programa con excepciones cuando intentas meter el libro número once.
+
+sin embargo, el análisis omitió un vacío gigante en la cobertura real de las reglas de negocio de openlib market. la inteligencia artificial cometió el error de dejar por fuera pruebas críticas de fronteras numéricas, pues aunque probó validarparacheckout con el carrito vacío, no se le ocurrió evaluar qué pasa si el cliente intenta hacer el proceso de compra teniendo exactamente diez libros o si el stock queda en cero justo después de agregar el límite máximo permitido. para que la solución fuera perfecta, faltó mencionar que la inteligencia artificial pasó por alto probar los hilos simultáneos cuando dos personas compran el último ejemplar al mismo tiempo, lo cual genera condiciones de carrera en el servidor. tampoco escribió pruebas para verificar el comportamiento si el precio del libro cambia en la base de datos a mitad de la sesión, dejando una suite incompleta frente a fallos lógicos reales.
+
+el código original de las pruebas estaba mal diseñado porque no evaluaba los límites reales de la aplicación de openlib market, violando los principios de pruebas exhaustivas. para solucionarlo bien, se debe cambiar la estructura de la suite agregando los experimentos que el robot olvidó. los nuevos casos de prueba que faltaron consisten primero en evaluar el método validarparacheckout cuando la cesta tiene artículos válidos pero el stock cambió en el repositorio en el último segundo. segundo, probar el límite exacto del stock agregando una cantidad que deje las existencias exactamente en cero para comprobar que el sistema lo permite pero bloquea la siguiente compra. por último, se debe meter un experimento para el caso donde el identificador del libro viene con un valor nulo, pues para evitar que el programa falle de forma fea, la opción elegida debe asegurar que el servicio responda con una alerta controlada. de esta manera, el sistema no solo borra las dudas de cobertura, sino que asegura un motor de pruebas robusto, seguro y listo para aguantar cualquier cambio en el futuro.

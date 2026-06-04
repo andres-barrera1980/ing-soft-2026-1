@@ -470,4 +470,8 @@ El núcleo del negocio es completamente testeable en memoria, sin infraestructur
 ---
 
 ### Análisis crítico de la respuesta
+El prompt funcionó bien porque usar PaymentService como caso concreto obligó al LLM a mejorar algo específico en vez de explicar Clean Architecture en abstracto. También ayudó restringir explícitamente que el caso de uso no importara nada de Spring, lo cumplió e incluso lo comentó en el código.
+Lo que no funcionó: el diagrama Mermaid quedó en texto plano y no se puede evaluar. 
+El TransaccionRepositorioJPA usa un HashMap en memoria, lo cual simplifica demasiado porque el punto era mostrar cómo integrar JPA sin que el núcleo lo conozca. Y el AppConfig instancia directo TarjetaGatewayAdapter sin explicar cómo se elegiría PSE o PayPal en tiempo de ejecución, que era parte del contexto original.
 
+Para la próxima le pediría un repositorio JPA real con mapper de entidades y que resuelva la selección dinámica de pasarela de pago.

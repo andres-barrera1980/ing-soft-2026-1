@@ -1,9 +1,5 @@
 # Plantilla de entrega — Parcial 2
 
-> **Instrucción**: Copia esta plantilla para cada pregunta del parcial. Reemplaza `[Pregunta XX]` por el identificador correcto (ej: `P01_solid_srp`) y completa todas las secciones. Haz al menos 2 commits por pregunta: uno con el prompt + respuesta del LLM, y otro con el análisis.
-
----
-
 ## Pregunta [02]: [P02_solid_refactor]
 
 ### Estudiante
@@ -487,10 +483,11 @@ creo que lo que más funcionó fue asignarle el rol de ingeniero senior desde el
 #### 2. ¿Qué se puede mejorar?
 
 [¿Qué le faltó a tu prompt? ¿Qué harías diferente si pudieras reformularlo? ¿El LLM entendió mal algo por falta de claridad en tu prompt? ¿La respuesta tiene errores u omisiones? ¿Qué no cubrió el LLM que tú sí sabes por lo visto en clase?]
-no 
+le pediria que me explicara mas a fondo el codigo y lo diera en un solo lugar
 
 #### 3. Respuesta final
 
 [Escribe tu respuesta definitiva a la pregunta del parcial, integrando lo que aprendiste del LLM pero yendo más allá. Corrige errores, llena omisiones, conecta con conceptos vistos en clase. Esta es tu respuesta: demuestra que tú dominas el tema.]
 
-La clase original tiene el problema de que concentra demasiadas cosas en un solo lugar cada metodo de pago es un dominio completamente distinto con su propia logica. Mezclarlos en una sola clase hace que cualquier modificacion, por pequeña que sea, ponga en riesgo el resto.
+la clase original tiene el problema de que concentra demasiadas cosas en un solo lugar cada metodo de pago es un dominio completamente distinto con su propia logica y mezclarlos en una sola clase hace que cualquier modificacion, ponga en riesgo el resto. Por ejemplo, para la clase ProcesadorPago original viola principalmente OCP y SRP. Viola OCP porque cada vez que se agrega un método de pago hay que abrir la clase y agregar otro else if. Viola SRP porque una sola clase concentra la lógica de tarjeta, PSE y PayPal.
+la solucion que propone el LLM con el patron Strategy me parece correcto y siento que es la mas adecuada ya que permite que cada metodo de pago tenga su propia implemntacion de la interfaz ProcesadorPago.

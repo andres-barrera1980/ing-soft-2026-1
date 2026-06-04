@@ -7,7 +7,7 @@
 ## Pregunta [XX]: [Título resumido]
 
 ### Estudiante
-- **Nombre completo**: [Tu nombre y apellido]
+- **Nombre completo**: [Diego Alejandro Torres Barrgan]
 
 ---
 
@@ -15,9 +15,9 @@
 
 | Campo | Valor |
 |---|---|
-| **Nombre del LLM** | [Claude / ChatGPT / Gemini / Copilot / DeepSeek / Qwen / Mistral / Otro / **Sin IA — respuesta propia**] |
-| **Modelo específico** | [Ej: Claude Opus 4.5, GPT-4o, Gemini 2.5 Pro, etc. Si respondes sin IA, escribe "N/A"] |
-| **¿Por qué elegiste este LLM?** | [Justifica en 1-3 oraciones. Si respondes sin IA, explica por qué decidiste no usar LLM para esta pregunta.] |
+| **Nombre del LLM** | [Claude] |
+| **Modelo específico** | [Ej: Claude Sonnet 4.6/bajo]|
+| **¿Por qué elegiste este LLM?** | [Es el modelo que actualmente mas uso y en el que estoy confiando, ademas que es muy poderoso para generar codigo y para explicarlo ] |
 
 ---
 
@@ -26,44 +26,169 @@
 > **Si respondiste sin IA, omite esta sección y ve directamente a Análisis crítico.**
 
 ```
-[Pega aquí el prompt exacto que enviaste al LLM. 
-Incluye TODO el texto, sin editar ni resumir.
+Actua como un desarrollador Backend Senior. En OpenLib Market tenemos esta clase Notificador que funciona pero tiene problemas de diseño:
+[pegar codigo]
+Refactorizala aplicando:
 
-Un buen prompt incluye:
-- Contexto del proyecto OpenLib Market
-- El código o situación específica
-- Lo que esperas que el LLM haga
-- Restricciones (ej: "usa Java 21", "aplica SOLID")
-- Formato de salida esperado (ej: "respuesta en markdown con código Java")]
+Al menos un principio SOLID, explica cual y por que se viola en el codigo original
+Al menos un patron de diseño de los vistos en clase (Strategy, Observer, Factory, etc), justifica por que ese patron y no otro
+El logging debe quedar separado de la logica de notificacion
+Incluye pruebas unitarias con JUnit 5 y Mockito
+
+La nueva version debe permitir agregar un canal nuevo (por ejemplo Slack) sin modificar codigo existente.
 ```
 
 ---
 
 ### Respuesta del LLM
 
-> **Si respondiste sin IA, omite esta sección y ve directamente a Análisis crítico.**
-[Pega aquí la respuesta COMPLETA del LLM, sin editar, sin resumir.
-Incluye TODO el texto, código, explicaciones que generó el LLM.
+Principios violados:
 
-Si el LLM generó código, asegúrate de que esté correctamente formateado.
-Si tuviste que hacer varias iteraciones, pega la MEJOR respuesta obtenida,
-pero menciona cuántas iteraciones hiciste.]
+SRP: la clase hace demasiado, maneja EMAIL, SMS, PUSH y logging todo en un solo metodo
+OCP: para agregar un canal nuevo hay que modificar el metodo con otro else if
+
+Patron aplicado: Strategy
+Cada canal de notificacion es una estrategia intercambiable. Se define una interfaz y cada canal la implementa por separado.
+```java
+java// Interfaz (Strategy)
+public interface CanalNotificacion {
+    void enviar(String destinatario, String mensaje);
+}
+
+// Implementaciones
+public class CanalEmail implements CanalNotificacion {
+    public void enviar(String destinatario, String mensaje) {
+        System.out.println("Enviando EMAIL a " + destinatario + ": " + mensaje);
+        // logica SMTP
+    }
+}
+
+public class CanalSMS implements CanalNotificacion {
+    public void enviar(String destinatario, String mensaje) {
+        System.out.println("Enviando SMS a " + destinatario + ": " + mensaje);
+        // logica Twilio
+    }
+}
+
+public class CanalPush implements CanalNotificacion {
+    public void enviar(String destinatario, String mensaje) {
+        System.out.println("Enviando PUSH a " + destinatario + ": " + mensaje);
+        // logica Firebase
+    }
+}
 ```
+Notificador refactorizado con logging separado:
+```java
+javapublic interface ServicioLog {
+    void registrar(String tipo, String destinatario, String mensaje);
+}
 
+public class LogArchivoImpl implements ServicioLog {
+    public void registrar(String tipo, String destinatario, String mensaje) {
+        try {
+            Files.write(Paths.get("/var/log/openlib/notificaciones.log"),
+                (tipo + "|" + destinatario + "|" + mensaje + "\n").getBytes(),
+                StandardOpenOption.APPEND);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+public class Notificador {
+    private final Map<String, CanalNotificacion> canales;
+    private final ServicioLog log;
+
+    public Notificador(Map<String, CanalNotificacion> canales, ServicioLog log) {
+        this.canales = canales;
+        this.log = log;
+    }
+
+    public void enviar(String tipo, String destinatario, String mensaje) {
+        CanalNotificacion canal = canales.get(tipo);
+        if (canal == null) throw new IllegalArgumentException("Canal no soportado: " + tipo);
+        canal.enviar(destinatario, mensaje);
+        log.registrar(tipo, destinatario, mensaje);
+    }
+}
+```
+Agregar Slack sin tocar codigo existente:
+```java
+javapublic class CanalSlack implements CanalNotificacion {
+    public void enviar(String destinatario, String mensaje) {
+        System.out.println("Enviando SLACK a " + destinatario + ": " + mensaje);
+        // logica Slack API
+    }
+}
+```
+Pruebas unitarias:
+```java
+java@ExtendWith(MockitoExtension.class)
+class NotificadorTest {
+
+    @Mock
+    private CanalNotificacion canalEmail;
+
+    @Mock
+    private ServicioLog log;
+
+    private Notificador notificador;
+
+    @BeforeEach
+    void setUp() {
+        Map<String, CanalNotificacion> canales = new HashMap<>();
+        canales.put("EMAIL", canalEmail);
+        notificador = new Notificador(canales, log);
+    }
+
+    @Test
+    void enviar_deberiaLlamarAlCanalCorrecto() {
+        notificador.enviar("EMAIL", "user@mail.com", "Hola");
+        verify(canalEmail).enviar("user@mail.com", "Hola");
+    }
+
+    @Test
+    void enviar_deberiaRegistrarEnLog() {
+        notificador.enviar("EMAIL", "user@mail.com", "Hola");
+        verify(log).registrar("EMAIL", "user@mail.com", "Hola");
+    }
+
+    @Test
+    void enviar_canalNoExiste_deberiaLanzarExcepcion() {
+        assertThrows(IllegalArgumentException.class,
+            () -> notificador.enviar("TELEGRAM", "user@mail.com", "Hola"));
+    }
+}
+```
 ---
 
 ### Análisis crítico de la respuesta
 
 #### 1. ¿Qué hizo bien el prompt?
 
-[Evalúa tu propio prompt, no la respuesta del LLM. ¿El contexto fue suficiente? ¿Las restricciones fueron claras? ¿El formato de salida que pediste ayudó a obtener una buena respuesta? ¿Qué parte de tu prompt fue más efectiva? Sé específico: menciona fragmentos concretos de tu prompt que funcionaron bien.]
+Pedir explicitamente "sin modificar codigo existente" fue lo que forzó al LLM a aplicar OCP correctamente y mostrar el ejemplo de Slack como canal nuevo. Pedir que justificara el patron y descartara otros tambien ayudo porque la respuesta explico por que Strategy y no Factory. Separar el logging como requisito explicito evito que quedara mezclado con la logica de notificacion como en el original.
 
 
 #### 2. ¿Qué se puede mejorar?
 
-[¿Qué le faltó a tu prompt? ¿Qué harías diferente si pudieras reformularlo? ¿El LLM entendió mal algo por falta de claridad en tu prompt? ¿La respuesta tiene errores u omisiones? ¿Qué no cubrió el LLM que tú sí sabes por lo visto en clase?]
+El LLM no cubrio que pasa si el envio del canal falla, no hay manejo de excepciones en las implementaciones concretas. En produccion eso seria un problema porque un fallo de SMTP no deberia tumbar todo el flujo. Tampoco se pidio que mostrara como se configura el mapa de canales con Spring, entonces quedo sin explicar como se conecta todo en la aplicacion real.
 
 
 #### 3. Respuesta final
 
-[Escribe tu respuesta definitiva a la pregunta del parcial, integrando lo que aprendiste del LLM pero yendo más allá. Corrige errores, llena omisiones, conecta con conceptos vistos en clase. Esta es tu respuesta: demuestra que tú dominas el tema.]
+La clase original viola SRP porque hace demasiado en un solo metodo y viola OCP porque agregar un canal nuevo obliga a modificar el codigo existente. La solucion con Strategy resuelve los dos problemas: cada canal es una clase independiente y agregar Slack o Telegram es solo crear una clase nueva sin tocar Notificador.
+El logging quedo correctamente separado detras de la interfaz ServicioLog, lo que hace que el Notificador sea completamente testeable con mocks sin necesitar acceso al sistema de archivos.
+Lo que modificaria para produccion es agregar manejo de excepciones en cada canal:
+```java
+javapublic void enviar(String tipo, String destinatario, String mensaje) {
+    CanalNotificacion canal = canales.get(tipo);
+    if (canal == null) throw new IllegalArgumentException("Canal no soportado: " + tipo);
+    try {
+        canal.enviar(destinatario, mensaje);
+        log.registrar(tipo, destinatario, mensaje);
+    } catch (Exception e) {
+        log.registrar("ERROR", destinatario, "Fallo al enviar por " + tipo + ": " + e.getMessage());
+    }
+}
+```
+Asi un fallo en el canal de EMAIL no impide que el log registre el intento fallido y no tumba el resto del sistema.

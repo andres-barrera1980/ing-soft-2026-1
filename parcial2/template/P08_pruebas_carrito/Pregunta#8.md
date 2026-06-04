@@ -193,10 +193,17 @@ Nota: En la entrega final, cada método contiene la implementación completa con
 
 #### 1. ¿Qué hizo bien el prompt?
 
-
+Listar explícitamente los casos de prueba requeridos (caminos felices, límites y excepciones) fue un acierto estructural. Esto obligó a la IA a planear una estrategia de validación ordenada, muy similar a lo que aplicamos en los talleres de Ingeniería de Software. Exigir las anotaciones modernas de JUnit 5 y Mockito (@ExtendWith, @InjectMocks, @Mock) garantizó que el esqueleto del código se apegara a los estándares actuales, evitando que el modelo recurriera a herramientas deprecadas o configuraciones antiguas como JUnit 4.
 
 #### 2. ¿Qué se puede mejorar?
 
+Aunque la teoría sobre la que montó la clase es válida, noté fallas operativas y analíticas graves al revisar el código propuesto:
 
+Primero, omitió el desarrollo del código. El modelo dejó los métodos de prueba vacíos con el comentario de que "se implementarían en la entrega final". A nivel académico o profesional, esto anula la utilidad del snippet porque no compila ni ejecuta ninguna validación real.
+
+Segundo, incurrió en un anti-patrón de pruebas. Diseñó un método crearLibro() utilizando mock(Libro.class) para simular el comportamiento de sus métodos get. La bibliografía técnica es clara al respecto: nunca se deben mockear entidades de dominio ni objetos planos (POJOs). Los objetos de dominio deben instanciarse de forma concreta (con un new o usando el patrón Builder). Únicamente mockeamos los componentes externos, como los repositorios o servicios web. Mockear una entidad solo hace que las pruebas sean lentas, frágiles y difíciles de mantener.
+
+Tercero, dejó pasar un bug crítico en el código analizado. La IA propuso probar el escenario de "Stock insuficiente", pero no detectó el fallo lógico en el método agregarItem(). La validación original (if (libro.getStock() < cantidad)) tiene una falla de acumulación. Si tenemos un libro con stock de 6 y agregamos 4, la condición lo permite. Si el usuario vuelve a agregar 3 unidades de ese mismo libro al carrito, el sistema evalúa de nuevo 6 < 3, lo aprueba, y termina permitiendo 7 unidades de un libro que solo tiene 6 disponibles. La IA no contempló un caso de prueba para validar la sumatoria de ítems ya existentes en el carrito.
 
 #### 3. Respuesta final
+La estructura inicial del modelo sirve como guía metodológica: identifica correctamente los tres frentes de un buen conjunto de pruebas unitarias (caminos felices, el borde de los 10 ítems distintos, y el control de excepciones de dominio). Sin embargo, para presentar esta solución en un proyecto formal, yo reestructuraría la ejecución. Descartaría los métodos vacíos e instanciaría objetos Libro reales, eliminando el anti-patrón de Mockito. Por último, incluiría el caso de prueba más importante, el cual la IA omitió por completo, diseñado específicamente para evidenciar el error de acumulación de inventario. Ese test quedaría así:

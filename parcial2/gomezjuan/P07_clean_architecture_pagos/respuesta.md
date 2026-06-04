@@ -1,13 +1,7 @@
-# Plantilla de entrega — Parcial 2
-
-> **Instrucción**: Copia esta plantilla para cada pregunta del parcial. Reemplaza `[Pregunta XX]` por el identificador correcto (ej: `P01_solid_srp`) y completa todas las secciones. Haz al menos 2 commits por pregunta: uno con el prompt + respuesta del LLM, y otro con el análisis.
-
----
-
-## Pregunta [XX]: [Título resumido]
+# Pregunta P07: Módulo de pagos con Clean Architecture
 
 ### Estudiante
-- **Nombre completo**: [Tu nombre y apellido]
+- **Nombre completo**: Juan Camilo Gomez
 
 ---
 
@@ -15,39 +9,229 @@
 
 | Campo | Valor |
 |---|---|
-| **Nombre del LLM** | [Claude / ChatGPT / Gemini / Copilot / DeepSeek / Qwen / Mistral / Otro / **Sin IA — respuesta propia**] |
-| **Modelo específico** | [Ej: Claude Opus 4.5, GPT-4o, Gemini 2.5 Pro, etc. Si respondes sin IA, escribe "N/A"] |
-| **¿Por qué elegiste este LLM?** | [Justifica en 1-3 oraciones. Si respondes sin IA, explica por qué decidiste no usar LLM para esta pregunta.] |
+| **Nombre del LLM** | Claude |
+| **Modelo específico** | Claude Sonnet 4.6 |
+| **¿Por qué elegiste este LLM?** | Diseñar un módulo completo con Clean Architecture requiere generar mucho código estructurado y diagramas.
 
 ---
 
 ### Prompt utilizado
 
-> **Si respondiste sin IA, omite esta sección y ve directamente a Análisis crítico.**
-
 ```
-[Pega aquí el prompt exacto que enviaste al LLM. 
-Incluye TODO el texto, sin editar ni resumir.
+Soy estudiante de Ingeniería de Software en la Pontificia Universidad Javeriana.
+Proyecto: OpenLib Market, plataforma de venta de libros digitales en Colombia.
 
-Un buen prompt incluye:
-- Contexto del proyecto OpenLib Market
-- El código o situación específica
-- Lo que esperas que el LLM haga
-- Restricciones (ej: "usa Java 21", "aplica SOLID")
-- Formato de salida esperado (ej: "respuesta en markdown con código Java")]
+El equipo acopló todo en un PaymentService monolítico que hace: llamar a la pasarela de pago, 
+enviar correo de notificación, cambiar el estado de la orden y preparar la descarga.
+
+Necesito rediseñar el módulo de pagos aplicando Clean Architecture de Robert C. Martin.
+El módulo debe soportar:
+- Múltiples métodos de pago (tarjeta, PSE, PayPal)
+- Registrar la transacción en PostgreSQL
+- Notificar al comprador y vendedor por correo
+- Exponer una API REST para el frontend JavaFX
+
+Tareas:
+1. Define qué va en cada capa: Entities, Use Cases, Interface Adapters, Frameworks & Drivers
+2. Dibuja el diagrama de la estructura en Mermaid
+3. Muestra código Java 21 de las clases clave de cada capa
+4. Explica cómo se respeta la regla de dependencia
+5. Muestra cómo se inyectan las dependencias externas sin violar la arquitectura
+
+Restricciones:
+- Java 21
+- Respeta estrictamente la regla de dependencia (las dependencias solo apuntan hacia adentro)
+- Muestra el mecanismo de inyección de dependencias
+- Responde en markdown con diagrama Mermaid y código Java
 ```
 
 ---
 
 ### Respuesta del LLM
 
-> **Si respondiste sin IA, omite esta sección y ve directamente a Análisis crítico.**
-[Pega aquí la respuesta COMPLETA del LLM, sin editar, sin resumir.
-Incluye TODO el texto, código, explicaciones que generó el LLM.
+## Módulo de Pagos con Clean Architecture
 
-Si el LLM generó código, asegúrate de que esté correctamente formateado.
-Si tuviste que hacer varias iteraciones, pega la MEJOR respuesta obtenida,
-pero menciona cuántas iteraciones hiciste.]
+### Distribución por capas
+
+**Entities:** `Pago`, `Orden`, `ResultadoPago`, `EstadoOrden` — objetos de dominio puros, sin anotaciones de frameworks.
+
+**Use Cases:** `ProcesarPagoUseCase`, `RepositorioPago` (interfaz), `PasarelaPago` (interfaz), `ServicioNotificacion` (interfaz).
+
+**Interface Adapters:** `PagoController` (REST), `PagoRepositorioPostgres` (implementación JPA), `EmailNotificacion` (implementación), `PasarelaTarjeta` / `PasarelaPSE` (implementaciones).
+
+**Frameworks & Drivers:** Spring Boot, PostgreSQL/JPA, JavaMailSender, cliente REST de la pasarela.
+
+---
+
+### Diagrama de estructura (Mermaid)
+
+```mermaid
+graph TD
+    subgraph Frameworks["Frameworks & Drivers"]
+        SpringBoot["Spring Boot"]
+        PostgreSQL["PostgreSQL / JPA"]
+        SMTP["SMTP / JavaMail"]
+        Pasarelas["APIs Pasarelas Pago"]
+    end
+
+    subgraph Adapters["Interface Adapters"]
+        PagoController["PagoController (REST)"]
+        PagoRepositorioImpl["PagoRepositorioPostgres"]
+        EmailImpl["EmailNotificacion"]
+        PasarelaImpl["PasarelaTarjeta / PasarelaPSE"]
+    end
+
+    subgraph UseCases["Use Cases"]
+        ProcesarPagoUC["ProcesarPagoUseCase"]
+        RepositorioPago["&lt;&lt;interface&gt;&gt; RepositorioPago"]
+        ServicioNotif["&lt;&lt;interface&gt;&gt; ServicioNotificacion"]
+        PasarelaPort["&lt;&lt;interface&gt;&gt; PasarelaPago"]
+    end
+
+    subgraph Entities["Entities"]
+        Pago["Pago"]
+        Orden["Orden"]
+        ResultadoPago["ResultadoPago"]
+    end
+
+    PagoController --> ProcesarPagoUC
+    ProcesarPagoUC --> RepositorioPago
+    ProcesarPagoUC --> ServicioNotif
+    ProcesarPagoUC --> PasarelaPort
+    ProcesarPagoUC --> Pago
+    ProcesarPagoUC --> Orden
+
+    PagoRepositorioImpl --> RepositorioPago
+    EmailImpl --> ServicioNotif
+    PasarelaImpl --> PasarelaPort
+
+    PagoRepositorioImpl --> PostgreSQL
+    EmailImpl --> SMTP
+    PasarelaImpl --> Pasarelas
+    PagoController --> SpringBoot
+```
+
+---
+
+### Código Java por capa
+
+#### Entities
+
+```java
+// Entities — sin imports de frameworks
+public class Pago {
+    private final String id;
+    private final BigDecimal monto;
+    private final String metodoPago;
+    private EstadoPago estado;
+
+    public Pago(String id, BigDecimal monto, String metodoPago) {
+        this.id = id;
+        this.monto = monto;
+        this.metodoPago = metodoPago;
+        this.estado = EstadoPago.PENDIENTE;
+    }
+
+    public void marcarAprobado() { this.estado = EstadoPago.APROBADO; }
+    public void marcarRechazado() { this.estado = EstadoPago.RECHAZADO; }
+
+    // getters...
+}
+```
+
+#### Use Cases — interfaces (puertos)
+
+```java
+// Puerto de salida — repositorio
+public interface RepositorioPago {
+    void guardar(Pago pago);
+    Optional<Pago> buscarPorId(String id);
+}
+
+// Puerto de salida — pasarela
+public interface PasarelaPago {
+    ResultadoPago cobrar(Pago pago);
+}
+
+// Puerto de salida — notificación
+public interface ServicioNotificacion {
+    void notificarPago(Pago pago, Usuario comprador, Usuario vendedor);
+}
+```
+
+```java
+// Caso de uso
+public class ProcesarPagoUseCase {
+    private final RepositorioPago repositorio;
+    private final PasarelaPago pasarela;
+    private final ServicioNotificacion notificacion;
+
+    public ProcesarPagoUseCase(RepositorioPago repositorio,
+                                PasarelaPago pasarela,
+                                ServicioNotificacion notificacion) {
+        this.repositorio = repositorio;
+        this.pasarela = pasarela;
+        this.notificacion = notificacion;
+    }
+
+    public ResultadoPago ejecutar(Pago pago, Usuario comprador, Usuario vendedor) {
+        ResultadoPago resultado = pasarela.cobrar(pago);
+        if (resultado.isAprobado()) {
+            pago.marcarAprobado();
+        } else {
+            pago.marcarRechazado();
+        }
+        repositorio.guardar(pago);
+        notificacion.notificarPago(pago, comprador, vendedor);
+        return resultado;
+    }
+}
+```
+
+#### Interface Adapters
+
+```java
+// Controlador REST — en capa Adapters
+@RestController
+@RequestMapping("/api/pagos")
+public class PagoController {
+    private final ProcesarPagoUseCase procesarPagoUseCase;
+
+    public PagoController(ProcesarPagoUseCase procesarPagoUseCase) {
+        this.procesarPagoUseCase = procesarPagoUseCase;
+    }
+
+    @PostMapping
+    public ResponseEntity<ResultadoPagoDTO> procesar(@RequestBody PagoRequestDTO request) {
+        Pago pago = new Pago(UUID.randomUUID().toString(),
+                             request.getMonto(), request.getMetodoPago());
+        ResultadoPago resultado = procesarPagoUseCase.ejecutar(
+            pago, request.getComprador(), request.getVendedor());
+        return ResponseEntity.ok(ResultadoPagoDTO.from(resultado));
+    }
+}
+```
+
+```java
+// Implementación del repositorio — en capa Adapters
+@Repository
+public class PagoRepositorioPostgres implements RepositorioPago {
+    private final JpaRepository<PagoEntity, String> jpaRepo;
+
+    public PagoRepositorioPostgres(JpaRepository<PagoEntity, String> jpaRepo) {
+        this.jpaRepo = jpaRepo;
+    }
+
+    @Override
+    public void guardar(Pago pago) {
+        jpaRepo.save(PagoEntity.from(pago));
+    }
+
+    @Override
+    public Optional<Pago> buscarPorId(String id) {
+        return jpaRepo.findById(id).map(PagoEntity::toDomain);
+    }
+}
 ```
 
 ---
@@ -56,14 +240,35 @@ pero menciona cuántas iteraciones hiciste.]
 
 #### 1. ¿Qué hizo bien el prompt?
 
-[Evalúa tu propio prompt, no la respuesta del LLM. ¿El contexto fue suficiente? ¿Las restricciones fueron claras? ¿El formato de salida que pediste ayudó a obtener una buena respuesta? ¿Qué parte de tu prompt fue más efectiva? Sé específico: menciona fragmentos concretos de tu prompt que funcionaron bien.]
-
+pedía las cuatro capas explícitamente, el diagrama, el código por capa, la verificación de la regla de dependencia y el mecanismo de inyección. Esto produjo una respuesta estructurada y completa. 
 
 #### 2. ¿Qué se puede mejorar?
 
-[¿Qué le faltó a tu prompt? ¿Qué harías diferente si pudieras reformularlo? ¿El LLM entendió mal algo por falta de claridad en tu prompt? ¿La respuesta tiene errores u omisiones? ¿Qué no cubrió el LLM que tú sí sabes por lo visto en clase?]
-
+El prompt no pidió que el LLM mostrara la configuración de inyección de dependencias 
 
 #### 3. Respuesta final
 
-[Escribe tu respuesta definitiva a la pregunta del parcial, integrando lo que aprendiste del LLM pero yendo más allá. Corrige errores, llena omisiones, conecta con conceptos vistos en clase. Esta es tu respuesta: demuestra que tú dominas el tema.]
+El diseño del LLM es correcto y respeta la regla de dependencia. Los puntos importantes:
+- ProcesarPagoUseCase depende de interfaces (RepositorioPago, PasarelaPago, ServicioNotificacion), no de implementaciones.
+- Las implementaciones (PagoRepositorioPostgres, EmailNotificacion) están en Adapters e implementan las interfaces de Use Cases. El flujo de dependencia va de afuera hacia adentro.
+- PagoController está en Adapters y llama al Use Case, no al reves.
+
+Lo que falto en la respuesta: la testeabilidad es la principal ventaja de este diseño. Se puede probar ProcesarPagoUseCase con mocks de RepositorioPago y PasarelaPago :
+
+
+void debeMarcarPagoAprobadoCuandoPasarelaAprueba() {
+    RepositorioPago repoMock = mock(RepositorioPago.class);
+    PasarelaPago pasarelaMock = mock(PasarelaPago.class);
+    ServicioNotificacion notifMock = mock(ServicioNotificacion.class);
+    
+    when(pasarelaMock.cobrar(any())).thenReturn(new ResultadoPago(true, "Aprobado"));
+    
+    ProcesarPagoUseCase useCase = new ProcesarPagoUseCase(repoMock, pasarelaMock, notifMock);
+    ResultadoPago resultado = useCase.ejecutar(pago, comprador, vendedor);
+    
+    assertTrue(resultado.isAprobado());
+    verify(repoMock).guardar(any());
+}
+```
+
+Esto no seria posible con el `PaymentService` monolítico original.

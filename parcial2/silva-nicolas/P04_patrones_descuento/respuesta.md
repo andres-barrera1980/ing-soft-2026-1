@@ -227,11 +227,11 @@ public class OpenLibDescuentosApp {
 
 #### 1. ¿Qué hizo bien el prompt?
 
-Con la linea "Regla de negocio crítica: Estas estrategias pueden combinarse...". A obligue al LLM a pensar en la composición estructural del sistema de descuentos, y crear la logica de su caracter combinable.
+Con la linea "Regla de negocio crítica: Estas estrategias pueden combinarse...". A obligue al LLM a pensar en la composición estructural del sistema de descuentos, y crear la logica de su caracter combinable, ademas de generar el codigo para lograrlo.
 
 Obligue al LLM a realizar un proceso de descarte de patrones alternativos como el strategy, para que el mismo analizara pros y contras y optara por el decorator, que resulta ser el mas eficiente para este problema.
 
-Obligue al LLM a crear un main donde simulara dos descuentos en ejecucion, demostrando que su propuesta es efectiva y no se quedo solo en la teoria del proceso de desarrollo
+Obligue al LLM a crear un main donde simulara dos descuentos en ejecucion, demostrando que su propuesta es efectiva y no se quedo solo en la teoria del proceso de desarrollo.
 
 #### 2. ¿Qué se puede mejorar?
 

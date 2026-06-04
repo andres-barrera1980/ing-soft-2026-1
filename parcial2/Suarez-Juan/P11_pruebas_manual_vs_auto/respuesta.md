@@ -4,66 +4,18 @@
 
 ---
 
-## Pregunta [XX]: [Título resumido]
+## Pregunta [11]: Pruebas Manuales Automaticas
 
 ### Estudiante
-- **Nombre completo**: [Tu nombre y apellido]
+- **Nombre completo**: Juan Pablo Suarez Moreno
 
----
-
-### LLM utilizado
-
-| Campo | Valor |
-|---|---|
-| **Nombre del LLM** | [Claude / ChatGPT / Gemini / Copilot / DeepSeek / Qwen / Mistral / Otro / **Sin IA — respuesta propia**] |
-| **Modelo específico** | [Ej: Claude Opus 4.5, GPT-4o, Gemini 2.5 Pro, etc. Si respondes sin IA, escribe "N/A"] |
-| **¿Por qué elegiste este LLM?** | [Justifica en 1-3 oraciones. Si respondes sin IA, explica por qué decidiste no usar LLM para esta pregunta.] |
-
----
-
-### Prompt utilizado
-
-> **Si respondiste sin IA, omite esta sección y ve directamente a Análisis crítico.**
-
-```
-[Pega aquí el prompt exacto que enviaste al LLM. 
-Incluye TODO el texto, sin editar ni resumir.
-
-Un buen prompt incluye:
-- Contexto del proyecto OpenLib Market
-- El código o situación específica
-- Lo que esperas que el LLM haga
-- Restricciones (ej: "usa Java 21", "aplica SOLID")
-- Formato de salida esperado (ej: "respuesta en markdown con código Java")]
-```
-
----
-
-### Respuesta del LLM
-
-> **Si respondiste sin IA, omite esta sección y ve directamente a Análisis crítico.**
-[Pega aquí la respuesta COMPLETA del LLM, sin editar, sin resumir.
-Incluye TODO el texto, código, explicaciones que generó el LLM.
-
-Si el LLM generó código, asegúrate de que esté correctamente formateado.
-Si tuviste que hacer varias iteraciones, pega la MEJOR respuesta obtenida,
-pero menciona cuántas iteraciones hiciste.]
-```
-
----
 
 ### Análisis crítico de la respuesta
 
-#### 1. ¿Qué hizo bien el prompt?
+#### 1. Pruebas manuales
 
-[Evalúa tu propio prompt, no la respuesta del LLM. ¿El contexto fue suficiente? ¿Las restricciones fueron claras? ¿El formato de salida que pediste ayudó a obtener una buena respuesta? ¿Qué parte de tu prompt fue más efectiva? Sé específico: menciona fragmentos concretos de tu prompt que funcionaron bien.]
+Tienen ventajas principales que permiten detectar problemas de usabilidad y experiencia de usuario que un script jamas captaria, son en parte flexibles para explorar flujos inesperados sin tener un caso definido de antemano, y no requieren inversion inicial en infraestructura ni conocimiento tecnico avanzado, pero entre sus desventajas son que son lentas y no escalan bien cuando el proyecto crece, son propensas a errores humanos ya sea por fatiga o hasta algun descuido, y son costosas a largo plazo. Los tipos de pruebas que aplican aqui son pruebas exploratorias, pruebas de usabilidad, pruebas de aceptacion del usuario y pruebas para medir hasta el hoc. Para el proyecto OpenLib Market puede ser bueno hacer manual todo lo relacionado con la experiencia de busqueda y navegacion del catalogo, el flujo de compra desde la perspectiva del usuario, y cualquier pantalla nueva que no haya sido probada antes para detectar problemas de diseno antes de automatizar.
 
+#### 2. Pruebas Automatizadas
 
-#### 2. ¿Qué se puede mejorar?
-
-[¿Qué le faltó a tu prompt? ¿Qué harías diferente si pudieras reformularlo? ¿El LLM entendió mal algo por falta de claridad en tu prompt? ¿La respuesta tiene errores u omisiones? ¿Qué no cubrió el LLM que tú sí sabes por lo visto en clase?]
-
-
-#### 3. Respuesta final
-
-[Escribe tu respuesta definitiva a la pregunta del parcial, integrando lo que aprendiste del LLM pero yendo más allá. Corrige errores, llena omisiones, conecta con conceptos vistos en clase. Esta es tu respuesta: demuestra que tú dominas el tema.]
+Las pruebas automatizadas por su lado tienen la ventaja de que se pueden correr rapidamente, son consistentes y no cometen errores por cansancio como los humanos, y a largo plazo pueden reducir el costo de regresion significativamente, sus desventajas son que tienen un costo alto de implementacion inicial, y no detectan bien problemas subjetivos de la expereiencia de Usuario o pues panatallas taan bien como las manuales. Aplican especialmente para pruebas unitarias, pruebas de integracion, pruebas de regresion y pruebas de carga. El criterio clave para decidir cuando automatizar es si la prueba se va a repetir muchas veces y es poco probable que cambie pronto alguna logica del negocio. Para OpenLib Market se deberian automatizar el login y autenticacion, la logica de prestamo y devolucion de libros, las APIs del catalogo, ya que son flujos usados y repetitivos que no deberian fallar en produccion.

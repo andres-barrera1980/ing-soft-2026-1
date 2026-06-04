@@ -181,14 +181,18 @@ Como líder de QA, te sugiero que mantengamos una comunicación estrecha con el 
 
 #### 1. ¿Qué hizo bien el prompt?
 
-[Evalúa tu propio prompt, no la respuesta del LLM. ¿El contexto fue suficiente? ¿Las restricciones fueron claras? ¿El formato de salida que pediste ayudó a obtener una buena respuesta? ¿Qué parte de tu prompt fue más efectiva? Sé específico: menciona fragmentos concretos de tu prompt que funcionaron bien.]
+El prompt definio bien el rol de un Lider QA Senior con experiencia en Jira, lo que le dio un enfoque estructurado y realista a la respuesta. Tambien fue muy util que incluyera el reporte completo con los pasos de reproduccion, el resultado esperado y el obtenido para el caso de OpenLib Market. Pedir variables fijas para cada fase (responsable, accion, herramienta, estado y resultado) aseguro que la respuesta tuviera toda la informacion metodologica clave sin saltarse datos basicos.
 
 
 #### 2. ¿Qué se puede mejorar?
 
-[¿Qué le faltó a tu prompt? ¿Qué harías diferente si pudieras reformularlo? ¿El LLM entendió mal algo por falta de claridad en tu prompt? ¿La respuesta tiene errores u omisiones? ¿Qué no cubrió el LLM que tú sí sabes por lo visto en clase?]
+Al prompt le falto meter restricciones de los temas vistos en clase, como exigir que se diferenciara entre severidad e impacto del negocio, o pedir explicitamente que se explicara que pasa en Jira cuando una verificacion falla. Por otro lado, la respuesta del LLM se salto por completo la fase de clasificacion inicial (Triage) antes de la asignacion, que es donde el equipo discute si el reporte es un bug real, un duplicado o un cambio de requerimiento. Tambien trato de forma muy superficial el estado de reabierto (Reopen); lo puso en el diagrama pero no explico que accion tecnica debe hacer el tester en Jira si la correccion falla. Ademas, metio herramientas como Postman y Git en el diagnostico, cuando esas corresponden a la etapa donde el dev ya esta tirando codigo para corregir el fallo.
 
 
 #### 3. Respuesta final
 
-[Escribe tu respuesta definitiva a la pregunta del parcial, integrando lo que aprendiste del LLM pero yendo más allá. Corrige errores, llena omisiones, conecta con conceptos vistos en clase. Esta es tu respuesta: demuestra que tú dominas el tema.]
+Para manejar este problema con el boton del carrito en OpenLib Market, el flujo arranca con la deteccion, donde el tester ejecuta las pruebas del modulo, nota el bloqueo al intentar meter el sexto libro y saca las evidencias con las DevTools del navegador; en este punto el estado en Jira no existe porque apenas se esta investigando. Despues pasamos al reporte, donde el QA redacta el ticket con los pasos exactos en Jira Software y le pone una severidad alta porque frena el flujo de compras; el ticket queda en estado Nuevo o Backlog. Luego se hace el Triage y la asignacion, donde el Lider QA y el Scrum Master confirman que si es un fallo y asignan el caso a un desarrollador, moviendo el estado a Seleccionado para Desarrollo.
+
+En la fase de diagnostico, el desarrollador toma el ticket, lo pasa a En Progreso y recrea el escenario en su entorno local usando el IDE para revisar el codigo. La causa raiz mas probable es que dejaron una validacion logica fija (un "hardcoded") en el frontend de JavaScript, como un limite maximo menor o igual a cinco, que corta la ejecucion antes de mandar la peticion HTTP. Por eso el boton no reacciona y la interfaz se congela sin que el servidor llegue a enterarse o a mandar un codigo de error.
+
+Una vez encontrado el fallo, viene la correccion: el dev arregla la condicion en el codigo, monta pruebas unitarias y sube un Pull Request a GitHub; cuando sus compañeros lo aprueban y el cambio se despliega en el servidor de pruebas, el ticket pasa a Listo para QA. En la verificacion, el tester toma el ticket en estado En Pruebas, limpia el cache del entorno de Staging y recrea el flujo metiendo seis o mas libros; si el error sigue, el ticket se mueve a Reabierto para que el dev lo revise otra vez, pero si todo funciona, avanza. Finalmente, en el cierre, el tester documenta en Jira que las pruebas de regresion pasaron con exito y cambia el estado del ticket a Cerrado o Terminado, finalizando el ciclo de vida del bug.

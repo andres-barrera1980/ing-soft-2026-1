@@ -131,14 +131,31 @@ pero menciona cuántas iteraciones hiciste.]
 
 #### 1. ¿Qué hizo bien el prompt?
 
-[Evalúa tu propio prompt, no la respuesta del LLM. ¿El contexto fue suficiente? ¿Las restricciones fueron claras? ¿El formato de salida que pediste ayudó a obtener una buena respuesta? ¿Qué parte de tu prompt fue más efectiva? Sé específico: menciona fragmentos concretos de tu prompt que funcionaron bien.]
+[Evalúa tu propio prompt, no la respuesta del LLM. ¿El contexto fue suficiente?
+-Si yo diria que si porque al moento de analisar la respeusta me di cuanta qu esta bien echa 
+¿Las restricciones fueron claras?
+-si Las restricciones fueron claras porque le pedí explícitamente que definiera cada capa.
+- ¿El formato de salida que pediste ayudó a obtener una buena respuesta? 
+-Sí ayudó porque le pedí el diagrama y el código por capas separadas,y  hizo que la respuesta fuera ordenada y fácil de entender. 
+¿Qué parte de tu prompt fue más efectiva?
+-La parte más efectiva fue pedir explícitamente que definiera qué va en cada capa con ejemplos de OpenLib Market.
+ Sé específico: menciona fragmentos concretos de tu prompt que funcionaron bien.]
 
 
 #### 2. ¿Qué se puede mejorar?
 
-[¿Qué le faltó a tu prompt? ¿Qué harías diferente si pudieras reformularlo? ¿El LLM entendió mal algo por falta de claridad en tu prompt? ¿La respuesta tiene errores u omisiones? ¿Qué no cubrió el LLM que tú sí sabes por lo visto en clase?]
+[¿Qué le faltó a tu prompt?
+-pueda que le halla faltado mas contexo para una respuesta mucho mejor apesar que esta esta bien segun mi analisis.
+ ¿Qué harías diferente si pudieras reformularlo?
+-mas contexto y mas espesifico con la salida que deseo.
+ ¿El LLM entendió mal algo por falta de claridad en tu prompt?
+ -segun lo que vi no porque salio la salida tal caul com la pedi en el promt 
+  ¿La respuesta tiene errores u omisiones?
+  -yo diria que no
+   ¿Qué no cubrió el LLM que tú sí sabes por lo visto en clase?
+   -pues no explico tan explisito la arquitectura tanto la tradicional como la clean ya que ne a calse no la vimos tan por ensima omo esta en promt]
 
 
 #### 3. Respuesta final
 
-[Escribe tu respuesta definitiva a la pregunta del parcial, integrando lo que aprendiste del LLM pero yendo más allá. Corrige errores, llena omisiones, conecta con conceptos vistos en clase. Esta es tu respuesta: demuestra que tú dominas el tema.]
+[Que el módulo de pagos esta  separado en capas donde  cada componente tiene su responsabilidad. El caso de uso solo conoce interfaces, nunca implementaciones concretas, lo que lo hace testeable sin infraestructura real.]

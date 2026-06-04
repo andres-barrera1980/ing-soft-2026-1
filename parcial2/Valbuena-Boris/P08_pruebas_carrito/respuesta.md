@@ -484,14 +484,33 @@ A nivel de arquitectura de software, si el sistema escala, recomendaría agregar
 
 #### 1. ¿Qué hizo bien el prompt?
 
-[Evalúa tu propio prompt, no la respuesta del LLM. ¿El contexto fue suficiente? ¿Las restricciones fueron claras? ¿El formato de salida que pediste ayudó a obtener una buena respuesta? ¿Qué parte de tu prompt fue más efectiva? Sé específico: menciona fragmentos concretos de tu prompt que funcionaron bien.]
+El prompt fue bastante completo porque identificó claramente las reglas de negocio que debían probarse, especialmente el mínimo de 1 ítem para checkout y el máximo de 10 ítems diferentes. También especificó el uso de JUnit 5, Mockito, @Mock, @InjectMocks y assertThrows, lo que ayudó a obtener pruebas alineadas con las buenas prácticas. Además, pedir explícitamente casos borde como el carrito lleno con 10 ítems y el intento de agregar el ítem 11 permitió cubrir las validaciones más importantes del servicio.
 
 
 #### 2. ¿Qué se puede mejorar?
 
-[¿Qué le faltó a tu prompt? ¿Qué harías diferente si pudieras reformularlo? ¿El LLM entendió mal algo por falta de claridad en tu prompt? ¿La respuesta tiene errores u omisiones? ¿Qué no cubrió el LLM que tú sí sabes por lo visto en clase?]
+La respuesta cubrió la mayoría de los métodos públicos y utilizó correctamente Mockito para simular RepositorioLibro. También probó validarParaCheckout() y el caso de agregar un ítem ya existente.
+
+Sin embargo, afirmar que tiene 100% de cobertura es exagerado porque faltan algunos escenarios relevantes:
+
+Agregar exactamente 10 ítems diferentes y verificar que sí está permitido.
+Agregar el mismo libro cuando el carrito ya tiene 10 ítems distintos para comprobar que no lanza excepción.
+Intentar agregar una cantidad negativa (solo probó cantidad 0).
+Verificar que cantidadItemsUnicos() retorna correctamente 10 cuando el carrito está lleno.
+Verificar que después de remover un ítem del carrito lleno se puede volver a agregar otro diferente.
+
+Estos casos ayudan a validar mejor los límites de la regla de negocio.
 
 
 #### 3. Respuesta final
 
-[Escribe tu respuesta definitiva a la pregunta del parcial, integrando lo que aprendiste del LLM pero yendo más allá. Corrige errores, llena omisiones, conecta con conceptos vistos en clase. Esta es tu respuesta: demuestra que tú dominas el tema.]
+La respuesta del LLM es correcta porque prueba todos los metodos publicos de CarritoService, utiliza Mockito adecuadamente para aislar RepositorioLibro y cubre la mayoria de reglas de negocio importantes.
+
+Se validan correctamente los casos de exito y error de agregarItem, incluyendo libro inexistente, cantidad invalida, stock insuficiente y el intento de agregar el item numero 11. Tambien se prueban removerItem, calcularTotal, vaciar y validarParaCheckout.
+
+Sin embargo, agregaria dos pruebas adicionales:
+
+Verificar que un carrito con exactamente 10 items unicos sigue funcionando normalmente.
+Verificar que cuando ya existen 10 items unicos, agregar mas cantidad a un item existente no genera excepcion porque no aumenta la cantidad de items diferentes.
+
+En general, la suite propuesta tiene una cobertura alta, respeta las reglas de negocio y es mucho mejor que realizar pruebas manuales, ya que permite detectar regresiones de forma automatica y repetible.

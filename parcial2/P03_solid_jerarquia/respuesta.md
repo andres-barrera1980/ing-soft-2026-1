@@ -4,66 +4,71 @@
 
 ---
 
-## Pregunta [XX]: [Título resumido]
+## Pregunta [03]: [Solid jerarquia]
 
 ### Estudiante
-- **Nombre completo**: [Tu nombre y apellido]
+- **Marlon Garcia**: [Tu nombre y apellido]
 
 ---
 
-### LLM utilizado
 
-| Campo | Valor |
-|---|---|
-| **Nombre del LLM** | [Claude / ChatGPT / Gemini / Copilot / DeepSeek / Qwen / Mistral / Otro / **Sin IA — respuesta propia**] |
-| **Modelo específico** | [Ej: Claude Opus 4.5, GPT-4o, Gemini 2.5 Pro, etc. Si respondes sin IA, escribe "N/A"] |
-| **¿Por qué elegiste este LLM?** | [Justifica en 1-3 oraciones. Si respondes sin IA, explica por qué decidiste no usar LLM para esta pregunta.] |
+### Respuesta sin IA 
 
----
+La clase viola principalmente el principio de segregación de interfaces+, porque la interfaz Usuario obliga a todos los tipos de usuario a implementar métodos que no necesariamente le corresponden. Por ejemplo, un comprador no debería estar obligado a tener métodos como vender, generarReporteVentas o gestionarUsuarios, ya que esas acciones pertenecen a otros roles como vendedor o administrador.
 
-### Prompt utilizado
+Esto provoca que algunas clases tengan que implementar métodos innecesarios y manejar esos casos lanzando excepciones como “no autorizado”. Sin embargo, esa excepción no debería ser necesaria si las responsabilidades estuvieran bien separadas en interfaces más específicas.
 
-> **Si respondiste sin IA, omite esta sección y ve directamente a Análisis crítico.**
+Además, también viola el principio de sustitución de Liskov ,porque si una clase Comprador implementa Usuario, debería poder usarse en cualquier lugar donde se espere un Usuario sin romper el comportamiento esperado. Pero si al llamar métodos como vender o gestionarUsuarios el comprador lanza una excepción, entonces no puede sustituir correctamente a la interfaz Usuario.
+
+Una mejor solución sería dividir la interfaz en interfaces más pequeñas, por ejemplo: `Comprador`, `Vendedor` y `Administrador`, cada una con los métodos que deberia tener en vez de que usuario embeba todos.
+
+### Refactor del codigo 
+```java
+
+public interface Usuario {
+    String getNombre();
+    String getEmail();
+}
+
+// ======Interfaces específicas por rol=====
+
+// Solo los usuarios que pueden comprar implementan esta interfaz.
+public interface Comprador extends Usuario {
+    void comprar(Libro libro);
+}
+
+// Solo los usuarios que pueden vender implementan esta interfaz.
+public interface Vendedor extends Usuario {
+    void vender(Libro libro);
+    // Podria ser una clase, pero los reportes pueden ser PDF, Excel, etc. [factory jeje]
+    void generarReporteVentas();
+}
+
+// Solo los usuarios administradores implementan esta interfaz.
+public interface Administrador extends Usuario {
+    void gestionarUsuarios(Usuario usuario);
+}
+
+// Esta clase evita repetir nombre y email en todos los tipos de usuario.
+public abstract class UsuarioBase implements Usuario {
+
+    private String nombre;
+    private String email;
+
+    public UsuarioBase(String nombre, String email) {
+        this.nombre = nombre;
+        this.email = email;
+    }
+
+    @Override
+    public String getNombre() {
+        return nombre;
+    }
+
+    @Override
+    public String getEmail() {
+        return email;
+    }
+}
 
 ```
-[Pega aquí el prompt exacto que enviaste al LLM. 
-Incluye TODO el texto, sin editar ni resumir.
-
-Un buen prompt incluye:
-- Contexto del proyecto OpenLib Market
-- El código o situación específica
-- Lo que esperas que el LLM haga
-- Restricciones (ej: "usa Java 21", "aplica SOLID")
-- Formato de salida esperado (ej: "respuesta en markdown con código Java")]
-```
-
----
-
-### Respuesta del LLM
-
-> **Si respondiste sin IA, omite esta sección y ve directamente a Análisis crítico.**
-[Pega aquí la respuesta COMPLETA del LLM, sin editar, sin resumir.
-Incluye TODO el texto, código, explicaciones que generó el LLM.
-
-Si el LLM generó código, asegúrate de que esté correctamente formateado.
-Si tuviste que hacer varias iteraciones, pega la MEJOR respuesta obtenida,
-pero menciona cuántas iteraciones hiciste.]
-```
-
----
-
-### Análisis crítico de la respuesta
-
-#### 1. ¿Qué hizo bien el prompt?
-
-[Evalúa tu propio prompt, no la respuesta del LLM. ¿El contexto fue suficiente? ¿Las restricciones fueron claras? ¿El formato de salida que pediste ayudó a obtener una buena respuesta? ¿Qué parte de tu prompt fue más efectiva? Sé específico: menciona fragmentos concretos de tu prompt que funcionaron bien.]
-
-
-#### 2. ¿Qué se puede mejorar?
-
-[¿Qué le faltó a tu prompt? ¿Qué harías diferente si pudieras reformularlo? ¿El LLM entendió mal algo por falta de claridad en tu prompt? ¿La respuesta tiene errores u omisiones? ¿Qué no cubrió el LLM que tú sí sabes por lo visto en clase?]
-
-
-#### 3. Respuesta final
-
-[Escribe tu respuesta definitiva a la pregunta del parcial, integrando lo que aprendiste del LLM pero yendo más allá. Corrige errores, llena omisiones, conecta con conceptos vistos en clase. Esta es tu respuesta: demuestra que tú dominas el tema.]

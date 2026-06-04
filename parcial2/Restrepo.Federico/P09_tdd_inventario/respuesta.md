@@ -361,5 +361,7 @@ public class ControlInventarioService {
 ---
 
 ### Análisis crítico de la respuesta
-
+Pedir RED, GREEN y REFACTOR separados funcionó bien, el LLM respetó el orden y la fase GREEN fue honesta con la duplicación a propósito. El REFACTOR quedó limpio y los tests no cambiaron.
+Lo que falló: los comentarios de RED son todos iguales y no distinguen por qué falla cada test específicamente. Faltó un test para cuando el libro no existe, el código lo maneja con NoSuchElementException pero nadie lo verifica. Y reponerStock no extrajo el cambio de estado a DISPONIBLE como método privado, quedó inconsistente.
+Para la próxima le pediría que detalle mejor los fallos en RED y que cubra el caso del libro no encontrado.
 

@@ -4,10 +4,10 @@
 
 ---
 
-## Pregunta [XX]: [Título resumido]
+## Pregunta [6]: [P06_clean_architecture]
 
 ### Estudiante
-- **Nombre completo**: [Tu nombre y apellido]
+- **Nombre completo**: [Jhoan Galeano]
 
 ---
 
@@ -15,9 +15,9 @@
 
 | Campo | Valor |
 |---|---|
-| **Nombre del LLM** | [Claude / ChatGPT / Gemini / Copilot / DeepSeek / Qwen / Mistral / Otro / **Sin IA — respuesta propia**] |
-| **Modelo específico** | [Ej: Claude Opus 4.5, GPT-4o, Gemini 2.5 Pro, etc. Si respondes sin IA, escribe "N/A"] |
-| **¿Por qué elegiste este LLM?** | [Justifica en 1-3 oraciones. Si respondes sin IA, explica por qué decidiste no usar LLM para esta pregunta.] |
+| **Nombre del LLM** | **Sin IA — respuesta propia**] |
+| **Modelo específico** | ["N/A"] |
+| **¿Por qué elegiste este LLM?** | No use IA debido a que la pregunta es teorica y se puede hacer analizando] |
 
 ---
 
@@ -66,4 +66,6 @@ pero menciona cuántas iteraciones hiciste.]
 
 #### 3. Respuesta final
 
-[Escribe tu respuesta definitiva a la pregunta del parcial, integrando lo que aprendiste del LLM pero yendo más allá. Corrige errores, llena omisiones, conecta con conceptos vistos en clase. Esta es tu respuesta: demuestra que tú dominas el tema.]
+[Esta arquitectura se organiza en círculos de adentro hacia afuera y lo que está afuera puede ver hacia adentro, pero lo de adentro no puede ver hacia afuera.
+
+Si se aplica a OpenLib Market, en el puro centro estarían las Entidades, que son los datos básicos como el Libro o el Usuario con sus reglas simples. Encima de eso van los Casos de Uso, que son las acciones de la aplicación como "Procesar Compra" o "Buscar Libro". en esta no se usa IA.]

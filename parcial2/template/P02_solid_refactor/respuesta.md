@@ -192,3 +192,26 @@ Spring inyecta automáticamente esta nueva implementación en la lista de `estra
 
 ### Análisis crítico de la respuesta
 
+#### 1. ¿Qué hizo bien el prompt?
+
+El prompt fue muy efectivo en tres aspectos. Primero, **la restricción de usar enum** en lugar de Strings mágicos orientó al LLM hacia un diseño más robusto — el LLM creó el enum `TipoPago` exactamente como se pidió. Segundo, pedir que el LLM demostrara la extensión con criptomonedas **forzó verificar que el diseño cumple OCP** en la práctica, no solo en teoría. Tercero, descartar alternativas reveló que el LLM conoce la diferencia entre Strategy y Factory.
+
+La parte de pedir "justificación técnica específica citando el código" produjo análisis más precisos que un prompt genérico.
+
+#### 2. ¿Qué se puede mejorar?
+
+El LLM no abordó **el manejo de errores y reintentos**: ¿qué pasa si el pago con tarjeta falla por timeout? El diseño no muestra cómo cada estrategia propaga excepciones. En un contexto real de e-commerce, esto es crítico.
+
+También omitió **la transaccionalidad**: si el pago se procesa exitosamente pero falla el registro en DB después, ¿qué pasa? El diseño no contempla un patrón de compensación o saga para pagos distribuidos.
+
+El prompt tampoco pidió pruebas unitarias, lo que habría demostrado la testabilidad del diseño.
+
+#### 3. Respuesta final
+
+**Principios violados**:
+
+- **OCP** (principal): El `if-else` en `procesar()` debe modificarse por cada nuevo método de pago. El código existente cambia para acomodar extensiones — exactamente lo que OCP prohíbe.
+- **SRP**: `ProcesadorPago` conoce el protocolo de tres pasarelas distintas. Si cambia el proveedor de PSE, esta clase cambia.
+- **DIP**: No hay ninguna abstracción entre el selector de método de pago y la lógica de cada método.
+
+**El diseño del LLM es correcto y bien estructurado**. El truco del constructor que recibe `List<EstrategiaPago>` de Spring es particularmente elegante — Spring inyecta automáticamente todas las implementaciones de `EstrategiaPago` encontradas en el contexto, sin necesidad de registro manual.

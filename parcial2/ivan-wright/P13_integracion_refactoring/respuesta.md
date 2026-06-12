@@ -1,0 +1,215 @@
+# Plantilla de entrega — Parcial 2
+
+---
+
+## Pregunta P13: Integración — Refactoring
+
+### Estudiante
+- **Nombre completo**: Ivan Wright
+
+---
+
+### LLM utilizado
+
+| Campo | Valor |
+|---|---|
+| **Nombre del LLM** | Gemini |
+| **Modelo especifico** | Gemini 3.1 Pro |
+| **¿Por que elegiste este LLM?** | Lo elegi porque es extremadamente rapido detectando bad smells en Java y generando codigo estructurado usando patrones clasicos como Strategy y buenas practicas de inyeccion de dependencias. |
+
+---
+
+### Prompt utilizado
+
+> **Si respondiste sin IA, omite esta sección y ve directamente a Análisis crítico.**
+
+```text
+hola gemini, actua como un Tech Lead en Java.
+
+[CONTEXTO]
+Basicamente un junior en OpenLib Market escribio una clase `Notificador` que tiene un metodo `enviar` lleno de bloques if-else para mandar EMAIL, SMS y PUSH, y ademas guarda un log escribiendo directo en el disco (`/var/log/openlib/notificaciones.log`). Aca te dejo el codigo original en mente para que lo refactorices.
+
+[PROBLEMA]
+Primeramente necesito que refactorices esta clase integralmente. Tienes que identificar que principios SOLID se estan violando, aplicar un patron de diseño para solucionarlo, e incluir pruebas unitarias con JUnit 5 y Mockito.
+
+[RESTRICCIONES]
+Seguidamente para tu solucion debes cumplir esto:
+- Explicar que principio SOLID violaba el codigo original.
+- Justificar el patron de diseño que elegiste.
+- Separar la logica de logging de la logica de notificacion.
+- Entregar pruebas unitarias para tu solucion aislando la base de datos o el disco.
+
+[FORMATO]
+Ahi entregame todo en markdown separando las explicaciones, el codigo refactorizado y las pruebas unitarias en bloques de codigo distintos.
+
+[VALIDACION]
+Sabre que tu refactoring sirvio si el dia de mañana puedo agregar un nuevo canal de notificacion (como WhatsApp) sin tener que tocar ni modificar la clase principal.
+```
+
+---
+
+### Respuesta del LLM
+
+> **Si respondiste sin IA, omite esta sección y ve directamente a Análisis crítico.**
+
+```markdown
+¡Hola! Excelente iniciativa para mejorar la calidad del código de OpenLib Market. El código original del desarrollador junior es un clásico ejemplo de código altamente acoplado. Vamos a refactorizarlo profesionalmente.
+
+### 1. Principios SOLID Violados
+El código original violaba dos principios fundamentales de diseño:
+*   **Single Responsibility Principle (SRP):** La clase `Notificador` hacía tres cosas totalmente distintas: decidía la lógica del canal a usar, enviaba el mensaje, y gestionaba la escritura física en un archivo de texto en el disco duro.
+*   **Open/Closed Principle (OCP):** El código no estaba cerrado a la modificación. Si mañana querías agregar un nuevo canal (ej. WhatsApp), te obligaba a abrir la clase principal y añadir otro bloque `else if`, arriesgándote a romper lo que ya funcionaba.
+
+### 2. Patrón de Diseño Seleccionado
+Para erradicar los múltiples `if-else` acoplados, aplicaremos el patrón **Strategy** (Estrategia). Este patrón de comportamiento nos permite definir una familia de algoritmos (los canales de notificación), encapsular cada uno en su propia clase e inyectarlos, haciéndolos totalmente intercambiables sin alterar el contexto que los utiliza.
+
+### 3. Código Refactorizado en Java
+
+Primero, creamos interfaces limpias para abstraer las responsabilidades de notificar y de registrar logs.
+
+```java
+public interface CanalNotificacion {
+    boolean soporta(String tipo);
+    void enviar(String destinatario, String mensaje);
+}
+
+public interface LoggerService {
+    void registrar(String tipo, String destinatario, String mensaje);
+}
+```
+
+Luego, implementamos las estrategias específicas por cada canal:
+
+```java
+public class EmailNotificacion implements CanalNotificacion {
+    @Override
+    public boolean soporta(String tipo) { return "EMAIL".equals(tipo); }
+    @Override
+    public void enviar(String destinatario, String mensaje) {
+        System.out.println("Enviando EMAIL a " + destinatario + ": " + mensaje);
+    }
+}
+
+public class SmsNotificacion implements CanalNotificacion {
+    @Override
+    public boolean soporta(String tipo) { return "SMS".equals(tipo); }
+    @Override
+    public void enviar(String destinatario, String mensaje) {
+        System.out.println("Enviando SMS a " + destinatario + ": " + mensaje);
+    }
+}
+```
+
+Implementamos el Logger separado de la lógica de negocio, encapsulando la escritura:
+
+```java
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+
+public class FileLoggerService implements LoggerService {
+    @Override
+    public void registrar(String tipo, String destinatario, String mensaje) {
+        try {
+            Files.write(Paths.get("/var/log/openlib/notificaciones.log"),
+                (tipo + "|" + destinatario + "|" + mensaje + "\n").getBytes(),
+                StandardOpenOption.APPEND);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
+```
+
+Finalmente, nuestro `Notificador` queda totalmente limpio y cerrado a modificaciones:
+
+```java
+import java.util.List;
+
+public class Notificador {
+    private final List<CanalNotificacion> canales;
+    private final LoggerService logger;
+
+    public Notificador(List<CanalNotificacion> canales, LoggerService logger) {
+        this.canales = canales;
+        this.logger = logger;
+    }
+
+    public void enviar(String tipo, String destinatario, String mensaje) {
+        CanalNotificacion canalSeleccionado = canales.stream()
+            .filter(c -> c.soporta(tipo))
+            .findFirst()
+            .orElseThrow(() -> new IllegalArgumentException("Canal no soportado: " + tipo));
+
+        canalSeleccionado.enviar(destinatario, mensaje);
+        logger.registrar(tipo, destinatario, mensaje);
+    }
+}
+```
+
+### 4. Pruebas Unitarias (JUnit 5 y Mockito)
+
+```java
+import org.junit.jupiter.api.Test;
+import java.util.Arrays;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.*;
+
+class NotificadorTest {
+
+    @Test
+    void enviar_CanalSoportado_DebeLlamarAlCanalYAlLogger() {
+        // Arrange
+        CanalNotificacion emailMock = mock(CanalNotificacion.class);
+        when(emailMock.soporta("EMAIL")).thenReturn(true);
+        LoggerService loggerMock = mock(LoggerService.class);
+        
+        Notificador notificador = new Notificador(Arrays.asList(emailMock), loggerMock);
+
+        // Act
+        notificador.enviar("EMAIL", "juan@test.com", "Hola");
+
+        // Assert
+        verify(emailMock).enviar("juan@test.com", "Hola");
+        verify(loggerMock).registrar("EMAIL", "juan@test.com", "Hola");
+    }
+
+    @Test
+    void enviar_CanalNoSoportado_DebeLanzarExcepcion() {
+        // Arrange
+        Notificador notificador = new Notificador(Arrays.asList(), mock(LoggerService.class));
+        
+        // Act & Assert
+        assertThrows(IllegalArgumentException.class, () -> {
+            notificador.enviar("WHATSAPP", "juan@test.com", "Hola");
+        });
+    }
+}
+```
+Con este diseño moderno, si quieres agregar WhatsApp, solo creas la clase `WhatsappNotificacion implements CanalNotificacion` y la inyectas a la lista. No tocas `Notificador` en absoluto. Misión cumplida.
+```
+
+---
+
+### Analisis critico de la respuesta
+
+#### 1. ¿Que hizo bien el prompt?
+
+Primeramente el prompt fue super claro al exigirle al LLM que identificara explicitamente los principios SOLID que se estaban rompiendo. Ahi evite que simplemente me escupiera el codigo arreglado sin enseñarme nada de teoria de diseño. Seguidamente pedirle que incluyera pruebas aislando obligatoriamente el disco fue la jugada maestra, porque lo obligo a crear interfaces limpias (DIP) para poder inyectar Mockito en los tests en lugar de acoplarse al sistema operativo.
+
+
+#### 2. ¿Que se puede mejorar?
+
+Basicamente me falto pedirle a la IA que aplicara buenas practicas empresariales y frameworks reales para llevar esto a produccion. Al no hacer eso, la IA me programo un Logger casero usando `Files.write` en lugar de sugerirme una solucion limpia y estandarizada de Java, y tampoco me explico como inyectar agilmente la lista de canales usando el propio framework en el que esta basado OpenLib Market (Spring Boot).
+
+
+#### 3. Respuesta final
+
+Primeramente el LLM identifico a la perfeccion que el codigo original violaba el Single Responsibility Principle (SRP) al mezclar logica de logging y notificacion, y el Open/Closed Principle (OCP) al depender de una cadena de if-else para escoger el canal. 
+
+Seguidamente, el patron Strategy que aplico fue la eleccion mas optima y adecuada. Aca la nueva version si permite agregar un nuevo canal (como WhatsApp) solo creando una clase nueva que implemente la interfaz, sin modificar para nada la clase `Notificador`, respetando asi el principio OCP. Ademas la solucion es 100% testeable gracias a la inyeccion de dependencias, lo cual le permitio al LLM aislar el disco duro en las pruebas unitarias usando Mockito.
+
+Sin embargo, si yo tuviera que implementar esto en produccion real para OpenLib Market jamas usaria la solucion exacta del LLM. Modificaria dos cosas graves. Primeramente reemplazaria esa clase casera `FileLoggerService` por una libreria profesional y real como SLF4J con Logback o Log4j2. *Escribir en disco directamente con `Files.write` en un sistema de alta concurrencia como OpenLib Market es super peligroso y bloqueria los hilos principales; las librerias reales manejan logs asincronos y rotacion de archivos automaticamente*.
+
+Basicamente la segunda modificacion seria aprovechar el framework del proyecto. En lugar de pasar la lista de canales a mano en el constructor como hizo la IA, le agregaria las anotaciones de Spring Boot (`@Service` y `@Component`) a las estrategias para que Spring haga un auto-discovery y me inyecte la lista completa de `CanalNotificacion` de forma automatica sin que yo tenga que armar listas manuales en ningun lado.

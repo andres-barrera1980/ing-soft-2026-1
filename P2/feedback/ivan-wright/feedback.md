@@ -8,7 +8,7 @@
 
 ## Resumen ejecutivo
 
-**Nota final: 38.4 / 50 (76.8%)**
+**Nota final: 38.9 / 50 (77.8%)**
 
 Buen desempeño general. Los prompts están bien estructurados siguiendo el patrón CONTEXTO → PROBLEMA → RESTRICCIONES → FORMATO → VALIDACIÓN, lo cual garantiza respuestas de calidad del LLM. El análisis es sólido en la mayoría de preguntas: el estudiante identifica omisiones del LLM y propone mejoras concretas. Las tres preguntas declaradas "Sin IA" (P01, P03, P06) fueron penalizadas por evidencia de uso de LLM. Las áreas de mejora están en la profundidad del análisis en algunas preguntas teóricas (P10, P12) y en la evaluación más crítica de las respuestas del LLM cuando comete errores conceptuales.
 
@@ -136,11 +136,9 @@ Buen desempeño general. Los prompts están bien estructurados siguiendo el patr
 
 **Respuesta del LLM:** Buena. Tabla comparativa clara, explicaciones correctas de arquitectura (hypervisor vs Docker engine), ventajas de cada uno realistas. Pitfalls bien identificados (overprovisioning, fat containers).
 
-**Análisis del estudiante:** Identifica omisión crítica: los contenedores comparten el kernel del host, lo cual es un problema de seguridad fundamental. Explica correctamente que un Kernel Panic afecta todos los contenedores vs el aislamiento de hardware en VMs.
+**Análisis del estudiante:** Bueno. Identifica omisión crítica: los contenedores comparten el kernel del host, lo cual es un problema de seguridad fundamental. Explica correctamente que un Kernel Panic afecta todos los contenedores vs el aislamiento de hardware en VMs. Fue capaz de abstraer información relevante del prompt del LLM y construir un análisis sólido.
 
-**Área de mejora:** El análisis es correcto pero breve. Podría haber profundizado más en los pitfalls o haber conectado con conceptos de orquestación (Kubernetes) que complementan la discusión de containers.
-
-**Nota:** 3.5/5
+**Nota:** 4.0/5
 
 ---
 
@@ -199,14 +197,14 @@ Buen desempeño general. Los prompts están bien estructurados siguiendo el patr
 | P07 | Clean Architecture — Pagos | 4 | 88% | 100% | 4.0 |
 | P08 | Pruebas — CarritoService | 5 | 85% | 90% | 4.5 |
 | P09 | TDD — ControlInventario | 4 | 80% | 87% | 3.5 |
-| P10 | VM vs Containers | 5 | 82% | 70% | 3.5 |
+| P10 | VM vs Containers | 5 | 82% | 80% | 4.0 |
 | P11 | Pruebas manuales vs auto | 4 | 85% | 78% | 3.2 |
 | P12 | Ciclo de vida defectos | 3 | 78% | 76% | 2.4 |
 | P13 | Integración — Refactoring | 3 | 85% | 82% | 2.6 |
-| | **Subtotal** | **50** | | | **37.9** |
+| | **Subtotal** | **50** | | | **38.4** |
 | | Bonificaciones | | | | +0.5 |
 | | Penalizaciones | | | | −6.0 (P01, P03, P06: integridad) |
-| | **NOTA FINAL** | | | | **38.4 / 50** |
+| | **NOTA FINAL** | | | | **38.9 / 50** |
 
 ---
 

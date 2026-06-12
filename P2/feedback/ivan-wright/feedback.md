@@ -8,7 +8,7 @@
 
 ## Resumen ejecutivo
 
-**Nota final: 37.8 / 50 (75.6%)**
+**Nota final: 38.1 / 50 (76.2%)**
 
 Buen desempeño general. Los prompts están bien estructurados siguiendo el patrón CONTEXTO → PROBLEMA → RESTRICCIONES → FORMATO → VALIDACIÓN, lo cual garantiza respuestas de calidad del LLM. El análisis es sólido en la mayoría de preguntas: el estudiante identifica omisiones del LLM y propone mejoras concretas. Las tres preguntas declaradas "Sin IA" (P01, P03, P06) fueron penalizadas por evidencia de uso de LLM. Las áreas de mejora están en la profundidad del análisis en algunas preguntas teóricas (P10, P12) y en la evaluación más crítica de las respuestas del LLM cuando comete errores conceptuales.
 
@@ -112,7 +112,7 @@ Buen desempeño general. Los prompts están bien estructurados siguiendo el patr
 
 **Bonus:** +0.5 por commits que muestran evolución (prompt primero, análisis después).
 
-**Nota:** 4.2/5
+**Nota:** 4.5/5
 
 ---
 
@@ -197,16 +197,16 @@ Buen desempeño general. Los prompts están bien estructurados siguiendo el patr
 | P05 | Patrones — Notificaciones | 5 | 85% | 84% | 4.2 |
 | P06 ⭐ | Clean Architecture — Conceptos (Sin IA) | 4 | N/A | 100%−penalización | 1.5 |
 | P07 | Clean Architecture — Pagos | 4 | 88% | 100% | 4.0 |
-| P08 | Pruebas — CarritoService | 5 | 85% | 84% | 4.2 |
+| P08 | Pruebas — CarritoService | 5 | 85% | 90% | 4.5 |
 | P09 | TDD — ControlInventario | 4 | 80% | 80% | 3.2 |
 | P10 | VM vs Containers | 5 | 82% | 70% | 3.5 |
 | P11 | Pruebas manuales vs auto | 4 | 85% | 78% | 3.2 |
 | P12 | Ciclo de vida defectos | 3 | 78% | 76% | 2.4 |
 | P13 | Integración — Refactoring | 3 | 85% | 82% | 2.6 |
-| | **Subtotal** | **50** | | | **37.3** |
+| | **Subtotal** | **50** | | | **37.6** |
 | | Bonificaciones | | | | +0.5 |
 | | Penalizaciones | | | | −6.0 (P01, P03, P06: integridad) |
-| | **NOTA FINAL** | | | | **37.8 / 50** |
+| | **NOTA FINAL** | | | | **38.1 / 50** |
 
 ---
 

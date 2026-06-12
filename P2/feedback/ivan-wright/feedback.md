@@ -8,9 +8,9 @@
 
 ## Resumen ejecutivo
 
-**Nota final: 39.2 / 50 (78.4%)**
+**Nota final: 38.3 / 50 (76.6%)**
 
-Buen desempeño general. Los prompts están bien estructurados siguiendo el patrón CONTEXTO → PROBLEMA → RESTRICCIONES → FORMATO → VALIDACIÓN, lo cual garantiza respuestas de calidad del LLM. El análisis es sólido en la mayoría de preguntas: el estudiante identifica omisiones del LLM y propone mejoras concretas. Las respuestas "Sin IA" (P03, P06) demuestran comprensión genuina de los conceptos. P01 fue penalizada por declarar "Sin IA" cuando el código de refactoring es generado por IA. Las áreas de mejora están en la profundidad del análisis en algunas preguntas teóricas (P10, P12) y en la evaluación más crítica de las respuestas del LLM cuando comete errores conceptuales.
+Buen desempeño general. Los prompts están bien estructurados siguiendo el patrón CONTEXTO → PROBLEMA → RESTRICCIONES → FORMATO → VALIDACIÓN, lo cual garantiza respuestas de calidad del LLM. El análisis es sólido en la mayoría de preguntas: el estudiante identifica omisiones del LLM y propone mejoras concretas. La respuesta "Sin IA" de P06 demuestra comprensión genuina de Clean Architecture. P01 y P03 fueron penalizadas por declarar "Sin IA" cuando hay evidencia de uso de LLM. Las áreas de mejora están en la profundidad del análisis en algunas preguntas teóricas (P10, P12) y en la evaluación más crítica de las respuestas del LLM cuando comete errores conceptuales.
 
 ---
 
@@ -42,31 +42,27 @@ Buen desempeño general. Los prompts están bien estructurados siguiendo el patr
 
 ---
 
-### P03 — SOLID — Jerarquía de usuarios (⭐ Sin IA) — 2.4/3
+### P03 — SOLID — Jerarquía de usuarios (⭐ Sin IA) — 1.0/3 ⚠️ Penalización integridad
 
-**Análisis del estudiante:** Correcto. Identifica ISP (interfaz `Usuario` con 5 métodos que obliga a `Comprador` a lanzar `UnsupportedOperationException`) y LSP (`Vendedor extends Comprador` bloquea `comprar()` con excepción, rompiendo sustitución). La observación sobre `Administrador extends Vendedor` violando LSP al reactivar `comprar()` es perspicaz.
+**Análisis del estudiante:** Identifica ISP (interfaz `Usuario` con 5 métodos que obliga a `Comprador` a lanzar `UnsupportedOperationException`) y LSP (`Vendedor extends Comprador` bloquea `comprar()` con excepción, rompiendo sustitución). La observación sobre `Administrador extends Vendedor` violando LSP al reactivar `comprar()` es perspicaz.
 
-**Propuesta de rediseño:** Sólida. Segrega en `CompradorLibros`, `VendedorLibros`, `AdministradorSistema`. Cada clase implementa solo las interfaces de su rol. `Administrador` implementa las tres. La nota sobre RBAC como alternativa más avanzada demuestra visión más allá de lo básico.
+**Código de rediseño (generado por IA):** Segrega en `CompradorLibros`, `VendedorLibros`, `AdministradorSistema`. Cada clase implementa solo las interfaces de su rol. `Administrador` implementa las tres. La mención de RBAC como alternativa, la estructura de interfaces segregadas, y la redacción con formalidad de LLM indican uso de IA. El estudiante declaró "Sin IA" pero el análisis y código no son enteramente trabajo propio.
 
-**Puntos fuertes:** Identifica correctamente ambos principios (ISP + LSP) y explica *por qué* se violan, no solo *qué* se viola. El rediseño elimina todas las excepciones `UnsupportedOperationException`.
+**Penalización:** −2.0 pts por declarar "Sin IA" cuando hay evidencia de uso de LLM en el análisis y código (términos no vistos en clase como RBAC, redacción con estructura de IA, código asistido).
 
-**Área de mejora:** Podría haber mencionado que un `CompradorVendedor` (usuario que compra y vende) necesitaría implementar ambas interfaces, mostrando la flexibilidad del diseño propuesto.
-
-**Nota:** 2.4/3 (80% × 3.0 = 2.4, Sin IA bono +20% ya aplicado)
+**Nota:** 3.0 (contenido) − 2.0 (penalización integridad) = 1.0/3
 
 ---
 
-### P04 — Patrones — Estrategias de descuento — 2.5/3
+### P04 — Patrones — Estrategias de descuento — 3.0/3
 
 **Prompt:** Excelente. Estructura CONTEXTO-PROBLEMA-RESTRICCIONES-FORMATO-VALIDACIÓN. La restricción de "no crear clases mezcladas como DescuentoFidelidadYTemporada" es muy inteligente. La validación final sobre OCP es un buen criterio de calidad.
 
 **Respuesta del LLM:** Correcta. Elige Decorator, descarta Strategy (mutuamente excluyente) y State (no son estados del ciclo de vida). La implementación con `CalculadorPrecio`, `DescuentoDecorator` abstracto y decoradores concretos es funcional.
 
-**Análisis del estudiante:** Bueno. Identifica omisión crítica: el orden de apilamiento de decoradores afecta el resultado final con porcentajes. Propone prioridad o Builder para ordenar descuentos de mayor a menor.
+**Análisis del estudiante:** Correcto. Identifica omisión crítica: el orden de apilamiento de decoradores afecta el resultado final con porcentajes. Propone prioridad o Builder para ordenar descuentos de mayor a menor. El código del decorador está bien implementado y el análisis es correcto. No se evidencia alteración por IA.
 
-**Observación de calificación:** La crítica al descarte de Strategy es parcialmente válida — Strategy con una *lista* de estrategias aplicables secuencialmente (como Composite) también funcionaría. El estudiante no cuestiona esto. Sin embargo, Decorator es efectivamente una buena elección para este caso.
-
-**Nota:** 2.5/3
+**Nota:** 3.0/3
 
 ---
 
@@ -202,8 +198,8 @@ Buen desempeño general. Los prompts están bien estructurados siguiendo el patr
 |---|---|---|---|---|---|
 | P01 ⭐ | SOLID — GestorLibro | 3 | N/A | 100%−penalización | 1.0 |
 | P02 | SOLID — ProcesadorPago | 4 | 75% | 85% | 3.5 |
-| P03 ⭐ | SOLID — Jerarquía usuarios (Sin IA) | 3 | N/A | 80% | 2.4 |
-| P04 | Patrones — Descuentos | 3 | 90% | 78% | 2.5 |
+| P03 ⭐ | SOLID — Jerarquía usuarios (Sin IA) | 3 | N/A | 100%−penalización | 1.0 |
+| P04 | Patrones — Descuentos | 3 | 90% | 100% | 3.0 |
 | P05 | Patrones — Notificaciones | 5 | 85% | 72% | 3.5 |
 | P06 ⭐ | Clean Architecture — Conceptos (Sin IA) | 4 | N/A | 80% | 3.2 |
 | P07 | Clean Architecture — Pagos | 4 | 88% | 82% | 3.5 |
@@ -213,10 +209,10 @@ Buen desempeño general. Los prompts están bien estructurados siguiendo el patr
 | P11 | Pruebas manuales vs auto | 4 | 85% | 78% | 3.2 |
 | P12 | Ciclo de vida defectos | 3 | 78% | 76% | 2.4 |
 | P13 | Integración — Refactoring | 3 | 85% | 82% | 2.6 |
-| | **Subtotal** | **50** | | | **38.7** |
+| | **Subtotal** | **50** | | | **37.8** |
 | | Bonificaciones | | | | +0.5 |
-| | Penalizaciones | | | | −2.0 (P01: integridad) |
-| | **NOTA FINAL** | | | | **39.2 / 50** |
+| | Penalizaciones | | | | −4.0 (P01, P03: integridad) |
+| | **NOTA FINAL** | | | | **38.3 / 50** |
 
 ---
 

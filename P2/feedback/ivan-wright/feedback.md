@@ -8,7 +8,7 @@
 
 ## Resumen ejecutivo
 
-**Nota final: 39.7 / 50 (79.4%)**
+**Nota final: 39.3 / 50 (78.6%)**
 
 Buen desempeño general. Los prompts están bien estructurados siguiendo el patrón CONTEXTO → PROBLEMA → RESTRICCIONES → FORMATO → VALIDACIÓN, lo cual garantiza respuestas de calidad del LLM. El análisis es sólido en la mayoría de preguntas: el estudiante identifica omisiones del LLM y propone mejoras concretas. Las tres preguntas declaradas "Sin IA" (P01, P03, P06) fueron penalizadas por evidencia de uso de LLM. Las áreas de mejora están en la profundidad del análisis en algunas preguntas teóricas (P10, P12) y en la evaluación más crítica de las respuestas del LLM cuando comete errores conceptuales.
 
@@ -154,17 +154,15 @@ Buen desempeño general. Los prompts están bien estructurados siguiendo el patr
 
 ---
 
-### P12 — Ciclo de vida de defectos (⭐) — 2.4/3
+### P12 — Ciclo de vida de defectos (⭐) — 2.0/3
 
 **Prompt:** Bueno. Incluye el bug report completo, pide las 7 fases con responsables, acciones, herramientas y estados Jira.
 
 **Respuesta del LLM:** Aceptable. Cubre las fases del ciclo de vida y asigna responsables correctos. Estados Jira propuestos son razonables (`NEW`, `ASSIGNED`, `IN PROGRESS`, `RESOLVED`, `IN TESTING`, `CLOSED`).
 
-**Análisis del estudiante:** Identifica dos errores graves del LLM: (1) fusiona Diagnóstico con Corrección, cuando el diagnóstico es la fase más crítica y demorada; (2) la causa raiz propuesta por el LLM ("límite de 5 items") contradice las reglas de negocio de OpenLib Market (límite real es 10). El estudiante propone la causa raiz correcta: error en el Frontend que no maneja la respuesta asíncrona del Backend.
+**Análisis del estudiante:** Demasiada intervención de IA — se nota que Ivan no lo hizo. El análisis suena a LLM en su estructura y redacción. La causa raiz que describe ("límite quemado de 5") es una simplificación de IA: el carrito tiene un límite real de 10 items; si el botón dejó de responder al item 6, la verdadera causa raiz es un defecto en el Frontend que no maneja correctamente la respuesta asíncrona del Backend, o un error de validación prematura en el JavaScript de la vista. Los estados Jira del LLM tampoco coinciden con los estados del curso (ABIERTO→EN REVISION→ASIGNADO→EN PROGRESO→EN VERIFICACION→RESUELTO→CERRADO), y el estudiante no señala esta discrepancia.
 
-**Observación de calificación:** Los estados Jira del LLM no coinciden exactamente con los estados del curso (ABIERTO→EN REVISION→ASIGNADO→EN PROGRESO→EN VERIFICACION→RESUELTO→CERRADO). El estudiante no señala esta discrepancia.
-
-**Nota:** 2.4/3
+**Nota:** 2.0/3
 
 ---
 
@@ -197,12 +195,12 @@ Buen desempeño general. Los prompts están bien estructurados siguiendo el patr
 | P09 | TDD — ControlInventario | 4 | 80% | 87% | 3.5 |
 | P10 | VM vs Containers | 5 | 82% | 80% | 4.0 |
 | P11 | Pruebas manuales vs auto | 4 | 85% | 100% | 4.0 |
-| P12 | Ciclo de vida defectos | 3 | 78% | 76% | 2.4 |
+| P12 | Ciclo de vida defectos | 3 | 78% | 67% | 2.0 |
 | P13 | Integración — Refactoring | 3 | 85% | 82% | 2.6 |
-| | **Subtotal** | **50** | | | **39.2** |
+| | **Subtotal** | **50** | | | **38.8** |
 | | Bonificaciones | | | | +0.5 |
 | | Penalizaciones | | | | −6.0 (P01, P03, P06: integridad) |
-| | **NOTA FINAL** | | | | **39.7 / 50** |
+| | **NOTA FINAL** | | | | **39.3 / 50** |
 
 ---
 

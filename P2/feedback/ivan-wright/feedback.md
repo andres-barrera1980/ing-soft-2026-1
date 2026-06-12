@@ -8,7 +8,7 @@
 
 ## Resumen ejecutivo
 
-**Nota final: 38.3 / 50 (76.6%)**
+**Nota final: 39.0 / 50 (78.0%)**
 
 Buen desempeño general. Los prompts están bien estructurados siguiendo el patrón CONTEXTO → PROBLEMA → RESTRICCIONES → FORMATO → VALIDACIÓN, lo cual garantiza respuestas de calidad del LLM. El análisis es sólido en la mayoría de preguntas: el estudiante identifica omisiones del LLM y propone mejoras concretas. La respuesta "Sin IA" de P06 demuestra comprensión genuina de Clean Architecture. P01 y P03 fueron penalizadas por declarar "Sin IA" cuando hay evidencia de uso de LLM. Las áreas de mejora están en la profundidad del análisis en algunas preguntas teóricas (P10, P12) y en la evaluación más crítica de las respuestas del LLM cuando comete errores conceptuales.
 
@@ -66,17 +66,15 @@ Buen desempeño general. Los prompts están bien estructurados siguiendo el patr
 
 ---
 
-### P05 — Patrones — Notificaciones combinadas — 3.5/5
+### P05 — Patrones — Notificaciones combinadas — 4.2/5
 
 **Prompt:** Muy bueno. Define claramente los 4 eventos que deben ocurrir, pide exactamente dos patrones combinados con diagrama Mermaid. La restricción de "no modificar la clase original del inventario" es clave. La validación sobre fallos de red es excelente.
 
 **Respuesta del LLM:** Buena. Elige Observer + Command. Observer para pub/sub dinámico, Command para encapsular acciones y permitir reintentos. Diagrama Mermaid correcto. Implementación funcional con `GestorInventario` como sujeto y observers que internamente crean comandos.
 
-**Análisis del estudiante:** Identifica correctamente que la instanciación con `new` dentro de los observers impide la inyección de dependencias de Spring. Propone Factory Method como solución, lo cual es una mejora válida.
+**Análisis del estudiante:** Buena combinación de patrones, bien justificada. Identifica correctamente que la instanciación con `new` dentro de los observers impide la inyección de dependencias de Spring. Propone Factory Method como solución, lo cual es una mejora válida. El análisis tiene apoyo de IA en la redacción pero es de menor intensidad — el contenido demuestra comprensión propia de los patrones.
 
-**Área de mejora:** El estudiante propone agregar un tercer patrón (Factory), pero la pregunta pide exactamente dos. La observación sobre DI es correcta pero la solución con Factory añade complejidad innecesaria — Spring puede inyectar beans en los observers directamente si se usan `@Component`.
-
-**Nota:** 3.5/5
+**Nota:** 4.2/5
 
 ---
 
@@ -200,7 +198,7 @@ Buen desempeño general. Los prompts están bien estructurados siguiendo el patr
 | P02 | SOLID — ProcesadorPago | 4 | 75% | 85% | 3.5 |
 | P03 ⭐ | SOLID — Jerarquía usuarios (Sin IA) | 3 | N/A | 100%−penalización | 1.0 |
 | P04 | Patrones — Descuentos | 3 | 90% | 100% | 3.0 |
-| P05 | Patrones — Notificaciones | 5 | 85% | 72% | 3.5 |
+| P05 | Patrones — Notificaciones | 5 | 85% | 84% | 4.2 |
 | P06 ⭐ | Clean Architecture — Conceptos (Sin IA) | 4 | N/A | 80% | 3.2 |
 | P07 | Clean Architecture — Pagos | 4 | 88% | 82% | 3.5 |
 | P08 | Pruebas — CarritoService | 5 | 85% | 84% | 4.2 |
@@ -209,10 +207,10 @@ Buen desempeño general. Los prompts están bien estructurados siguiendo el patr
 | P11 | Pruebas manuales vs auto | 4 | 85% | 78% | 3.2 |
 | P12 | Ciclo de vida defectos | 3 | 78% | 76% | 2.4 |
 | P13 | Integración — Refactoring | 3 | 85% | 82% | 2.6 |
-| | **Subtotal** | **50** | | | **37.8** |
+| | **Subtotal** | **50** | | | **38.5** |
 | | Bonificaciones | | | | +0.5 |
 | | Penalizaciones | | | | −4.0 (P01, P03: integridad) |
-| | **NOTA FINAL** | | | | **38.3 / 50** |
+| | **NOTA FINAL** | | | | **39.0 / 50** |
 
 ---
 

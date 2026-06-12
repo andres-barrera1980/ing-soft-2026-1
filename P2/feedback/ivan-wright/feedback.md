@@ -8,9 +8,9 @@
 
 ## Resumen ejecutivo
 
-**Nota final: 39.0 / 50 (78.0%)**
+**Nota final: 37.3 / 50 (74.6%)**
 
-Buen desempeño general. Los prompts están bien estructurados siguiendo el patrón CONTEXTO → PROBLEMA → RESTRICCIONES → FORMATO → VALIDACIÓN, lo cual garantiza respuestas de calidad del LLM. El análisis es sólido en la mayoría de preguntas: el estudiante identifica omisiones del LLM y propone mejoras concretas. La respuesta "Sin IA" de P06 demuestra comprensión genuina de Clean Architecture. P01 y P03 fueron penalizadas por declarar "Sin IA" cuando hay evidencia de uso de LLM. Las áreas de mejora están en la profundidad del análisis en algunas preguntas teóricas (P10, P12) y en la evaluación más crítica de las respuestas del LLM cuando comete errores conceptuales.
+Buen desempeño general. Los prompts están bien estructurados siguiendo el patrón CONTEXTO → PROBLEMA → RESTRICCIONES → FORMATO → VALIDACIÓN, lo cual garantiza respuestas de calidad del LLM. El análisis es sólido en la mayoría de preguntas: el estudiante identifica omisiones del LLM y propone mejoras concretas. Las tres preguntas declaradas "Sin IA" (P01, P03, P06) fueron penalizadas por evidencia de uso de LLM. Las áreas de mejora están en la profundidad del análisis en algunas preguntas teóricas (P10, P12) y en la evaluación más crítica de las respuestas del LLM cuando comete errores conceptuales.
 
 ---
 
@@ -78,15 +78,13 @@ Buen desempeño general. Los prompts están bien estructurados siguiendo el patr
 
 ---
 
-### P06 — Clean Architecture — Conceptos (⭐ Sin IA) — 3.2/4
+### P06 — Clean Architecture — Conceptos (⭐ Sin IA) — 1.5/4 ⚠️ Penalización integridad
 
-**Análisis del estudiante:** Sólido. Explica correctamente las 4 capas (Entities, Use Cases, Interface Adapters, Frameworks & Drivers), la regla de dependencia (hacia adentro), y el DIP en los límites entre capas. La analogía con la arquitectura tradicional (presentación → lógica → datos) y por qué cambiar de MySQL a MongoDB "nos cae todo el sistema" es clara y correcta.
+**Análisis del estudiante:** Explica correctamente las 4 capas (Entities, Use Cases, Interface Adapters, Frameworks & Drivers), la regla de dependencia (hacia adentro), y el DIP en los límites entre capas. La analogía con la arquitectura tradicional (presentación → lógica → datos) y por qué cambiar de MySQL a MongoDB "nos cae todo el sistema" es clara y correcta. El ejemplo de código con `RepositorioLibro` como interfaz en la capa interna y `PostgresLibroRepository` implementándola en la capa externa demuestra comprensión del DIP. Los 4 fragmentos de código están correctamente ubicados en sus capas.
 
-**Puntos fuertes:** El ejemplo de código con `RepositorioLibro` como interfaz en la capa interna y `PostgresLibroRepository` implementándola en la capa externa demuestra comprensión real del DIP. Los 4 fragmentos de código (entidad, caso de uso, controlador, repositorio) están correctamente ubicados en sus capas.
+**Penalización:** −2.0 pts por declarar "Sin IA" cuando hay evidencia de uso de LLM en el análisis (estructura pulida, terminología de IA, código asistido).
 
-**Área de mejora:** No menciona los "casos de uso" como orquestadores que coordinan las entidades — solo muestra un caso de uso que delega directamente al repositorio. Un caso de uso real coordinaría múltiples entidades y servicios.
-
-**Nota:** 3.2/4 (80% × 4.0 = 3.2, Sin IA bono +20% ya aplicado)
+**Nota:** 3.5 (contenido) − 2.0 (penalización integridad) = 1.5/4
 
 ---
 
@@ -199,7 +197,7 @@ Buen desempeño general. Los prompts están bien estructurados siguiendo el patr
 | P03 ⭐ | SOLID — Jerarquía usuarios (Sin IA) | 3 | N/A | 100%−penalización | 1.0 |
 | P04 | Patrones — Descuentos | 3 | 90% | 100% | 3.0 |
 | P05 | Patrones — Notificaciones | 5 | 85% | 84% | 4.2 |
-| P06 ⭐ | Clean Architecture — Conceptos (Sin IA) | 4 | N/A | 80% | 3.2 |
+| P06 ⭐ | Clean Architecture — Conceptos (Sin IA) | 4 | N/A | 100%−penalización | 1.5 |
 | P07 | Clean Architecture — Pagos | 4 | 88% | 82% | 3.5 |
 | P08 | Pruebas — CarritoService | 5 | 85% | 84% | 4.2 |
 | P09 | TDD — ControlInventario | 4 | 80% | 80% | 3.2 |
@@ -207,10 +205,10 @@ Buen desempeño general. Los prompts están bien estructurados siguiendo el patr
 | P11 | Pruebas manuales vs auto | 4 | 85% | 78% | 3.2 |
 | P12 | Ciclo de vida defectos | 3 | 78% | 76% | 2.4 |
 | P13 | Integración — Refactoring | 3 | 85% | 82% | 2.6 |
-| | **Subtotal** | **50** | | | **38.5** |
+| | **Subtotal** | **50** | | | **36.8** |
 | | Bonificaciones | | | | +0.5 |
-| | Penalizaciones | | | | −4.0 (P01, P03: integridad) |
-| | **NOTA FINAL** | | | | **39.0 / 50** |
+| | Penalizaciones | | | | −6.0 (P01, P03, P06: integridad) |
+| | **NOTA FINAL** | | | | **37.3 / 50** |
 
 ---
 

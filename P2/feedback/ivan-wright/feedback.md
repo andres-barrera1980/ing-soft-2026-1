@@ -1,44 +1,44 @@
 # Feedback — Parcial 2: Prompting
 
 **Estudiante:** Ivan Wright
-**LLM utilizado:** Gemini 3.1 Pro (preguntas con IA); Sin IA en P01, P03, P06
+**LLM utilizado:** Gemini 3.1 Pro (preguntas con IA); Sin IA en P03, P06. P01 declarada Sin IA pero el código de refactoring es generado por IA.
 **Fecha de revisión:** 2026-06-11
 
 ---
 
 ## Resumen ejecutivo
 
-**Nota final: 39.9 / 50 (79.8%)**
+**Nota final: 39.2 / 50 (78.4%)**
 
-Buen desempeño general. Los prompts están bien estructurados siguiendo el patrón CONTEXTO → PROBLEMA → RESTRICCIONES → FORMATO → VALIDACIÓN, lo cual garantiza respuestas de calidad del LLM. El análisis es sólido en la mayoría de preguntas: el estudiante identifica omisiones del LLM y propone mejoras concretas. Las respuestas "Sin IA" (P01, P03, P06) demuestran comprensión genuina de los conceptos. Las áreas de mejora están en la profundidad del análisis en algunas preguntas teóricas (P10, P12) y en la evaluación más crítica de las respuestas del LLM cuando comete errores conceptuales.
+Buen desempeño general. Los prompts están bien estructurados siguiendo el patrón CONTEXTO → PROBLEMA → RESTRICCIONES → FORMATO → VALIDACIÓN, lo cual garantiza respuestas de calidad del LLM. El análisis es sólido en la mayoría de preguntas: el estudiante identifica omisiones del LLM y propone mejoras concretas. Las respuestas "Sin IA" (P03, P06) demuestran comprensión genuina de los conceptos. P01 fue penalizada por declarar "Sin IA" cuando el código de refactoring es generado por IA. Las áreas de mejora están en la profundidad del análisis en algunas preguntas teóricas (P10, P12) y en la evaluación más crítica de las respuestas del LLM cuando comete errores conceptuales.
 
 ---
 
 ## Evaluación por pregunta
 
-### P01 — SOLID — Principio violado en GestorLibro (⭐ Sin IA) — 2.4/3
+### P01 — SOLID — Principio violado en GestorLibro (⭐) — 1.0/3 ⚠️ Penalización integridad
 
-**Análisis del estudiante:** Excelente trabajo identificando las violaciones SOLID línea por línea. Correctamente señala SRP (validación, slug, logging, indexación), DIP (instanciación directa de PostgreSQL, EmailService, SearchIndex) y OCP (EmailService, SearchIndex). La propuesta de refactoring con interfaces (`LibroRepository`, `NotaificacionService`, `SearchIndexer`), inyección de dependencias por constructor, y movimiento de validación/slug a la entidad `Libro` es correcta y bien ejecutada.
+**Análisis del estudiante (genuino):** El análisis textual es trabajo propio del estudiante. Identifica correctamente las violaciones SOLID línea por línea: SRP (validación, slug, logging, indexación), DIP (instanciación directa de PostgreSQL, EmailService, SearchIndex) y OCP (EmailService, SearchIndex). Las explicaciones del *por qué* cada línea viola un principio son claras y demuestran comprensión.
 
-**Puntos fuertes:** Análisis línea a línea del código original. La decisión de mover `validar()` y `generarSlug()` a la clase `Libro` es una mejora sobre la respuesta típica del LLM.
+**Código de refactoring (generado por IA):** El código de refactoring tiene el formato pulido y estructurado típico de un LLM: interfaces limpias, inyección de dependencias por constructor, entidad con métodos de dominio. El estudiante declaró "Sin IA" pero el código no es trabajo propio.
 
-**Área de mejora:** El logging queda como `LOGGER.info()` directo en el servicio. Podría haber propuesto un aspecto o decorador para logging cross-cutting, mencionando el patrón Decorator o AOP.
+**Penalización:** −2.0 pts por declarar "Sin IA" cuando hay evidencia de uso de LLM en el código de refactoring.
 
-**Nota:** 2.4/3 (80% × 3.0 = 2.4, Sin IA bono +20% ya aplicado en el %)
+**Nota:** 3.0 (contenido) − 2.0 (penalización integridad) = 1.0/3
 
 ---
 
-### P02 — SOLID — Refactoring ProcesadorPago — 3.2/4
+### P02 — SOLID — Refactoring ProcesadorPago — 3.5/4
 
 **Prompt:** Bueno. Proporciona contexto de OpenLib Market con Java 21 y Spring Boot, pide identificar al menos dos principios SOLID y refactoring con patrón de diseño. El formato markdown y las restricciones técnicas están bien definidos.
 
 **Respuesta del LLM:** Correcta. Identifica SRP y OCP, propone Strategy pattern con Spring Boot. La implementación con `List<EstrategiaPago>` inyectada y selección por stream es elegante.
 
-**Análisis del estudiante:** Bueno. Identifica que el LLM no generó pruebas ni manejó excepciones de dominio. Propone `MetodoPagoNoSoportadoException` personalizada, lo cual mejora la solución. Menciona que Strategy facilita testing con Mockito.
+**Análisis del estudiante:** Bueno. Identifica que el LLM no generó pruebas ni manejó excepciones de dominio. Propone `MetodoPagoNoSoportadoException` personalizada, lo cual mejora la solución. Menciona que Strategy facilita testing con Mockito. La respuesta y justificación del estudiante son correctas.
 
-**Observación de calificación:** El LLM identifica SRP como violado, pero como se discutió en clase, las variantes de pago (tarjeta, PSE, PayPal) son implementaciones de la *misma* responsabilidad ("procesar pago"), no responsabilidades distintas. La violación principal es OCP. El estudiante acepta el análisis del LLM sin cuestionar esta distinción.
+**Observación de calificación:** El LLM identifica SRP como violado. Como se discutió en clase, las variantes de pago son implementaciones de la *misma* responsabilidad ("procesar pago"), por lo que la violación principal es OCP. El estudiante acepta el análisis del LLM sin cuestionar esta distinción, pero su análisis adicional sobre testing y excepciones es válido.
 
-**Nota:** 3.2/4
+**Nota:** 3.5/4
 
 ---
 
@@ -200,8 +200,8 @@ Buen desempeño general. Los prompts están bien estructurados siguiendo el patr
 
 | # | Tema | Puntos | % Prompt | % Análisis | Puntaje |
 |---|---|---|---|---|---|
-| P01 ⭐ | SOLID — GestorLibro (Sin IA) | 3 | N/A | 80% | 2.4 |
-| P02 | SOLID — ProcesadorPago | 4 | 75% | 78% | 3.2 |
+| P01 ⭐ | SOLID — GestorLibro | 3 | N/A | 100%−penalización | 1.0 |
+| P02 | SOLID — ProcesadorPago | 4 | 75% | 85% | 3.5 |
 | P03 ⭐ | SOLID — Jerarquía usuarios (Sin IA) | 3 | N/A | 80% | 2.4 |
 | P04 | Patrones — Descuentos | 3 | 90% | 78% | 2.5 |
 | P05 | Patrones — Notificaciones | 5 | 85% | 72% | 3.5 |
@@ -213,10 +213,10 @@ Buen desempeño general. Los prompts están bien estructurados siguiendo el patr
 | P11 | Pruebas manuales vs auto | 4 | 85% | 78% | 3.2 |
 | P12 | Ciclo de vida defectos | 3 | 78% | 76% | 2.4 |
 | P13 | Integración — Refactoring | 3 | 85% | 82% | 2.6 |
-| | **Subtotal** | **50** | | | **39.9** |
+| | **Subtotal** | **50** | | | **38.7** |
 | | Bonificaciones | | | | +0.5 |
-| | Penalizaciones | | | | 0.0 |
-| | **NOTA FINAL** | | | | **40.4 / 50** |
+| | Penalizaciones | | | | −2.0 (P01: integridad) |
+| | **NOTA FINAL** | | | | **39.2 / 50** |
 
 ---
 

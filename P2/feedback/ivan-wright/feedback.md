@@ -8,7 +8,7 @@
 
 ## Resumen ejecutivo
 
-**Nota final: 39.3 / 50 (78.6%)**
+**Nota final: 39.4 / 50 (78.8%)**
 
 Buen desempeño general. Los prompts están bien estructurados siguiendo el patrón CONTEXTO → PROBLEMA → RESTRICCIONES → FORMATO → VALIDACIÓN, lo cual garantiza respuestas de calidad del LLM. El análisis es sólido en la mayoría de preguntas: el estudiante identifica omisiones del LLM y propone mejoras concretas. Las tres preguntas declaradas "Sin IA" (P01, P03, P06) fueron penalizadas por evidencia de uso de LLM. Las áreas de mejora están en la profundidad del análisis en algunas preguntas teóricas (P10, P12) y en la evaluación más crítica de las respuestas del LLM cuando comete errores conceptuales.
 
@@ -176,7 +176,7 @@ Buen desempeño general. Los prompts están bien estructurados siguiendo el patr
 
 **Puntos fuertes:** Las mejoras propuestas son prácticas y muestran conocimiento de frameworks reales.
 
-**Nota:** 2.6/3
+**Nota:** 2.7/3
 
 ---
 
@@ -196,11 +196,11 @@ Buen desempeño general. Los prompts están bien estructurados siguiendo el patr
 | P10 | VM vs Containers | 5 | 82% | 80% | 4.0 |
 | P11 | Pruebas manuales vs auto | 4 | 85% | 100% | 4.0 |
 | P12 | Ciclo de vida defectos | 3 | 78% | 67% | 2.0 |
-| P13 | Integración — Refactoring | 3 | 85% | 82% | 2.6 |
-| | **Subtotal** | **50** | | | **38.8** |
+| P13 | Integración — Refactoring | 3 | 85% | 90% | 2.7 |
+| | **Subtotal** | **50** | | | **38.9** |
 | | Bonificaciones | | | | +0.5 |
 | | Penalizaciones | | | | −6.0 (P01, P03, P06: integridad) |
-| | **NOTA FINAL** | | | | **39.3 / 50** |
+| | **NOTA FINAL** | | | | **39.4 / 50** |
 
 ---
 

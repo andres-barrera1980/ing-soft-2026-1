@@ -8,7 +8,7 @@
 
 ## Resumen ejecutivo
 
-**Nota final: 38.1 / 50 (76.2%)**
+**Nota final: 38.4 / 50 (76.8%)**
 
 Buen desempeño general. Los prompts están bien estructurados siguiendo el patrón CONTEXTO → PROBLEMA → RESTRICCIONES → FORMATO → VALIDACIÓN, lo cual garantiza respuestas de calidad del LLM. El análisis es sólido en la mayoría de preguntas: el estudiante identifica omisiones del LLM y propone mejoras concretas. Las tres preguntas declaradas "Sin IA" (P01, P03, P06) fueron penalizadas por evidencia de uso de LLM. Las áreas de mejora están en la profundidad del análisis en algunas preguntas teóricas (P10, P12) y en la evaluación más crítica de las respuestas del LLM cuando comete errores conceptuales.
 
@@ -122,11 +122,11 @@ Buen desempeño general. Los prompts están bien estructurados siguiendo el patr
 
 **Respuesta del LLM:** Correcta en estructura pero problemática en sustancia. La fase "Green" del LLM escribe la implementación completa directamente, no el código mínimo para pasar la prueba. Esto es un error conceptual de TDD.
 
-**Análisis del estudiante:** Muy bueno. Identifica correctamente que el LLM "simula TDD" en lugar de aplicarlo genuinamente, porque la fase Green debería ser "el código más tonto posible". También señala que falta la segunda funcionalidad (reponer stock → DISPONIBLE) y la escribe él mismo.
+**Análisis del estudiante:** Muy bueno. Identifica correctamente que el LLM "simula TDD" en lugar de aplicarlo genuinamente, porque la fase Green debería ser "el código más tonto posible". También señala que falta la segunda funcionalidad (reponer stock → DISPONIBLE) y la escribe él mismo. Se nota ayuda de la IA en el análisis pero el contenido demuestra comprensión del ciclo TDD.
 
 **Observación de calificación:** El análisis demuestra comprensión genuina del ciclo TDD. La crítica de que "baby steps" son esenciales para verificar TDD genuino es una de las mejores observaciones del parcial.
 
-**Nota:** 3.2/4
+**Nota:** 3.5/4
 
 ---
 
@@ -198,15 +198,15 @@ Buen desempeño general. Los prompts están bien estructurados siguiendo el patr
 | P06 ⭐ | Clean Architecture — Conceptos (Sin IA) | 4 | N/A | 100%−penalización | 1.5 |
 | P07 | Clean Architecture — Pagos | 4 | 88% | 100% | 4.0 |
 | P08 | Pruebas — CarritoService | 5 | 85% | 90% | 4.5 |
-| P09 | TDD — ControlInventario | 4 | 80% | 80% | 3.2 |
+| P09 | TDD — ControlInventario | 4 | 80% | 87% | 3.5 |
 | P10 | VM vs Containers | 5 | 82% | 70% | 3.5 |
 | P11 | Pruebas manuales vs auto | 4 | 85% | 78% | 3.2 |
 | P12 | Ciclo de vida defectos | 3 | 78% | 76% | 2.4 |
 | P13 | Integración — Refactoring | 3 | 85% | 82% | 2.6 |
-| | **Subtotal** | **50** | | | **37.6** |
+| | **Subtotal** | **50** | | | **37.9** |
 | | Bonificaciones | | | | +0.5 |
 | | Penalizaciones | | | | −6.0 (P01, P03, P06: integridad) |
-| | **NOTA FINAL** | | | | **38.1 / 50** |
+| | **NOTA FINAL** | | | | **38.4 / 50** |
 
 ---
 

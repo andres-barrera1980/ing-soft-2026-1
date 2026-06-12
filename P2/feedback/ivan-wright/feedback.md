@@ -8,7 +8,7 @@
 
 ## Resumen ejecutivo
 
-**Nota final: 38.9 / 50 (77.8%)**
+**Nota final: 39.7 / 50 (79.4%)**
 
 Buen desempeño general. Los prompts están bien estructurados siguiendo el patrón CONTEXTO → PROBLEMA → RESTRICCIONES → FORMATO → VALIDACIÓN, lo cual garantiza respuestas de calidad del LLM. El análisis es sólido en la mayoría de preguntas: el estudiante identifica omisiones del LLM y propone mejoras concretas. Las tres preguntas declaradas "Sin IA" (P01, P03, P06) fueron penalizadas por evidencia de uso de LLM. Las áreas de mejora están en la profundidad del análisis en algunas preguntas teóricas (P10, P12) y en la evaluación más crítica de las respuestas del LLM cuando comete errores conceptuales.
 
@@ -142,17 +142,15 @@ Buen desempeño general. Los prompts están bien estructurados siguiendo el patr
 
 ---
 
-### P11 — Pruebas manuales vs automatizadas (⭐) — 3.2/4
+### P11 — Pruebas manuales vs automatizadas (⭐) — 4.0/4
 
 **Prompt:** Muy bueno. Los 5 puntos solicitados están claramente definidos con mínimo de 3 ventajas/desventajas cada uno. La restricción de "primer release" es clave.
 
 **Respuesta del LLM:** Buena en la comparativa teórica. Las ventajas/desventajas son correctas, los criterios de decisión son prácticos. Sin embargo, la recomendación final de "automatizar todo E2E con Selenium desde V1.0" es irrealista.
 
-**Análisis del estudiante:** Excelente. Identifica que la recomendación del LLM contradice la Pirámide de Pruebas vista en clase. Propone invertir la pirámide: automatizar unitarias y API tests, usar manuales para UI en V1.0. Menciona correctamente el alto costo de mantenimiento de pruebas E2E automatizadas cuando la UI cambia constantemente.
+**Análisis del estudiante:** Excelente. Identifica que la recomendación del LLM contradice la Pirámide de Pruebas vista en clase. Propone invertir la pirámide: automatizar unitarias y API tests, usar manuales para UI en V1.0. Menciona correctamente el alto costo de mantenimiento de pruebas E2E automatizadas cuando la UI cambia constantemente. No "come entero" — evidencia problemas del prompt y su respuesta, cuestionando la recomendación del LLM con fundamentos del curso.
 
-**Puntos fuertes:** La referencia a la Pirámide de Pruebas y la crítica fundamentada a la recomendación del LLM demuestran comprensión real de estrategia de testing.
-
-**Nota:** 3.2/4
+**Nota:** 4.0/4
 
 ---
 
@@ -198,13 +196,13 @@ Buen desempeño general. Los prompts están bien estructurados siguiendo el patr
 | P08 | Pruebas — CarritoService | 5 | 85% | 90% | 4.5 |
 | P09 | TDD — ControlInventario | 4 | 80% | 87% | 3.5 |
 | P10 | VM vs Containers | 5 | 82% | 80% | 4.0 |
-| P11 | Pruebas manuales vs auto | 4 | 85% | 78% | 3.2 |
+| P11 | Pruebas manuales vs auto | 4 | 85% | 100% | 4.0 |
 | P12 | Ciclo de vida defectos | 3 | 78% | 76% | 2.4 |
 | P13 | Integración — Refactoring | 3 | 85% | 82% | 2.6 |
-| | **Subtotal** | **50** | | | **38.4** |
+| | **Subtotal** | **50** | | | **39.2** |
 | | Bonificaciones | | | | +0.5 |
 | | Penalizaciones | | | | −6.0 (P01, P03, P06: integridad) |
-| | **NOTA FINAL** | | | | **38.9 / 50** |
+| | **NOTA FINAL** | | | | **39.7 / 50** |
 
 ---
 
